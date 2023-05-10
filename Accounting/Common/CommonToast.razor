@@ -1,0 +1,34 @@
+﻿<div class=@("toast align-items-center text-white p-3 top-0 start-50 translate-middle-x border-0 bg-" + Color) role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true">
+  <div class="d-flex">
+    <div class="toast-body">
+        @Content
+    </div>
+    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Type { get; set; }
+
+    [Parameter]
+    public string Content { get; set; }
+
+    string Color { get; set; }
+
+    protected override void OnInitialized()
+    {
+        switch (Type)
+        {
+            case Constants.TOAST_SUCCESS:
+                Color = "success";
+                break;
+            case Constants.TOAST_NOTI:
+                Color = "info";
+                break;
+            case Constants.TOAST_ERROR:
+                Color = "danger";
+                break;
+        }
+    }
+}

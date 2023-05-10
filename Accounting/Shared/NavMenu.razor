@@ -1,0 +1,49 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="manage-meat">Meat Accounting</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage-meat">
+                <i class="fa-duotone fa-meat me-3"></i> Quản lý mặt hàng
+            </NavLink>
+        </div>
+        @*<div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage-price">
+                <i class="fa-duotone fa-circle-dollar me-3"></i> Quản lý giá
+            </NavLink>
+        </div>*@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage-entry">
+                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> Quản lý nhập vào
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage-sale">
+                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> Quản lý bán ra
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="recycle-bin">
+                <i class="fa-solid fa-recycle me-3"></i> Thùng rác
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

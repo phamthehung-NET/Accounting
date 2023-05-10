@@ -1,0 +1,30 @@
+﻿<div class="modal fade" id="@ModalID" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <CommonLabel DisplayText="@Title" Color="warning"/>
+            </div>
+            <div class="modal-body">
+                <p>@Message</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" @onclick="SubmitEvent">Xong</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ModalID { get; set; }
+    
+    [Parameter]
+    public string Title { get; set; }
+    
+    [Parameter]
+    public string Message { get; set; }
+    
+    [Parameter]
+    public EventCallback SubmitEvent { get; set; }
+}

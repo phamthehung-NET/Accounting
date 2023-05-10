@@ -1,0 +1,122 @@
+﻿@using System.Globalization
+@inject IPriceRepository PriceRepository
+@inject IJSRuntime JsRuntime
+
+<div class="modal-dialog modal-xl">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="Quản lý giá các mặt hàng" Color="primary"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
+        </div>
+        <div class="modal-body">
+            @if (Meats != null)
+            {
+                <table class="table table-bordered table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th class="align-middle">Tên</th>
+                            <th class="align-middle">Loại thịt</th>
+                            <th class="align-middle">Đông lạnh?</th>
+                            <th>
+                                Giá Nhập Hôm Qua/Kg
+                                <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
+                            </th>
+                            <th>
+                                Giá Nhập Hôm Nay/Kg
+                                <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
+                            </th>
+                            <th>
+                                Giá Bán Hôm Qua/Kg
+                                <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
+                            </th>
+                            <th>
+                                Giá Bán Hôm Nay/Kg
+                                <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Meats.Items.Any())
+                        {
+                            foreach (var meat in Meats.Items)
+                            {
+                                <tr>
+                                    <td>@meat.Name</td>
+                                    <td>@HelperFunctions.RenderMeatType(meat.Type.Value)</td>
+                                    <td>@(meat.Prozen.Value ? "✔️" : "❌")</td>
+                                    <td>@(meat.YesterdayEntryPrice == null ? "Không có dữ liệu" : meat.YesterdayEntryPrice)</td>
+                                    <td>
+                                        <input type="number" min=0 value="@(meat.TodayEntryPrice == null ? (InputEntryList.TryGetValue(meat.Id, out int value) ? value : null) : meat.TodayEntryPrice)" placeholder="Không có dữ liệu" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "entry"))" />
+                                    </td>
+                                    <td>@(meat.YesterdaySalePrice == null ? "Không có dữ liệu" : meat.YesterdaySalePrice)</td>
+                                    <td>
+                                        <input type="number" min=0 value="@(meat.TodaySalePrice == null ? (InputSaleList.TryGetValue(meat.Id, out int saleval) ? saleval : null) : meat.TodaySalePrice)" placeholder="Không có dữ liệu" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "sale"))" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">Đóng</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="OnSubmit">Xong</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Pagination<MeatDTO> Meats { get; set; }
+
+    [Parameter]
+    public EventCallback GetData { get; set; }
+
+    Dictionary<int, int> InputEntryList = new();
+
+    Dictionary<int, int> InputSaleList = new();
+
+    void OnInputChange(int meatId, int price, string inputType)
+    {
+        if (inputType == "sale")
+        {
+            if (InputSaleList.TryGetValue(meatId, out var value))
+            {
+                InputSaleList[meatId] = price;
+                return;
+            }
+            InputSaleList.Add(meatId, price);
+        }
+        else
+        {
+            if (InputEntryList.TryGetValue(meatId, out var value))
+            {
+                InputEntryList[meatId] = price;
+                return;
+            }
+            InputEntryList.Add(meatId, price);
+        }
+    }
+
+    async Task OnCloseModal()
+    {
+        InputEntryList.Clear();
+        InputSaleList.Clear();
+        await GetData.InvokeAsync();
+    }
+
+    async Task OnSubmit()
+    {
+        var result = PriceRepository.UpdateItemPrice(InputEntryList, InputSaleList);
+        if (result)
+        {
+            InputEntryList.Clear();
+            InputSaleList.Clear();
+            await HelperFunctions.ShowNotification(JsRuntime, "success", "Cập nhật giá thành công");
+            await GetData.InvokeAsync();
+            return;
+        }
+        await HelperFunctions.ShowNotification(JsRuntime, "danger", "Cập nhật giá thất bại");
+    }
+}

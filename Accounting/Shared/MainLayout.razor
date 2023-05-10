@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Accounting</PageTitle>
+
+<div class="page">
+    <AuthorizeView>
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    </AuthorizeView>
+
+    <main>
+        <div class="top-row px-4 auth">
+            <CultureSelector/>
+            <LoginDisplay />
+            <a href="https://docs.microsoft.com/aspnet/" class="nav-link ms-0" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

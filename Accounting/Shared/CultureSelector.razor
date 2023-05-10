@@ -1,0 +1,52 @@
+﻿@using System.Globalization
+@inject NavigationManager Nav
+
+<select @bind="Culture" style="width: 3rem" class="form-control px-2">
+    @foreach (var culture in supportedCultures)
+    {
+        <option value="@culture">@culture.TwoLetterISOLanguageName</option>
+    }
+</select>
+
+@code
+{
+    /// <summary>
+    /// Variable Culture supported
+    /// </summary>
+    private CultureInfo[] supportedCultures = new[]
+    {
+        new CultureInfo("vi-VN"),
+        new CultureInfo("en-US"),
+    };
+
+    /// <summary>
+    /// Initialize culture
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        Culture = CultureInfo.CurrentCulture;
+    }
+
+    /// <summary>
+    /// Set culture page
+    /// </summary>
+    private CultureInfo Culture
+    {
+        get => CultureInfo.CurrentCulture;
+
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(Nav.Uri)
+                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                Nav.NavigateTo(
+                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                    forceLoad: true);
+            }
+        }
+    }
+}

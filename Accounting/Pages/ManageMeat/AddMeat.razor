@@ -1,0 +1,84 @@
+﻿@inject IMeatRepository MeatRepository
+@inject IJSRuntime JsRuntime
+
+<EditForm EditContext="editContext" OnSubmit="async () => await OnSubmit()">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <CommonLabel DisplayText="Thêm mặt hàng mới" Color="primary"></CommonLabel>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
+            </div>
+            <div class="modal-body">
+                <DataAnnotationsValidator/>
+                <div class="col-md-9">
+                    <div class="mb-2">
+                        <label>Tên mặt hàng</label>
+                        <InputText @bind-Value="meat.Name" class="form-control"/>
+                    </div>
+                    <div class="mb-2">
+                        <label>Loại thịt</label>
+                        <InputSelect @bind-Value="meat.Type" class="form-control">
+                            <option value=""></option>
+                            <option value="@Constants.BEEF_TYPE">Bò</option>
+                            <option value="@Constants.BUFFALO_TYPE">Trâu</option>
+                        </InputSelect>
+                    </div>
+                    <div class="mb-2">
+                        <label>Đông lạnh?</label>
+                        <input type="checkbox" value="@meat.Prozen" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())"/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">Đóng</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Xong</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    EditContext editContext;
+
+    MeatDTO meat = new() { Prozen = false };
+
+    [Parameter]
+    public EventCallback GetData { get; set; }
+
+    protected override void OnInitialized()
+    {
+        editContext = new(meat);
+    }
+
+    void onChange(string value)
+    {
+        meat.Prozen = Convert.ToBoolean(value);
+    }
+
+    async Task OnSubmit()
+    {
+        if (editContext.Validate())
+        {
+            bool result = MeatRepository.AddMeat(meat);
+
+            if (result)
+            {
+                meat = new() { Prozen = false };
+                editContext = new(meat);
+                await HelperFunctions.ShowNotification(JsRuntime, "success", "Thêm mặt hàng thành công");
+                await GetData.InvokeAsync();
+                return;
+            }
+            await HelperFunctions.ShowNotification(JsRuntime, "danger", "Thêm mặt hàng thất bại");
+        }
+    }
+
+    void OnCloseModal()
+    {
+        meat = new() { Prozen = false };
+        editContext = new(meat);
+
+        //await GetData.InvokeAsync();
+    }
+}

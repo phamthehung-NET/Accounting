@@ -1,0 +1,232 @@
+﻿@page "/manage-meat"
+@using Microsoft.AspNetCore.WebUtilities;
+@using System.Globalization
+@using Microsoft.Extensions.Localization;
+@inject IMeatRepository MeatRepository
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+@attribute [Authorize]
+
+<PageTitle>@LRes["Product Management"]</PageTitle>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between">
+        <CommonLabel DisplayText="@LRes["Product List"]" Color="primary"></CommonLabel>
+        <div class="d-flex mb-2">
+            <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#priceModal"><i class="fa-duotone fa-circle-dollar"></i> @LRes["Manage Price"]</button>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fa-duotone fa-plus"></i> @LRes["Add"]</button>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mb-2">
+        <div class="col-md-1 me-2">
+            <select class="form-select" onchange="@((ChangeEventArgs e) => onParamsChange(e, "Prozen"))">
+                <option value="">@LRes["Product Type"]</option>
+                <option value="true" selected="@(Prozen)">@LRes["Prozen Meat"]</option>
+                <option value="false" selected="@(!Prozen)">@LRes["Normal Meat"]</option>
+            </select>
+        </div>
+        <div class="col-md-1 me-2">
+            <select class="form-select" onchange="@((ChangeEventArgs e) => onParamsChange(e, "Type"))">
+                <option value="">@LRes["Meat Type"]</option>
+                <option value="@Constants.BEEF_TYPE" selected="@(Type == Constants.BEEF_TYPE)">@LRes["Beef"]</option>
+                <option value="@Constants.BUFFALO_TYPE" selected="@(Type == Constants.BUFFALO_TYPE)">@LRes["Buffalo"]</option>
+            </select>
+        </div>
+        <div class="d-flex col-md-4 justify-content-between">
+            <div class="col-md-10 pe-1">
+                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => onParamsChange(e, "Keyword"))"/>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" @onclick="() => onParamSubmit()"><i class="fa-regular fa-filter"></i> @LRes["Filter"]</button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered table-striped text-center">
+        <thead>
+            <tr>
+                <th class="align-middle">@LRes["Name"]</th>
+                <th class="align-middle">@LRes["Meat Type"]</th>
+                <th class="align-middle">@LRes["Prozen Meat"]?</th>
+                <th>
+                    @LRes["Yesterday Entry Price"]
+                    <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
+                </th>
+                <th>
+                    @LRes["Today Entry Price"]
+                    <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
+                </th>
+                <th>
+                    @LRes["Yesterday Sale Price"]
+                    <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
+                </th>
+                <th>
+                    @LRes["Today Sale Price"]
+                    <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
+                </th>
+                <th class="align-middle">@LRes["Actions"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Meats != null && Meats.Items.Any())
+            {
+                foreach (var meat in Meats.Items)
+                {
+                    <tr>
+                        <td>@meat.Name</td>
+                        <td>@HelperFunctions.RenderMeatType(meat.Type.Value)</td>
+                        <td>@(meat.Prozen.Value ? "✔️" : "❌")</td>
+                        <td>@(meat.YesterdayEntryPrice == null ? "Không có dữ liệu" : meat.YesterdayEntryPrice + " nghìn đồng")</td>
+                        <td>@(meat.TodayEntryPrice == null ? "Không có dữ liệu" : meat.TodayEntryPrice  + " nghìn đồng")</td>
+                        <td>@(meat.YesterdaySalePrice == null ? "Không có dữ liệu" : meat.YesterdaySalePrice + " nghìn đồng")</td>
+                        <td>@(meat.TodaySalePrice == null ? "Không có dữ liệu" : meat.TodaySalePrice + " nghìn đồng")</td>
+                        <td>
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" @onclick="() => EditMeat(meat.Id) "><i class="fa-duotone fa-pen-to-square"></i> Sửa</button>
+                            @*<button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>*@
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deleteMeat" + meat.Id)"><i class="fa-solid fa-recycle"></i> Xóa</button>
+                            <CommonConfirmModal Title="Xác nhận xóa" Message="Bạn có chắc chắn muốn chuyển mặt hàng này vào thùng rác?" ModalID="@("deleteMeat" + meat.Id)" SubmitEvent="() => DeleteMeat(meat.Id)"/>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <PaginationView GetData="GetPaginateData" PaginationData="Meats" Pagination="Pagination"/>
+    <div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <AddMeat GetData="GetData"/>
+    </div>
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <EditMeat GetData="GetData" Meat="SelectedMeat"/>
+    </div>
+    <div class="modal fade" id="priceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <PriceList Meats="Meats" GetData="GetData"/>
+    </div>
+</div>
+
+
+
+@code {
+
+    Pagination<MeatDTO> Meats;
+
+    string Keyword = "";
+
+    PaginationObject Pagination = new();
+
+    int? Type = null;
+
+    bool? Prozen = null;
+
+    MeatDTO SelectedMeat;
+
+    Uri Uri;
+
+    Dictionary<string, string> Query = new()
+    {
+        {"pageIndex", ""},
+        {"pageSize", ""},
+        {"keyword", ""},
+        {"type", ""},
+        {"prozen", ""},
+    };
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetData();
+        }
+    }
+
+    void GetData()
+    {
+        Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+
+        if (Uri != null)
+        {
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("keyword", out var keyword))
+            {
+                Keyword = keyword;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageSize", out var pageSize))
+            {
+                Pagination.PageSize = !string.IsNullOrEmpty(pageSize) ? int.Parse(pageSize) : Pagination.PageSize;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageIndex", out var pageIndex))
+            {
+                Pagination.PageIndex = !string.IsNullOrEmpty(pageIndex) ? int.Parse(pageIndex) : Pagination.PageIndex;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("type", out var type))
+            {
+                Type = !string.IsNullOrEmpty(type) ? int.Parse(type) : null;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("prozen", out var prozen))
+            {
+                Prozen = !string.IsNullOrEmpty(prozen) ? bool.Parse(prozen) : null;
+            }
+        }
+
+        Meats = MeatRepository.GetAllMeats(Keyword, Type, Prozen, Pagination.PageIndex, Pagination.PageSize);
+        StateHasChanged();
+    }
+
+    void EditMeat(int id)
+    {
+        SelectedMeat = MeatRepository.GetMeatDetail(id);
+    }
+
+    async Task DeleteMeat(int id)
+    {
+        var result = MeatRepository.DeleteMeat(id);
+        if (result)
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, "success", "Đã chuyển vào thùng rác");
+            GetData();
+            return;
+        }
+        await HelperFunctions.ShowNotification(JsRuntime, "danger", "Chuyển vào thùng rác thất bại");
+    }
+
+    void onParamsChange(ChangeEventArgs e, string paramType)
+    {
+        Pagination.PageIndex = 1;
+        switch (paramType)
+        {
+            case "Prozen":
+                Prozen = !string.IsNullOrEmpty(e.Value.ToString()) ? bool.Parse(e.Value.ToString()) : null;
+                break;
+            case "Type":
+                Type = !string.IsNullOrEmpty(e.Value.ToString()) ? int.Parse(e.Value.ToString()) : null;
+                break;
+            case "Keyword":
+                Keyword = e.Value.ToString();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void onParamSubmit()
+    {
+        Query["keyword"] = Keyword;
+        Query["prozen"] = Prozen.ToString();
+        Query["type"] = Type.ToString();
+
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query));
+
+        Meats = MeatRepository.GetAllMeats(Keyword, Type, Prozen, Pagination.PageIndex, Pagination.PageSize);
+    }
+
+    void GetPaginateData(PaginationObject pagination)
+    {
+        Pagination.PageIndex = pagination.PageIndex;
+        Pagination.PageSize = pagination.PageSize;
+
+        Query["pageIndex"] = pagination.PageIndex.ToString();
+        Query["pageSize"] = pagination.PageSize.ToString();
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query));
+
+        Meats = MeatRepository.GetAllMeats(Keyword, Type, Prozen, pagination.PageIndex, pagination.PageSize);
+    }
+}
