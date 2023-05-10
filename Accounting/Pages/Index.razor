@@ -1,5 +1,13 @@
 ﻿@page "/"
+@page "/updatePrice"
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.WebUtilities;
 @inject IHttpContextAccessor HttpContext
+@inject NavigationManager NavigationManager
+@inject IMeatRepository MeatRepository
+@inject IJSRuntime JsRuntime
+@inject UserManager<CustomUser> userManager
+
 <PageTitle>Index</PageTitle>
 
 <div class="text-center">
@@ -8,11 +16,39 @@
     Welcome to your new app.
 
     <SurveyPrompt Title="How is Blazor working for you?" />
+    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#priceModal" hidden id="hiddenBtnPriceModal"></button>
+    <div class="modal fade" id="priceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <PriceList Meats="Meats"/>
+    </div>
 </div>
 
 @code{
+    Uri Uri;
+
+    Pagination<MeatDTO> Meats;
+
+    bool ShowModal = false;
+
     protected override void OnInitialized()
     {
-        var user = HttpContext.HttpContext.User;
+        Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var user = HttpContext.HttpContext.User;
+            if (user.Identity.IsAuthenticated && Uri.AbsolutePath.Equals("/updatePrice"))
+            {
+                var lastUpdatePriceDate = userManager.FindByNameAsync(user.Identity.Name).Result.UpdatedPriceDate;
+                if (lastUpdatePriceDate.Date < DateTime.Today)
+                {
+                    Meats = MeatRepository.GetAllMeats(string.Empty, null, null, 1, 10);
+                    await HelperFunctions.TriggerBtn(JsRuntime, "hiddenBtnPriceModal");
+                    StateHasChanged();
+                }
+            }
+        }
     }
 }

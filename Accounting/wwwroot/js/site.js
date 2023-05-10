@@ -12,3 +12,7 @@
     `)
     $('.toast').toast('show');
 }
+
+window.triggerBtn = (id) => {
+    $(`#${id}`).trigger('click');
+}

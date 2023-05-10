@@ -4,6 +4,7 @@ using Accounting.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accounting.Migrations.IdentityDb
 {
     [DbContext(typeof(IdentityDbContext))]
-    partial class IdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230510133308_AddFieldForUser")]
+    partial class AddFieldForUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,16 +97,16 @@ namespace Accounting.Migrations.IdentityDb
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d6457dab-8f0a-41e0-8205-f6dc78c3d1a3",
+                            ConcurrencyStamp = "21f8f2ff-b2ae-41ee-bb0a-9a8c1219463d",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFeKzU0LtwKHngu3QcyxPDUVcGIYJMvHKZpDZdmq32bE6eV0ZH043OeZIghMfBU0pw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJxPGfgcIYNe3KRaMZxrWGRupwuYtOu8iy0e2fEMZR5HNtMQGlysZ6HIcNrmu9s4dA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0711e091-e34f-4cba-bdc3-2792737666f1",
+                            SecurityStamp = "44caa0ea-2905-45a6-84ac-6a84feabf344",
                             TwoFactorEnabled = false,
-                            UpdatedPriceDate = new DateTime(2023, 5, 10, 13, 35, 31, 492, DateTimeKind.Utc).AddTicks(4902),
+                            UpdatedPriceDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "admin"
                         });
                 });

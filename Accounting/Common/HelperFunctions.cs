@@ -8,7 +8,7 @@ namespace Accounting.Common
     {
         public static Pagination<T> GetPaging<T>(int? pageIndex, int? itemPerPage, List<T> items)
         {
-            return new Pagination<T>(items.Count(), pageIndex, itemPerPage, items);
+            return new Pagination<T>(items.Count, pageIndex, itemPerPage, items);
         }
 
         public static string RenderMeatType(int type)
@@ -35,7 +35,12 @@ namespace Accounting.Common
             ChineseLunisolarCalendar lunarCalendar = new();
             var day = lunarCalendar.GetDayOfMonth(dateInput);
             var month = lunarCalendar.GetMonth(dateInput);
-            return string.Join("/", new int[] {day, month} );
+            return string.Join("/", new int[] { day, month });
+        }
+
+        public static async Task TriggerBtn(IJSRuntime jSRuntime, string btnId)
+        {
+            await jSRuntime.InvokeVoidAsync("triggerBtn", btnId);
         }
     }
 }

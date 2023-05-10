@@ -1,4 +1,5 @@
 using Accounting.Data;
+using Accounting.Model;
 using Accounting.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(idenetityConnectionString);
 }, ServiceLifetime.Transient);
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<CustomUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<IdentityDbContext>();
 
 builder.Services.AddLocalization(opt => opt.ResourcesPath = "Resources");
@@ -32,6 +33,8 @@ builder.Services.AddScoped<IMeatRepository, MeatRepository>();
 builder.Services.AddScoped<IPriceRepository, PriceRepository>();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -62,7 +65,6 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Accounting.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Data;
 
-public class IdentityDbContext : IdentityDbContext<IdentityUser>
+public class IdentityDbContext : IdentityDbContext<CustomUser>
 {
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
         : base(options)
@@ -20,9 +21,9 @@ public class IdentityDbContext : IdentityDbContext<IdentityUser>
 
     private static void SeedUser(ModelBuilder builder)
     {
-        var passwordHasher = new PasswordHasher<IdentityUser>();
+        var passwordHasher = new PasswordHasher<CustomUser>();
 
-        IdentityUser admin = new()
+        CustomUser admin = new()
         {
             Id = "1",
             Email = "admin@gmail.com",
@@ -32,8 +33,9 @@ public class IdentityDbContext : IdentityDbContext<IdentityUser>
             PasswordHash = passwordHasher.HashPassword(null, "Abc@12345"),
             EmailConfirmed = true,
             LockoutEnabled = true,
+            UpdatedPriceDate = DateTime.UtcNow,
         };
-        builder.Entity<IdentityUser>().HasData(admin);
+        builder.Entity<CustomUser>().HasData(admin);
     }
 
     private static void SeedRoleAndUserRole(ModelBuilder builder)
