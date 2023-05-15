@@ -6,14 +6,8 @@
 
         public string DisplayName { get; set; }
 
-        public string OrderId { get; set; }
+        public bool Ordering { get; set; } = false;
 
-        public bool Ordering
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(OrderId);
-            }
-        }
+        public bool IsHtml { get; set; } = false;
     }
 }

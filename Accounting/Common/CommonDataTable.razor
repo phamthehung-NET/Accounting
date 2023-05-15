@@ -1,15 +1,94 @@
-﻿<table class="table table-bordered table-striped text-center">
+﻿@typeparam TData
+
+<table class="table table-bordered table-striped text-center">
     <thead>
         <tr>
             @foreach(var header in Headers)
             {
-                <td>@header.DisplayName</td>
+                if (header.Ordering && Sorting.ToLower().Contains(header.Name.ToLower()))
+                {
+                    if (Sorting.ToLower().Contains("asc"))
+                    {
+                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down fa-rotate-180 float-end"></i></th>
+                    }
+                    else
+                    {
+                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down float-end"></i></th>
+                    }
+                }
+                else if (header.Ordering && !Sorting.ToLower().Contains(header.Name.ToLower()))
+                {
+                    <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-solid fa-arrow-up-arrow-down float-end" style="color: #a5acb9;"></i></th>
+                }
+                else
+                {
+                    <th>@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName)</th>
+                }
             }
         </tr>
     </thead>
+    <tbody>
+        @if(PaginationData != null && PaginationData.Items.Any())
+        {
+            @foreach (var item in PaginationData.Items)
+            {
+                <tr>@TBody(item)</tr>
+            }
+        }
+    </tbody>
 </table>
+@if(Pagination != null)
+{
+    @Pagination
+}
+else
+{
+    <PaginationView TData="TData" GetData="@GetData" PaginationData="@PaginationData" Pagination="@PaginationObject"/>
+}
 
 @code {
     [Parameter]
     public List<Header> Headers { get; set; }
+
+    [Parameter]
+    public RenderFragment<TData> TBody { get; set; }
+
+    [Parameter]
+    public Pagination<TData> PaginationData { get; set; }
+
+    [Parameter]
+    public Action<string> SortData { get; set; }
+
+    [Parameter]
+    public string Sorting { get; set; }
+
+    [Parameter]
+    public RenderFragment<TData> Pagination { get; set; }
+
+    [Parameter]
+    public Action<PaginationObject> GetData { get; set; }
+
+    [Parameter]
+    public PaginationObject PaginationObject { get; set; }
+
+    void OnHeaderClick(string fieldName)
+    {
+        var sortType = Sorting.Split('_')[1];
+        string sortingString = string.Empty;
+
+        if (!Sorting.Contains(fieldName.ToLower()))
+        {
+            sortType = "desc";
+        }
+
+        if (sortType.ToLower().Equals("asc"))
+        {
+            sortingString = $"{fieldName.ToLower()}_desc";
+        }
+        else
+        {
+            sortingString = $"{fieldName.ToLower()}_asc";
+        }
+        SortData?.Invoke(sortingString);
+    }
 }

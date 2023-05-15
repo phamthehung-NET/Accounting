@@ -42,7 +42,7 @@
             </div>
         </div>
     </div>
-    <table class="table table-bordered table-striped text-center">
+    @*<table class="table table-bordered table-striped text-center">
         <thead>
             <tr>
                 <th class="align-middle">@LRes["Name"]</th>
@@ -82,7 +82,6 @@
                         <td>@(meat.TodaySalePrice == null ? LRes["No data"] : meat.TodaySalePrice + " " + LRes["Thousand Dong"])</td>
                         <td>
                             <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" @onclick="() => EditMeat(meat.Id) "><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
-                            @*<button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>*@
                             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deleteMeat" + meat.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteProductConfirmation"]" ModalID="@("deleteMeat" + meat.Id)" SubmitEvent="() => DeleteMeat(meat.Id)"/>
                         </td>
@@ -90,8 +89,32 @@
                 }
             }
         </tbody>
-    </table>
-    <PaginationView TData="MeatDTO" GetData="GetPaginateData" PaginationData="Meats" Pagination="Pagination"/>
+    </table>*@
+
+    <CommonDataTable Context="Context" 
+        Headers="Headers" 
+        TData="MeatDTO" 
+        PaginationData="Meats" 
+        Sorting="@Sorting" 
+        SortData="(sortingString) => SortData(sortingString)"
+        GetData="GetPaginateData"
+        PaginationObject="Pagination">
+        <TBody>
+            <td>@Context.Name</td>
+            <td>@HelperFunctions.RenderMeatType(Context.Type.Value)</td>
+            <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
+            <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice + " " + LRes["Thousand Dong"])</td>
+            <td>@(Context.TodayEntryPrice == null ? LRes["No data"] : Context.TodayEntryPrice + " " + LRes["Thousand Dong"])</td>
+            <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice + " " + LRes["Thousand Dong"])</td>
+            <td>@(Context.TodaySalePrice == null ? LRes["No data"] : Context.TodaySalePrice + " " + LRes["Thousand Dong"])</td>
+            <td>
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" @onclick="() => EditMeat(Context.Id) "><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
+                @*<button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>*@
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deleteMeat" + Context.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
+                <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteProductConfirmation"]" ModalID="@("deleteMeat" + Context.Id)" SubmitEvent="() => DeleteMeat(Context.Id)"/>
+            </td>
+        </TBody>
+    </CommonDataTable>
     <CommonModalWrapper Id="addModal">
         <ModalContent>
             <AddMeat GetData="GetData"/>
@@ -134,6 +157,21 @@
         {"prozen", ""},
     };
 
+    List<Header> Headers = new();
+
+    string Sorting = "name_asc";
+
+    protected override void OnInitialized()
+    {
+        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
+        Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
+        Headers.Add(new Header() { Name = "Prozen", DisplayName = LRes["Prozen Meat"] + "?", Ordering = true });
+        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}", Ordering = true, IsHtml = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now)}", Ordering = true, IsHtml = true });
+        Headers.Add(new Header() { Name = "Yesterday Sale Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}", Ordering = true, IsHtml = true });
+        Headers.Add(new Header() { Name = "Today Sale Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now)}", Ordering = true, IsHtml = true });
+        Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -232,5 +270,11 @@
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query));
 
         Meats = MeatRepository.GetAllMeats(Keyword, Type, Prozen, pagination.PageIndex, pagination.PageSize);
+    }
+
+    void SortData(string sortingString)
+    {
+        Sorting = sortingString;
+        StateHasChanged();
     }
 }
