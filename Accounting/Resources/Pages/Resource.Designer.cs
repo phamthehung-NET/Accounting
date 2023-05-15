@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Accounting.Resources {
+namespace Accounting.Resources.Pages {
     using System;
     
     
@@ -133,6 +133,15 @@ namespace Accounting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Không có dữ liệu.
+        /// </summary>
+        public static string No_data {
+            get {
+                return ResourceManager.GetString("No data", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Thịt tươi.
         /// </summary>
         public static string Normal_Meat {
@@ -183,6 +192,15 @@ namespace Accounting.Resources {
         public static string Search_by_name {
             get {
                 return ResourceManager.GetString("Search by name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to nghìn đồng.
+        /// </summary>
+        public static string Thousand_Dong {
+            get {
+                return ResourceManager.GetString("Thousand Dong", resourceCulture);
             }
         }
         

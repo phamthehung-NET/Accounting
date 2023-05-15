@@ -116,7 +116,7 @@ namespace Accounting.Areas.Identity.Pages.Account
                     var user = await userManager.FindByNameAsync(Input.UserName);
                     if (user.UpdatedPriceDate.Date < DateTime.Today)
                     {
-                        returnUrl += "/updatePrice";
+                        returnUrl = "/updatePrice";
                     }
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);

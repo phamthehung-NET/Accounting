@@ -49,19 +49,19 @@
                 <th class="align-middle">@LRes["Meat Type"]</th>
                 <th class="align-middle">@LRes["Prozen Meat"]?</th>
                 <th>
-                    @LRes["Yesterday Entry Price"]
+                    @LRes["Yesterday Entry Price"]/Kg
                     <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
                 </th>
                 <th>
-                    @LRes["Today Entry Price"]
+                    @LRes["Today Entry Price"]/Kg
                     <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
                 </th>
                 <th>
-                    @LRes["Yesterday Sale Price"]
+                    @LRes["Yesterday Sale Price"]/Kg
                     <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
                 </th>
                 <th>
-                    @LRes["Today Sale Price"]
+                    @LRes["Today Sale Price"]/Kg
                     <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
                 </th>
                 <th class="align-middle">@LRes["Actions"]</th>
@@ -76,34 +76,38 @@
                         <td>@meat.Name</td>
                         <td>@HelperFunctions.RenderMeatType(meat.Type.Value)</td>
                         <td>@(meat.Prozen.Value ? "✔️" : "❌")</td>
-                        <td>@(meat.YesterdayEntryPrice == null ? "Không có dữ liệu" : meat.YesterdayEntryPrice + " nghìn đồng")</td>
-                        <td>@(meat.TodayEntryPrice == null ? "Không có dữ liệu" : meat.TodayEntryPrice  + " nghìn đồng")</td>
-                        <td>@(meat.YesterdaySalePrice == null ? "Không có dữ liệu" : meat.YesterdaySalePrice + " nghìn đồng")</td>
-                        <td>@(meat.TodaySalePrice == null ? "Không có dữ liệu" : meat.TodaySalePrice + " nghìn đồng")</td>
+                        <td>@(meat.YesterdayEntryPrice == null ? LRes["No data"] : meat.YesterdayEntryPrice + " " + LRes["Thousand Dong"])</td>
+                        <td>@(meat.TodayEntryPrice == null ? LRes["No data"] : meat.TodayEntryPrice + " " + LRes["Thousand Dong"])</td>
+                        <td>@(meat.YesterdaySalePrice == null ? LRes["No data"] : meat.YesterdaySalePrice + " " + LRes["Thousand Dong"])</td>
+                        <td>@(meat.TodaySalePrice == null ? LRes["No data"] : meat.TodaySalePrice + " " + LRes["Thousand Dong"])</td>
                         <td>
-                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" @onclick="() => EditMeat(meat.Id) "><i class="fa-duotone fa-pen-to-square"></i> Sửa</button>
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" @onclick="() => EditMeat(meat.Id) "><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
                             @*<button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>*@
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deleteMeat" + meat.Id)"><i class="fa-solid fa-recycle"></i> Xóa</button>
-                            <CommonConfirmModal Title="Xác nhận xóa" Message="Bạn có chắc chắn muốn chuyển mặt hàng này vào thùng rác?" ModalID="@("deleteMeat" + meat.Id)" SubmitEvent="() => DeleteMeat(meat.Id)"/>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deleteMeat" + meat.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
+                            <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteProductConfirmation"]" ModalID="@("deleteMeat" + meat.Id)" SubmitEvent="() => DeleteMeat(meat.Id)"/>
                         </td>
                     </tr>
                 }
             }
         </tbody>
     </table>
-    <PaginationView GetData="GetPaginateData" PaginationData="Meats" Pagination="Pagination"/>
-    <div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-        <AddMeat GetData="GetData"/>
-    </div>
-    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-        <EditMeat GetData="GetData" Meat="SelectedMeat"/>
-    </div>
-    <div class="modal fade" id="priceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-        <PriceList Meats="Meats" GetData="GetData"/>
-    </div>
+    <PaginationView TData="MeatDTO" GetData="GetPaginateData" PaginationData="Meats" Pagination="Pagination"/>
+    <CommonModalWrapper Id="addModal">
+        <ModalContent>
+            <AddMeat GetData="GetData"/>
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonModalWrapper Id="editModal">
+        <ModalContent>
+            <EditMeat GetData="GetData" Meat="SelectedMeat"/>
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonModalWrapper Id="priceModal">
+        <ModalContent>
+            <PriceList Meats="Meats" GetData="GetData"/>
+        </ModalContent>
+    </CommonModalWrapper>
 </div>
-
-
 
 @code {
 
@@ -181,11 +185,11 @@
         var result = MeatRepository.DeleteMeat(id);
         if (result)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, "success", "Đã chuyển vào thùng rác");
+            await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["Move to recycle bin success"]);
             GetData();
             return;
         }
-        await HelperFunctions.ShowNotification(JsRuntime, "danger", "Chuyển vào thùng rác thất bại");
+        await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["Move to reycle bin failed"]);
     }
 
     void onParamsChange(ChangeEventArgs e, string paramType)

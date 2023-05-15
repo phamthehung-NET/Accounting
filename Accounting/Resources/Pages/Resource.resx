@@ -118,57 +118,105 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Actions" xml:space="preserve">
-    <value>Actions</value>
+    <value>Hành động</value>
   </data>
   <data name="Add" xml:space="preserve">
-    <value>Add New</value>
+    <value>Thêm mới</value>
+  </data>
+  <data name="AddNewProduct" xml:space="preserve">
+    <value>Thêm mặt hàng mới</value>
+  </data>
+  <data name="AddProductFailed" xml:space="preserve">
+    <value>Thêm mặt hàng thất bại</value>
+  </data>
+  <data name="AddProductSuccess" xml:space="preserve">
+    <value>Thêm mặt hàng thành công</value>
   </data>
   <data name="Beef" xml:space="preserve">
-    <value>Beef</value>
+    <value>Bò</value>
   </data>
   <data name="Buffalo" xml:space="preserve">
-    <value>Buffalo</value>
+    <value>Trâu</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Đóng</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="DeleteProductConfirmation" xml:space="preserve">
+    <value>Bạn có chắc chắn muốn chuyển mặt hàng này vào thùng rác?</value>
+  </data>
+  <data name="DeleteTitle" xml:space="preserve">
+    <value>Xác nhận xóa</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Xong</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+  <data name="EditProductInfo" xml:space="preserve">
+    <value>Sửa thông tin mặt hàng</value>
   </data>
   <data name="Filter" xml:space="preserve">
-    <value>Filter</value>
+    <value>Lọc</value>
   </data>
   <data name="Manage Price" xml:space="preserve">
-    <value>Manage Price</value>
+    <value>Quản lý giá</value>
+  </data>
+  <data name="ManagePriceTitle" xml:space="preserve">
+    <value>Quản lý giá các mặt hàng</value>
   </data>
   <data name="Meat Type" xml:space="preserve">
-    <value>Meat Type</value>
+    <value>Loại thịt</value>
+  </data>
+  <data name="Move to recycle bin success" xml:space="preserve">
+    <value>Đã chuyển vào thùng rác</value>
+  </data>
+  <data name="Move to reycle bin failed" xml:space="preserve">
+    <value>Chuyển vào thùng rác thất bại</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>Name</value>
+    <value>Tên</value>
+  </data>
+  <data name="No data" xml:space="preserve">
+    <value>Không có dữ liệu</value>
   </data>
   <data name="Normal Meat" xml:space="preserve">
-    <value>Fresh</value>
+    <value>Thịt tươi</value>
   </data>
   <data name="Product List" xml:space="preserve">
-    <value>Product List</value>
+    <value>Danh sách mặt hàng</value>
   </data>
   <data name="Product Management" xml:space="preserve">
-    <value>Product Management</value>
+    <value>Quản lý Mặt hàng</value>
   </data>
   <data name="Product Type" xml:space="preserve">
-    <value>Product Type</value>
+    <value>Loại hàng</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Tên mặt hàng</value>
   </data>
   <data name="Prozen Meat" xml:space="preserve">
-    <value>Prozen</value>
+    <value>Đông lạnh</value>
   </data>
   <data name="Search by name" xml:space="preserve">
-    <value>Search by name</value>
+    <value>Tìm theo tên</value>
+  </data>
+  <data name="Thousand Dong" xml:space="preserve">
+    <value>nghìn đồng</value>
   </data>
   <data name="Today Entry Price" xml:space="preserve">
-    <value>Today Entry Price</value>
+    <value>Giá Nhập Hôm Nay</value>
   </data>
   <data name="Today Sale Price" xml:space="preserve">
-    <value>Today Sale Price</value>
+    <value>Giá Bán Hôm Nay</value>
   </data>
   <data name="Yesterday Entry Price" xml:space="preserve">
-    <value>Yesterday Entry Price</value>
+    <value>Giá Nhập Hôm Qua</value>
   </data>
   <data name="Yesterday Sale Price" xml:space="preserve">
-    <value>Yesterday Sale Price</value>
+    <value>Giá Bán Hôm Qua</value>
   </data>
 </root>

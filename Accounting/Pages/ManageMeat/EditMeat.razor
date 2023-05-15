@@ -1,26 +1,24 @@
-﻿@using Accounting.Common
-@using Accounting.Model;
-@using Accounting.Model.DTO;
-@using Accounting.Repositories;
+﻿@using Microsoft.Extensions.Localization;
 @inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
 
 <EditForm EditContext="editContext" OnSubmit="async () => await OnSubmit()">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <CommonLabel DisplayText="Sửa thông tin mặt hàng" Color="warning"></CommonLabel>
+                <CommonLabel DisplayText="@LRes["EditProductInfo"]" Color="warning"></CommonLabel>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <DataAnnotationsValidator/>
                 <div class="col-md-9">
                     <div class="mb-2">
-                        <label>Tên mặt hàng</label>
+                        <label>@LRes["ProductName"]</label>
                         <InputText @bind-Value="meat.Name" class="form-control"/>
                     </div>
                     <div class="mb-2">
-                        <label>Loại thịt</label>
+                        <label>@LRes["Meat Type"]</label>
                         <InputSelect @bind-Value="meat.Type" class="form-control">
                             <option value=""></option>
                             <option value="@Constants.BEEF_TYPE">Bò</option>
@@ -28,14 +26,14 @@
                         </InputSelect>
                     </div>
                     <div class="mb-2">
-                        <label>Đông lạnh?</label>
+                        <label>@LRes["Prozen Meat"]?</label>
                         <input type="checkbox" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())" checked="@meat.Prozen"/>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Xong</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@LRes["Close"]</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
             </div>
         </div>
     </div>
@@ -80,16 +78,11 @@
 
             if (result)
             {
-                await HelperFunctions.ShowNotification(JsRuntime, "success", "Sửa thông tin mặt hàng thành công");
+                await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["EditProductSuccess"]);
                 await GetData.InvokeAsync();
                 return;
             }
-            await HelperFunctions.ShowNotification(JsRuntime, "danger", "Sửa thông tin mặt hàng thất bại");
+            await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["EditProductFailed"]);
         }
     }
-
-    //async Task OnCloseModal()
-    //{
-    //    await GetData.InvokeAsync();
-    //}
 }

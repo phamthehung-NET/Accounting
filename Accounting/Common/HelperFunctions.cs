@@ -6,9 +6,9 @@ namespace Accounting.Common
 {
     public class HelperFunctions
     {
-        public static Pagination<T> GetPaging<T>(int? pageIndex, int? itemPerPage, List<T> items)
+        public static Pagination<T> GetPaging<T>(int? pageIndex, int? itemPerPage, IQueryable<T> items)
         {
-            return new Pagination<T>(items.Count, pageIndex, itemPerPage, items);
+            return new Pagination<T>(items.Count(), pageIndex, itemPerPage, items);
         }
 
         public static string RenderMeatType(int type)

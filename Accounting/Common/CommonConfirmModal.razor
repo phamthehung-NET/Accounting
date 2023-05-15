@@ -1,4 +1,7 @@
-﻿<div class="modal fade" id="@ModalID" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+﻿@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<Resource> LRes
+
+<div class="modal fade" id="@ModalID" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,8 +11,8 @@
                 <p>@Message</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" @onclick="SubmitEvent">Xong</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@LRes["Close"]</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" @onclick="SubmitEvent">@LRes["Done"]</button>
             </div>
         </div>
     </div>

@@ -16,7 +16,7 @@
 
         public List<T> Items { get; set; }
 
-        public Pagination(int totalItems, int? pageIndex, int? itemPerPage, List<T> items)
+        public Pagination(int totalItems, int? pageIndex, int? itemPerPage, IQueryable<T> items)
         {
             var totalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)itemPerPage);
 
@@ -43,7 +43,7 @@
                 prevPage = pageIndex;
             }
 
-            items = items.Skip((int)((pageIndex - 1) * itemPerPage)).Take((int)itemPerPage).ToList();
+            items = items.Skip((int)((pageIndex - 1) * itemPerPage)).Take((int)itemPerPage);
 
             TotalItems = totalItems;
             TotalPages = totalPages;
@@ -51,7 +51,18 @@
             ItemPerPage = itemPerPage;
             NextPage = nextPage;
             PrevPage = prevPage;
-            Items = items;
+            Items = items.ToList();
+        }
+
+        public Pagination()
+        {
+            TotalItems = 0;
+            TotalPages = 0;
+            PageIndex = 1;
+            ItemPerPage = 10;
+            NextPage = 1;
+            PrevPage = 1;
+            Items = null;
         }
     }
 }

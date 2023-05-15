@@ -1,5 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
-@if(DynamicPagination !=null && DynamicPagination.TotalPages > 0)
+@typeparam TData
+
+@if(PaginationData !=null && PaginationData.TotalPages > 0)
 {
 <nav class="d-flex justify-content-end">
     <ul class="pagination me-2">
@@ -11,7 +13,7 @@
                 </a>
             </li>
         }
-        @if(DynamicPagination.TotalPages >= 6)
+        @if(PaginationData.TotalPages >= 6)
         {
             if(Pagination.PageIndex < 4)
             {
@@ -25,11 +27,11 @@
                 <li class="page-item disabled">
                     <a class="page-link" role="button">...</a>
                 </li>
-                <li class=@(Pagination.PageIndex == DynamicPagination.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
-                    <a class="page-link" role="button">@DynamicPagination.TotalPages</a>
+                <li class=@(Pagination.PageIndex == PaginationData.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
+                    <a class="page-link" role="button">@PaginationData.TotalPages</a>
                 </li>
             }
-            else if (Pagination.PageIndex >= 4 && Pagination.PageIndex < DynamicPagination.TotalPages - 3)
+            else if (Pagination.PageIndex >= 4 && Pagination.PageIndex < PaginationData.TotalPages - 3)
             {
                 <li class=@(Pagination.PageIndex == 1 ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", 1))">
                     <a class="page-link" role="button">1</a>
@@ -50,8 +52,8 @@
                 <li class="page-item disabled">
                     <a class="page-link" role="button">...</a>
                 </li>
-                <li class=@(Pagination.PageIndex == DynamicPagination.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
-                    <a class="page-link" role="button">@DynamicPagination.TotalPages</a>
+                <li class=@(Pagination.PageIndex == PaginationData.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
+                    <a class="page-link" role="button">@PaginationData.TotalPages</a>
                 </li>
             }
             else
@@ -65,7 +67,7 @@
                         <a class="page-link" role="button">...</a>
                     </li>
                 }
-                @for (int i = Pagination.PageIndex - 2; i <= DynamicPagination.TotalPages; i++)
+                @for (int i = Pagination.PageIndex - 2; i <= PaginationData.TotalPages; i++)
                 {
                     var num = i;
                     <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
@@ -74,9 +76,9 @@
                 }
             }
         }
-        @if(DynamicPagination.TotalPages < 6)
+        @if(PaginationData.TotalPages < 6)
         {
-            @for (int i = 1; i <= DynamicPagination.TotalPages; i++)
+            @for (int i = 1; i <= PaginationData.TotalPages; i++)
             {
                 var num = i;
                 <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
@@ -84,7 +86,7 @@
                 </li>
             }
         }
-        @if(Pagination.PageIndex < DynamicPagination.TotalPages)
+        @if(Pagination.PageIndex < PaginationData.TotalPages)
         {
             <li class="page-item" onclick="@(async () => await onPaginationChange("next", null))">
                 <a class="page-link" role="button" aria-label="Next">
@@ -107,7 +109,7 @@
 
 @code {
     [Parameter]
-    public object PaginationData { get; set; }
+    public Pagination<TData> PaginationData { get; set; }
 
     [Parameter]
     public PaginationObject Pagination { get; set; }
@@ -117,25 +119,15 @@
 
     Uri Uri;
 
-    dynamic DynamicPagination;
-
     protected override void OnInitialized()
     {
         Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-
-        DynamicPagination = (dynamic)PaginationData;
     }
 
-    protected override void OnParametersSet()
-    {
-        DynamicPagination = (dynamic)PaginationData;
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Console.WriteLine("123");
-    }
-
+    //protected override void OnParametersSet()
+    //{
+    //    DynamicPagination = (dynamic)PaginationData;
+    //}
 
     async Task onPaginationChange(string type, int? number)
     {
@@ -151,7 +143,7 @@
                 Pagination.PageIndex = (int)number;
                 break;
             case "last":
-                Pagination.PageIndex = DynamicPagination.TotalPages;
+                Pagination.PageIndex = PaginationData.TotalPages;
                 break;
             case "pageSize":
                 Pagination.PageIndex = 1;

@@ -2,7 +2,9 @@ using Accounting.Data;
 using Accounting.Model;
 using Accounting.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +26,15 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(idenetityConnectionString);
 }, ServiceLifetime.Transient);
 
-builder.Services.AddIdentity<CustomUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<IdentityDbContext>();
+builder.Services.AddIdentity<CustomUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+}).AddEntityFrameworkStores<IdentityDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromHours(23);
+});
 
 builder.Services.AddLocalization(opt => opt.ResourcesPath = "Resources");
 

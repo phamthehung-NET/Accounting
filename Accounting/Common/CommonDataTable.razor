@@ -1,0 +1,15 @@
+﻿<table class="table table-bordered table-striped text-center">
+    <thead>
+        <tr>
+            @foreach(var header in Headers)
+            {
+                <td>@header.DisplayName</td>
+            }
+        </tr>
+    </thead>
+</table>
+
+@code {
+    [Parameter]
+    public List<Header> Headers { get; set; }
+}

@@ -1,11 +1,13 @@
 ﻿@using System.Globalization
+@using Microsoft.Extensions.Localization;
 @inject IPriceRepository PriceRepository
 @inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
 
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="Quản lý giá các mặt hàng" Color="primary"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["ManagePriceTitle"]" Color="primary"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
         </div>
         <div class="modal-body">
@@ -14,23 +16,23 @@
                 <table class="table table-bordered table-striped text-center">
                     <thead>
                         <tr>
-                            <th class="align-middle">Tên</th>
-                            <th class="align-middle">Loại thịt</th>
-                            <th class="align-middle">Đông lạnh?</th>
+                            <th class="align-middle">@LRes["Name"]</th>
+                            <th class="align-middle">@LRes["Meat Type"]</th>
+                            <th class="align-middle">@LRes["Prozen Meat"]?</th>
                             <th>
-                                Giá Nhập Hôm Qua/Kg
+                                @LRes["Yesterday Entry Price"]/Kg
                                 <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
                             </th>
                             <th>
-                                Giá Nhập Hôm Nay/Kg
+                                @LRes["Today Entry Price"]/Kg
                                 <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
                             </th>
                             <th>
-                                Giá Bán Hôm Qua/Kg
+                                @LRes["Yesterday Sale Price"]/Kg
                                 <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
                             </th>
                             <th>
-                                Giá Bán Hôm Nay/Kg
+                                @LRes["Today Sale Price"]/Kg
                                 <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
                             </th>
                         </tr>
@@ -44,13 +46,13 @@
                                     <td>@meat.Name</td>
                                     <td>@HelperFunctions.RenderMeatType(meat.Type.Value)</td>
                                     <td>@(meat.Prozen.Value ? "✔️" : "❌")</td>
-                                    <td>@(meat.YesterdayEntryPrice == null ? "Không có dữ liệu" : meat.YesterdayEntryPrice)</td>
+                                    <td>@(meat.YesterdayEntryPrice == null ? LRes["No data"] : meat.YesterdayEntryPrice)</td>
                                     <td>
-                                        <input type="number" min=0 value="@(meat.TodayEntryPrice == null ? (InputEntryList.TryGetValue(meat.Id, out int value) ? value : null) : meat.TodayEntryPrice)" placeholder="Không có dữ liệu" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "entry"))" />
+                                        <input type="number" min=0 value="@(meat.TodayEntryPrice == null ? (InputEntryList.TryGetValue(meat.Id, out int value) ? value : null) : meat.TodayEntryPrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "entry"))"/>
                                     </td>
-                                    <td>@(meat.YesterdaySalePrice == null ? "Không có dữ liệu" : meat.YesterdaySalePrice)</td>
+                                    <td>@(meat.YesterdaySalePrice == null ? LRes["No data"] : meat.YesterdaySalePrice)</td>
                                     <td>
-                                        <input type="number" min=0 value="@(meat.TodaySalePrice == null ? (InputSaleList.TryGetValue(meat.Id, out int saleval) ? saleval : null) : meat.TodaySalePrice)" placeholder="Không có dữ liệu" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "sale"))" />
+                                        <input type="number" min=0 value="@(meat.TodaySalePrice == null ? (InputSaleList.TryGetValue(meat.Id, out int saleval) ? saleval : null) : meat.TodaySalePrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "sale"))" />
                                     </td>
                                 </tr>
                             }
@@ -60,8 +62,8 @@
             }
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">Đóng</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="OnSubmit">Xong</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">@LRes["Close"]</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="OnSubmit">@LRes["Done"]</button>
         </div>
     </div>
 </div>
@@ -113,10 +115,10 @@
         {
             InputEntryList.Clear();
             InputSaleList.Clear();
-            await HelperFunctions.ShowNotification(JsRuntime, "success", "Cập nhật giá thành công");
+            await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["EditPriceSuccess"]);
             await GetData.InvokeAsync();
             return;
         }
-        await HelperFunctions.ShowNotification(JsRuntime, "danger", "Cập nhật giá thất bại");
+        await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["EditPriceFailed"]);
     }
 }

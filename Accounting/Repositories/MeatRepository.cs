@@ -63,7 +63,7 @@ namespace Accounting.Repositories
 
             meats = meats.Where(x => x.IsDeleted == false);
 
-            var pagination = HelperFunctions.GetPaging(pageIndex, pageSize, meats.OrderByDescending(x => x.Id).ToList());
+            var pagination = HelperFunctions.GetPaging(pageIndex, pageSize, meats.OrderByDescending(x => x.Id));
             return pagination;
         }
 

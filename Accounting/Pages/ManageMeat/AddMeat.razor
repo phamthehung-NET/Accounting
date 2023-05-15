@@ -1,37 +1,39 @@
-﻿@inject IMeatRepository MeatRepository
+﻿@using Microsoft.Extensions.Localization;
+@inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
 
 <EditForm EditContext="editContext" OnSubmit="async () => await OnSubmit()">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <CommonLabel DisplayText="Thêm mặt hàng mới" Color="primary"></CommonLabel>
+                <CommonLabel DisplayText="@LRes["AddNewProduct"]" Color="primary"></CommonLabel>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
             </div>
             <div class="modal-body">
                 <DataAnnotationsValidator/>
                 <div class="col-md-9">
                     <div class="mb-2">
-                        <label>Tên mặt hàng</label>
+                        <label>@LRes["ProductName"]</label>
                         <InputText @bind-Value="meat.Name" class="form-control"/>
                     </div>
                     <div class="mb-2">
-                        <label>Loại thịt</label>
+                        <label>@LRes["Meat Type"]</label>
                         <InputSelect @bind-Value="meat.Type" class="form-control">
                             <option value=""></option>
-                            <option value="@Constants.BEEF_TYPE">Bò</option>
-                            <option value="@Constants.BUFFALO_TYPE">Trâu</option>
+                            <option value="@Constants.BEEF_TYPE">@LRes["Beef"]</option>
+                            <option value="@Constants.BUFFALO_TYPE">@LRes["Buffalo"]</option>
                         </InputSelect>
                     </div>
                     <div class="mb-2">
-                        <label>Đông lạnh?</label>
+                        <label>@LRes["Prozen Meat"]?</label>
                         <input type="checkbox" value="@meat.Prozen" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())"/>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">Đóng</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Xong</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">@LRes["Close"]</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
             </div>
         </div>
     </div>
@@ -66,11 +68,11 @@
             {
                 meat = new() { Prozen = false };
                 editContext = new(meat);
-                await HelperFunctions.ShowNotification(JsRuntime, "success", "Thêm mặt hàng thành công");
+                await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["AddProductSuccess"]);
                 await GetData.InvokeAsync();
                 return;
             }
-            await HelperFunctions.ShowNotification(JsRuntime, "danger", "Thêm mặt hàng thất bại");
+            await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["AddProductFailed"]);
         }
     }
 
@@ -78,7 +80,5 @@
     {
         meat = new() { Prozen = false };
         editContext = new(meat);
-
-        //await GetData.InvokeAsync();
     }
 }
