@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Accounting.Pages;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using System.Globalization;
 
@@ -11,13 +13,13 @@ namespace Accounting.Common
             return new Pagination<T>(items.Count(), pageIndex, itemPerPage, items);
         }
 
-        public static string RenderMeatType(int type)
+        public static string RenderMeatType(IStringLocalizer<Resource> LRes, int type)
         {
-            if (type == Constants.BUFFALO_TYPE)
+            if (type == (int)Constants.MeatType.Buffalo)
             {
-                return "Trâu";
+                return LRes["Buffalo"];
             }
-            return "Bò";
+            return LRes["Beef"];
         }
 
         public static void NavigateUrl(NavigationManager navigation, string url)

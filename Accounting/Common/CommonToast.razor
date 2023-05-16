@@ -20,13 +20,13 @@
     {
         switch (Type)
         {
-            case Constants.TOAST_SUCCESS:
+            case (int)Constants.ToastType.Success:
                 Color = "success";
                 break;
-            case Constants.TOAST_NOTI:
+            case (int)Constants.ToastType.Notification:
                 Color = "info";
                 break;
-            case Constants.TOAST_ERROR:
+            case (int)Constants.ToastType.Error:
                 Color = "danger";
                 break;
         }

@@ -1,31 +1,40 @@
-﻿@typeparam TData
+﻿@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<Resource> LRes
+@typeparam TData
 
-<table class="table table-bordered table-striped text-center">
+<table class="table table-bordered table-striped text-center table-responsive">
     <thead>
-        <tr>
-            @foreach(var header in Headers)
-            {
-                if (header.Ordering && Sorting.ToLower().Contains(header.Name.ToLower()))
+        @if(THead != null)
+        {
+            @THead
+        }
+        else
+        {
+            <tr>
+                @foreach (var header in Headers)
                 {
-                    if (Sorting.ToLower().Contains("asc"))
+                    if (header.Ordering && Sorting.ToLower().Contains(header.Name.ToLower()))
                     {
-                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down fa-rotate-180 float-end"></i></th>
+                        if (Sorting.ToLower().Contains("asc"))
+                        {
+                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down fa-rotate-180 float-end"></i></th>
+                        }
+                        else
+                        {
+                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down float-end"></i></th>
+                        }
+                    }
+                    else if (header.Ordering && !Sorting.ToLower().Contains(header.Name.ToLower()))
+                    {
+                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-solid fa-arrow-up-arrow-down float-end" style="color: #a5acb9;"></i></th>
                     }
                     else
                     {
-                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down float-end"></i></th>
+                        <th>@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName)</th>
                     }
                 }
-                else if (header.Ordering && !Sorting.ToLower().Contains(header.Name.ToLower()))
-                {
-                    <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-solid fa-arrow-up-arrow-down float-end" style="color: #a5acb9;"></i></th>
-                }
-                else
-                {
-                    <th>@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName)</th>
-                }
-            }
-        </tr>
+            </tr>
+        }
     </thead>
     <tbody>
         @if(PaginationData != null && PaginationData.Items.Any())
@@ -34,6 +43,10 @@
             {
                 <tr>@TBody(item)</tr>
             }
+        }
+        else
+        {
+            <tr>@LRes["No data"]</tr>
         }
     </tbody>
 </table>
@@ -47,6 +60,9 @@ else
 }
 
 @code {
+    [Parameter]
+    public RenderFragment THead { get; set; }
+
     [Parameter]
     public List<Header> Headers { get; set; }
 

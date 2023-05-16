@@ -174,8 +174,23 @@
   <data name="Filter" xml:space="preserve">
     <value>Filter</value>
   </data>
+  <data name="here" xml:space="preserve">
+    <value>here</value>
+  </data>
+  <data name="item(s) from" xml:space="preserve">
+    <value>item(s) from</value>
+  </data>
+  <data name="Manage entries" xml:space="preserve">
+    <value>Manage entries</value>
+  </data>
   <data name="Manage Price" xml:space="preserve">
     <value>Manage Price</value>
+  </data>
+  <data name="Manage product" xml:space="preserve">
+    <value>Manage product</value>
+  </data>
+  <data name="Manage Sale" xml:space="preserve">
+    <value>Manage sales</value>
   </data>
   <data name="ManagePriceTitle" xml:space="preserve">
     <value>Manage products price</value>
@@ -198,6 +213,9 @@
   <data name="Normal Meat" xml:space="preserve">
     <value>Fresh</value>
   </data>
+  <data name="or click" xml:space="preserve">
+    <value>or click</value>
+  </data>
   <data name="Product List" xml:space="preserve">
     <value>Product List</value>
   </data>
@@ -213,11 +231,23 @@
   <data name="Prozen Meat" xml:space="preserve">
     <value>Prozen</value>
   </data>
+  <data name="Recycle bin" xml:space="preserve">
+    <value>Recycle bin</value>
+  </data>
+  <data name="Redirecting to login in" xml:space="preserve">
+    <value>Redirecting to login in</value>
+  </data>
   <data name="Search by name" xml:space="preserve">
     <value>Search by name</value>
   </data>
+  <data name="Showing" xml:space="preserve">
+    <value>Showing</value>
+  </data>
   <data name="Thousand Dong" xml:space="preserve">
     <value>thousand dong</value>
+  </data>
+  <data name="to" xml:space="preserve">
+    <value>to</value>
   </data>
   <data name="Today Entry Price" xml:space="preserve">
     <value>Today Entry Price</value>

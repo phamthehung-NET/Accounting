@@ -1,7 +1,6 @@
 ﻿using Accounting.Common;
 using Accounting.Data;
 using Accounting.Model;
-using Accounting.Model.DTO;
 
 namespace Accounting.Repositories
 {
@@ -16,14 +15,14 @@ namespace Accounting.Repositories
 
         public bool UpdateItemPrice(Dictionary<int, int> inputEntryPrice, Dictionary<int, int> inputSalePrice)
         {
-            if(!inputEntryPrice.Any() && !inputSalePrice.Any())
+            if (!inputEntryPrice.Any() && !inputSalePrice.Any())
             {
                 return false;
             }
             List<MeatPrice> priceList = new();
             foreach (var item in inputEntryPrice)
             {
-                var entryDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && x.PriceType == Constants.PRICE_TYPE_ENTRY);
+                var entryDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && x.PriceType == (int)Constants.PriceType.Entry);
                 if (entryDb == null)
                 {
                     MeatPrice meatPrice = new()
@@ -32,7 +31,7 @@ namespace Accounting.Repositories
                         Price = item.Value,
                         ActiveDate = DateTime.Now,
                         CreatedDate = DateTime.Now,
-                        PriceType = Constants.PRICE_TYPE_ENTRY,
+                        PriceType = (int)Constants.PriceType.Entry,
                     };
                     priceList.Add(meatPrice);
                 }
@@ -44,7 +43,7 @@ namespace Accounting.Repositories
 
             foreach (var item in inputSalePrice)
             {
-                var saleDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && x.PriceType == Constants.PRICE_TYPE_SALE);
+                var saleDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && x.PriceType == (int)Constants.PriceType.Sale);
                 if (saleDb == null)
                 {
                     MeatPrice meatPrice = new()
@@ -53,7 +52,7 @@ namespace Accounting.Repositories
                         Price = item.Value,
                         ActiveDate = DateTime.Now,
                         CreatedDate = DateTime.Now,
-                        PriceType = Constants.PRICE_TYPE_SALE,
+                        PriceType = (int)Constants.PriceType.Sale,
                     };
                     priceList.Add(meatPrice);
                 }

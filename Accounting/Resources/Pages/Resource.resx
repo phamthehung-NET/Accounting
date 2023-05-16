@@ -162,8 +162,23 @@
   <data name="Filter" xml:space="preserve">
     <value>Lọc</value>
   </data>
+  <data name="here" xml:space="preserve">
+    <value>đây</value>
+  </data>
+  <data name="item(s) from" xml:space="preserve">
+    <value>sản phẩm từ</value>
+  </data>
+  <data name="Manage entries" xml:space="preserve">
+    <value>Quản lý nhập vào</value>
+  </data>
   <data name="Manage Price" xml:space="preserve">
     <value>Quản lý giá</value>
+  </data>
+  <data name="Manage product" xml:space="preserve">
+    <value>Quản lý mặt hàng</value>
+  </data>
+  <data name="Manage Sale" xml:space="preserve">
+    <value>Quản lý bán ra</value>
   </data>
   <data name="ManagePriceTitle" xml:space="preserve">
     <value>Quản lý giá các mặt hàng</value>
@@ -186,6 +201,9 @@
   <data name="Normal Meat" xml:space="preserve">
     <value>Thịt tươi</value>
   </data>
+  <data name="or click" xml:space="preserve">
+    <value>hoặc nhấp vào</value>
+  </data>
   <data name="Product List" xml:space="preserve">
     <value>Danh sách mặt hàng</value>
   </data>
@@ -201,11 +219,23 @@
   <data name="Prozen Meat" xml:space="preserve">
     <value>Đông lạnh</value>
   </data>
+  <data name="Recycle bin" xml:space="preserve">
+    <value>Thùng rác</value>
+  </data>
+  <data name="Redirecting to login in" xml:space="preserve">
+    <value>Chuyển hướng đến trang đăng nhập trong</value>
+  </data>
   <data name="Search by name" xml:space="preserve">
     <value>Tìm theo tên</value>
   </data>
+  <data name="Showing" xml:space="preserve">
+    <value>Đang hiển thị</value>
+  </data>
   <data name="Thousand Dong" xml:space="preserve">
     <value>nghìn đồng</value>
+  </data>
+  <data name="to" xml:space="preserve">
+    <value>đến</value>
   </data>
   <data name="Today Entry Price" xml:space="preserve">
     <value>Giá Nhập Hôm Nay</value>

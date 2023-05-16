@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<Resource> LRes
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="manage-meat">Meat Accounting</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -11,7 +14,7 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="manage-meat">
-                <i class="fa-duotone fa-meat me-3"></i> Quản lý mặt hàng
+                <i class="fa-duotone fa-meat me-3"></i> @LRes["Manage product"]
             </NavLink>
         </div>
         @*<div class="nav-item px-3">
@@ -21,17 +24,17 @@
         </div>*@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="manage-entry">
-                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> Quản lý nhập vào
+                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> @LRes["Manage entries"]
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="manage-sale">
-                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> Quản lý bán ra
+                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> @LRes["Manage Sale"]
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="recycle-bin">
-                <i class="fa-solid fa-recycle me-3"></i> Thùng rác
+                <i class="fa-solid fa-recycle me-3"></i> @LRes["Recycle bin"]
             </NavLink>
         </div>
     </nav>

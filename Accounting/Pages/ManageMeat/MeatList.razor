@@ -29,8 +29,9 @@
         <div class="col-md-1 me-2">
             <select class="form-select" onchange="@((ChangeEventArgs e) => onParamsChange(e, "Type"))">
                 <option value="">@LRes["Meat Type"]</option>
-                <option value="@Constants.BEEF_TYPE" selected="@(Type == Constants.BEEF_TYPE)">@LRes["Beef"]</option>
-                <option value="@Constants.BUFFALO_TYPE" selected="@(Type == Constants.BUFFALO_TYPE)">@LRes["Buffalo"]</option>
+                <option value="@((int)Constants.MeatType.Beef)" selected="@(Type == (int)Constants.MeatType.Beef)">@LRes["Beef"]</option>
+                <option value="@((int)Constants.MeatType.Buffalo)" selected="@(Type == (int)Constants.MeatType.Buffalo)">@LRes["Buffalo"]</option>
+                <option value="@((int)Constants.MeatType.Calves)" selected="@(Type == (int)Constants.MeatType.Calves)">@LRes["Calves"]</option>
             </select>
         </div>
         <div class="d-flex col-md-4 justify-content-between">
@@ -101,7 +102,7 @@
         PaginationObject="Pagination">
         <TBody>
             <td>@Context.Name</td>
-            <td>@HelperFunctions.RenderMeatType(Context.Type.Value)</td>
+            <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
             <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
             <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice + " " + LRes["Thousand Dong"])</td>
             <td>@(Context.TodayEntryPrice == null ? LRes["No data"] : Context.TodayEntryPrice + " " + LRes["Thousand Dong"])</td>
@@ -159,7 +160,7 @@
 
     List<Header> Headers = new();
 
-    string Sorting = "name_asc";
+    string Sorting = "id_asc";
 
     protected override void OnInitialized()
     {
@@ -255,7 +256,7 @@
         Query["prozen"] = Prozen.ToString();
         Query["type"] = Type.ToString();
 
-        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query));
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
 
         Meats = MeatRepository.GetAllMeats(Keyword, Type, Prozen, Pagination.PageIndex, Pagination.PageSize);
     }
@@ -267,7 +268,7 @@
 
         Query["pageIndex"] = pagination.PageIndex.ToString();
         Query["pageSize"] = pagination.PageSize.ToString();
-        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query));
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
 
         Meats = MeatRepository.GetAllMeats(Keyword, Type, Prozen, pagination.PageIndex, pagination.PageSize);
     }

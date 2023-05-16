@@ -1,5 +1,7 @@
 ﻿@page "/"
 @page "/updatePrice"
+@page "/unauthorized"
+
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.AspNetCore.WebUtilities;
 @inject IHttpContextAccessor HttpContext
@@ -46,6 +48,10 @@
                     await HelperFunctions.TriggerBtn(JsRuntime, "hiddenBtnPriceModal");
                     StateHasChanged();
                 }
+            }
+            else if (!user.Identity.IsAuthenticated && Uri.AbsolutePath.Equals("/unauthorized"))
+            {
+                await HelperFunctions.ShowNotification(JsRuntime, "warning", "Unauthorized");
             }
         }
     }

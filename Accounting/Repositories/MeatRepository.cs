@@ -42,10 +42,10 @@ namespace Accounting.Repositories
                 Type = x.Type,
                 Prozen = x.Prozen,
                 IsDeleted = x.IsDeleted,
-                YesterdayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == Constants.PRICE_TYPE_ENTRY).Price,
-                TodayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == Constants.PRICE_TYPE_ENTRY).Price,
-                YesterdaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == Constants.PRICE_TYPE_SALE).Price,
-                TodaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == Constants.PRICE_TYPE_SALE).Price,
+                YesterdayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == (int)Constants.PriceType.Entry).Price,
+                TodayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == (int)Constants.PriceType.Entry).Price,
+                YesterdaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == (int)Constants.PriceType.Sale).Price,
+                TodaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == (int)Constants.PriceType.Sale).Price,
             });
 
             if (!string.IsNullOrEmpty(keyword))
@@ -107,7 +107,7 @@ namespace Accounting.Repositories
                 RecycleBin recycle = new()
                 {
                     ObjectId = id,
-                    Type = Constants.RECYCLE_BIN_TYPE_MEAT,
+                    Type = (int)Constants.RecycleBinObjectType.Meat,
                     CreatedDate = DateTime.Now,
                 };
                 context.RecycleBins.Add(recycle);
@@ -122,7 +122,7 @@ namespace Accounting.Repositories
             var db = context.Meats.FirstOrDefault(x => x.Name.Equals(meat.Name) && x.Type == meat.Type && x.Prozen == meat.Prozen);
             if (db != null)
             {
-                if(meat.Id > 0 && db.Id == meat.Id)
+                if (meat.Id > 0 && db.Id == meat.Id)
                 {
                     return false;
                 }

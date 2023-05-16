@@ -1,0 +1,31 @@
+﻿@using Microsoft.Extensions.Localization;
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Resource> LRes
+<h3 class="display-4 text-center">Unauthorized</h3>
+<div class="text-center">@LRes["Redirecting to login in"] @CountDown @LRes["or click"] <a href="/Identity/Account/Login">@LRes["here"]</a></div>
+
+@code {
+    int CountDown = 11;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Countdown();
+        }
+    }
+    async Task Countdown()
+    {
+        CountDown--;
+        StateHasChanged();
+        if(CountDown > 0)
+        {
+            await Task.Delay(1000);
+            await Countdown();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/Identity/Account/Login", true);
+        }
+    }
+}

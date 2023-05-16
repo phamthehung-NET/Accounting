@@ -1,110 +1,115 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using Microsoft.Extensions.Localization;
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Resource> LRes
 @typeparam TData
 
 @if(PaginationData !=null && PaginationData.TotalPages > 0)
 {
-<nav class="d-flex justify-content-end">
-    <ul class="pagination me-2">
-            @if (Pagination.PageIndex > 1)
-        {
-            <li class="page-item" onclick="@(async () => await onPaginationChange("prev", null))">
-                <a class="page-link" role="button" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-        }
-        @if(PaginationData.TotalPages >= 6)
-        {
-            if(Pagination.PageIndex < 4)
-            {
-                @for(int i = 1; i <= 4; i++)
+    <div class="d-flex justify-content-between">
+        <div class="col-sm-12 col-md-6">@($"{LRes["Showing"]} {PaginationData.Items.Count} {LRes["item(s) from"]} {(PaginationData.PageIndex - 1) * PaginationData.ItemPerPage + 1} {LRes["to"]} {(PaginationData.PageIndex - 1) * PaginationData.ItemPerPage + PaginationData.Items.Count}")</div>
+        <nav class="d-flex justify-content-end col-sm-12 col-md-6">
+            <ul class="pagination me-2">
+                @if (Pagination.PageIndex > 1)
                 {
-                    var num = i;
-                    <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
-                        <a class="page-link" role="button">@i</a>
+                    <li class="page-item" onclick="@(async () => await onPaginationChange("prev", null))">
+                        <a class="page-link" role="button" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
                     </li>
                 }
-                <li class="page-item disabled">
-                    <a class="page-link" role="button">...</a>
-                </li>
-                <li class=@(Pagination.PageIndex == PaginationData.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
-                    <a class="page-link" role="button">@PaginationData.TotalPages</a>
-                </li>
-            }
-            else if (Pagination.PageIndex >= 4 && Pagination.PageIndex < PaginationData.TotalPages - 3)
-            {
-                <li class=@(Pagination.PageIndex == 1 ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", 1))">
-                    <a class="page-link" role="button">1</a>
-                </li>
-                if(Pagination.PageIndex > 4)
+                @if (PaginationData.TotalPages >= 6)
                 {
-                    <li class="page-item disabled">
-                        <a class="page-link" role="button">...</a>
+                    if (Pagination.PageIndex < 4)
+                    {
+                        @for (int i = 1; i <= 4; i++)
+                        {
+                            var num = i;
+                            <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
+                                <a class="page-link" role="button">@i</a>
+                            </li>
+                        }
+                        <li class="page-item disabled">
+                            <a class="page-link" role="button">...</a>
+                        </li>
+                        <li class=@(Pagination.PageIndex == PaginationData.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
+                            <a class="page-link" role="button">@PaginationData.TotalPages</a>
+                        </li>
+                    }
+                    else if (Pagination.PageIndex >= 4 && Pagination.PageIndex < PaginationData.TotalPages - 3)
+                    {
+                        <li class=@(Pagination.PageIndex == 1 ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", 1))">
+                            <a class="page-link" role="button">1</a>
+                        </li>
+                        if (Pagination.PageIndex > 4)
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link" role="button">...</a>
+                            </li>
+                        }
+                        @for (int i = Pagination.PageIndex - 2; i <= Pagination.PageIndex + 2; i++)
+                        {
+                            var num = i;
+                            <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
+                                <a class="page-link" role="button">@i</a>
+                            </li>
+                        }
+                        <li class="page-item disabled">
+                            <a class="page-link" role="button">...</a>
+                        </li>
+                        <li class=@(Pagination.PageIndex == PaginationData.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
+                            <a class="page-link" role="button">@PaginationData.TotalPages</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class=@(Pagination.PageIndex == 1 ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", 1))">
+                            <a class="page-link" role="button">1</a>
+                        </li>
+                        if (Pagination.PageIndex > 4)
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link" role="button">...</a>
+                            </li>
+                        }
+                        @for (int i = Pagination.PageIndex - 2; i <= PaginationData.TotalPages; i++)
+                        {
+                            var num = i;
+                            <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
+                                <a class="page-link" role="button">@i</a>   
+                            </li>
+                        }
+                    }
+                }
+                @if (PaginationData.TotalPages < 6)
+                {
+                    @for (int i = 1; i <= PaginationData.TotalPages; i++)
+                    {
+                        var num = i;
+                        <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
+                            <a class="page-link" role="button">@i</a>
+                        </li>
+                    }
+                }
+                @if (Pagination.PageIndex < PaginationData.TotalPages)
+                {
+                    <li class="page-item" onclick="@(async () => await onPaginationChange("next", null))">
+                        <a class="page-link" role="button" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
                     </li>
                 }
-                @for (int i = Pagination.PageIndex - 2; i <= Pagination.PageIndex + 2; i++)
-                {
-                    var num = i;
-                    <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
-                        <a class="page-link" role="button">@i</a>
-                    </li>
-                }
-                <li class="page-item disabled">
-                    <a class="page-link" role="button">...</a>
-                </li>
-                <li class=@(Pagination.PageIndex == PaginationData.TotalPages ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("last", null))">
-                    <a class="page-link" role="button">@PaginationData.TotalPages</a>
-                </li>
-            }
-            else
-            {
-                <li class=@(Pagination.PageIndex == 1 ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", 1))">
-                    <a class="page-link" role="button">1</a>
-                </li>
-                if(Pagination.PageIndex > 4)
-                {
-                    <li class="page-item disabled">
-                        <a class="page-link" role="button">...</a>
-                    </li>
-                }
-                @for (int i = Pagination.PageIndex - 2; i <= PaginationData.TotalPages; i++)
-                {
-                    var num = i;
-                    <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
-                        <a class="page-link" role="button">@i</a>   
-                    </li>
-                }
-            }
-        }
-        @if(PaginationData.TotalPages < 6)
-        {
-            @for (int i = 1; i <= PaginationData.TotalPages; i++)
-            {
-                var num = i;
-                <li class=@(Pagination.PageIndex == i ? "page-item active" : "page-item") onclick="@(async () => await onPaginationChange("pageIndex", num))">
-                    <a class="page-link" role="button">@i</a>
-                </li>
-            }
-        }
-        @if(Pagination.PageIndex < PaginationData.TotalPages)
-        {
-            <li class="page-item" onclick="@(async () => await onPaginationChange("next", null))">
-                <a class="page-link" role="button" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        }
-    </ul>
-    <div class="col-1">
-        <select class="form-select" onchange="@((ChangeEventArgs e) => onPaginationChange("pageSize", int.Parse(e.Value.ToString())))" >
-            <option selected="@(Pagination.PageSize == 5)">5</option>
-            <option selected="@(Pagination.PageSize == 10)">10</option>
-            <option selected="@(Pagination.PageSize == 25)">25</option>
-            <option selected="@(Pagination.PageSize == 50)">50</option>
-            <option selected="@(Pagination.PageSize == 100)">100</option>
-        </select>
+            </ul>
+            <div class="col-2">
+                <select class="form-select" onchange="@((ChangeEventArgs e) => onPaginationChange("pageSize", int.Parse(e.Value.ToString())))" >
+                    <option selected="@(Pagination.PageSize == 5)">5</option>
+                    <option selected="@(Pagination.PageSize == 10)">10</option>
+                    <option selected="@(Pagination.PageSize == 25)">25</option>
+                    <option selected="@(Pagination.PageSize == 50)">50</option>
+                    <option selected="@(Pagination.PageSize == 100)">100</option>
+                </select>
+            </div>
+        </nav>
     </div>
-</nav>
 }
 
 @code {
@@ -124,10 +129,10 @@
         Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
     }
 
-    //protected override void OnParametersSet()
-    //{
-    //    DynamicPagination = (dynamic)PaginationData;
-    //}
+    protected override void OnParametersSet()
+    {
+        StateHasChanged();
+    }
 
     async Task onPaginationChange(string type, int? number)
     {

@@ -44,7 +44,7 @@
                             {
                                 <tr>
                                     <td>@meat.Name</td>
-                                    <td>@HelperFunctions.RenderMeatType(meat.Type.Value)</td>
+                                    <td>@HelperFunctions.RenderMeatType(LRes, meat.Type.Value)</td>
                                     <td>@(meat.Prozen.Value ? "✔️" : "❌")</td>
                                     <td>@(meat.YesterdayEntryPrice == null ? LRes["No data"] : meat.YesterdayEntryPrice)</td>
                                     <td>
