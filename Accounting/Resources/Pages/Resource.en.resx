@@ -174,11 +174,17 @@
   <data name="Filter" xml:space="preserve">
     <value>Filter</value>
   </data>
+  <data name="from" xml:space="preserve">
+    <value>from</value>
+  </data>
   <data name="here" xml:space="preserve">
     <value>here</value>
   </data>
-  <data name="item(s) from" xml:space="preserve">
-    <value>item(s) from</value>
+  <data name="in" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="item(s)" xml:space="preserve">
+    <value>item(s)</value>
   </data>
   <data name="Manage entries" xml:space="preserve">
     <value>Manage entries</value>

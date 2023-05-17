@@ -6,7 +6,7 @@
 @if(PaginationData !=null && PaginationData.TotalPages > 0)
 {
     <div class="d-flex justify-content-between">
-        <div class="col-sm-12 col-md-6">@($"{LRes["Showing"]} {PaginationData.Items.Count} {LRes["item(s) from"]} {(PaginationData.PageIndex - 1) * PaginationData.ItemPerPage + 1} {LRes["to"]} {(PaginationData.PageIndex - 1) * PaginationData.ItemPerPage + PaginationData.Items.Count}")</div>
+        <div class="col-sm-12 col-md-6">@($"{LRes["Showing"]} {LRes["from"]} {(PaginationData.PageIndex - 1) * PaginationData.ItemPerPage + 1} {LRes["to"]} {(PaginationData.PageIndex - 1) * PaginationData.ItemPerPage + PaginationData.Items.Count} {LRes["in"]} {PaginationData.TotalItems} {LRes["item(s)"]}")</div>
         <nav class="d-flex justify-content-end col-sm-12 col-md-6">
             <ul class="pagination me-2">
                 @if (Pagination.PageIndex > 1)

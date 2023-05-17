@@ -162,11 +162,17 @@
   <data name="Filter" xml:space="preserve">
     <value>Lọc</value>
   </data>
+  <data name="from" xml:space="preserve">
+    <value>từ</value>
+  </data>
   <data name="here" xml:space="preserve">
     <value>đây</value>
   </data>
-  <data name="item(s) from" xml:space="preserve">
-    <value>sản phẩm từ</value>
+  <data name="in" xml:space="preserve">
+    <value>trong</value>
+  </data>
+  <data name="item(s)" xml:space="preserve">
+    <value>sản phẩm</value>
   </data>
   <data name="Manage entries" xml:space="preserve">
     <value>Quản lý nhập vào</value>
