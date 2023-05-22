@@ -99,7 +99,8 @@
         Sorting="@Sorting" 
         SortData="(sortingString) => SortData(sortingString)"
         GetData="GetPaginateData"
-        PaginationObject="Pagination">
+        PaginationObject="Pagination"
+        DisplayPaging="true">
         <TBody>
             <td>@Context.Name</td>
             <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
@@ -167,10 +168,10 @@
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
         Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
         Headers.Add(new Header() { Name = "Prozen", DisplayName = LRes["Prozen Meat"] + "?", Ordering = true });
-        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}", Ordering = true, IsHtml = true });
-        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now)}", Ordering = true, IsHtml = true });
-        Headers.Add(new Header() { Name = "Yesterday Sale Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}", Ordering = true, IsHtml = true });
-        Headers.Add(new Header() { Name = "Today Sale Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg {HelperFunctions.GetLunarDate(DateTime.Now)}", Ordering = true, IsHtml = true });
+        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
     }
 

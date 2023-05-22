@@ -26,5 +26,10 @@
             Entry,
             Sale
         }
+
+        public const string ToastError = "danger";
+        public const string ToastSuccess = "success";
+        public const string ToastInfo = "info";
+        public const string ToastWarning = "warning";
     }
 }

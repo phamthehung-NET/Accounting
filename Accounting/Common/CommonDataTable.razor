@@ -17,20 +17,20 @@
                     {
                         if (Sorting.ToLower().Contains("asc"))
                         {
-                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down fa-rotate-180 float-end"></i></th>
+                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down fa-rotate-180 float-end"></i></th>
                         }
                         else
                         {
-                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down float-end"></i></th>
+                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down float-end"></i></th>
                         }
                     }
                     else if (header.Ordering && !Sorting.ToLower().Contains(header.Name.ToLower()))
                     {
-                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName) <i class="fa-solid fa-arrow-up-arrow-down float-end" style="color: #a5acb9;"></i></th>
+                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName)<i class="fa-solid fa-arrow-up-arrow-down float-end" style="color: #a5acb9;"></i></th>
                     }
                     else
                     {
-                        <th>@(header.IsHtml ? (MarkupString)header.DisplayName : header.DisplayName)</th>
+                        <th>@((MarkupString)header.DisplayName)</th>
                     }
                 }
             </tr>
@@ -50,13 +50,16 @@
         }
     </tbody>
 </table>
-@if(Pagination != null)
+@if (DisplayPaging)
 {
-    @Pagination
-}
-else
-{
-    <PaginationView TData="TData" GetData="@GetData" PaginationData="@PaginationData" Pagination="@PaginationObject"/>
+    if (Pagination != null)
+    {
+        @Pagination
+    }
+    else
+    {
+        <PaginationView TData="TData" GetData="@GetData" PaginationData="@PaginationData" Pagination="@PaginationObject"/>
+    }
 }
 
 @code {
@@ -86,6 +89,9 @@ else
 
     [Parameter]
     public PaginationObject PaginationObject { get; set; }
+
+    [Parameter]
+    public bool DisplayPaging { get; set; } = false;
 
     void OnHeaderClick(string fieldName)
     {

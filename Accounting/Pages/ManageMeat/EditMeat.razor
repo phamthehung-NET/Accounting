@@ -72,17 +72,25 @@
 
     async Task OnSubmit()
     {
-        if (editContext.Validate())
+        try
         {
-            bool result = MeatRepository.EditMeat(meat);
-
-            if (result)
+            if (editContext.Validate())
             {
-                await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["EditProductSuccess"]);
-                await GetData.InvokeAsync();
-                return;
+                bool result = MeatRepository.EditMeat(meat);
+
+                if (result)
+                {
+                    await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["EditProductSuccess"]);
+                    await GetData.InvokeAsync();
+                    return;
+                }
+                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["EditProductFailed"]);
             }
-            await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["EditProductFailed"]);
+        }
+        catch (Exception ex)
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, ex.Message);
+            throw;
         }
     }
 }

@@ -1,20 +1,26 @@
 ﻿using Accounting.Common;
 using Accounting.Data;
 using Accounting.Model;
+using Microsoft.AspNetCore.Identity;
 
 namespace Accounting.Repositories
 {
     public class PriceRepository : IPriceRepository
     {
         private readonly AccountingDbContext context;
+        private readonly IHttpContextAccessor httpContext;
+        private readonly UserManager<CustomUser> userManager;
 
-        public PriceRepository(AccountingDbContext _context)
+        public PriceRepository(AccountingDbContext _context, IHttpContextAccessor _httpContext, UserManager<CustomUser> _userManager)
         {
             context = _context;
+            httpContext = _httpContext;
+            userManager = _userManager;
         }
 
         public bool UpdateItemPrice(Dictionary<int, int> inputEntryPrice, Dictionary<int, int> inputSalePrice)
         {
+            var user = userManager.FindByNameAsync(httpContext.HttpContext.User.Identity.Name).Result;
             if (!inputEntryPrice.Any() && !inputSalePrice.Any())
             {
                 return false;
@@ -63,6 +69,8 @@ namespace Accounting.Repositories
             }
 
             context.MeatPrices.AddRange(priceList);
+            user.UpdatedPriceDate = DateTime.Now;
+            userManager.UpdateAsync(user);
             context.SaveChanges();
             return true;
         }

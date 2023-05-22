@@ -13,7 +13,7 @@
         <div class="modal-body">
             @if (Meats != null)
             {
-                <table class="table table-bordered table-striped text-center">
+                @*<table class="table table-bordered table-striped text-center">
                     <thead>
                         <tr>
                             <th class="align-middle">@LRes["Name"]</th>
@@ -58,7 +58,29 @@
                             }
                         }
                     </tbody>
-                </table>
+                </table>*@
+                <CommonDataTable Context="Context" 
+                    Headers="Headers" 
+                    TData="MeatDTO" 
+                    PaginationData="Meats" 
+                    Sorting="@Sorting" 
+                    SortData="(sortingString) => SortData(sortingString)">
+                    <TBody>
+                        <td>@Context.Name</td>
+                        <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
+                        <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
+                        <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice)</td>
+                        <td>
+                            <input type="number" min=0 value="@(Context.TodayEntryPrice == null ? (InputEntryList.TryGetValue(Context.Id, out int value) ? value : null) : Context.TodayEntryPrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "entry"))"/>
+                        </td>
+                        <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice)</td>
+                        <td>
+                            <input type="number" min=0 value="@(Context.TodaySalePrice == null ? (InputSaleList.TryGetValue(Context.Id, out int saleval) ? saleval : null) : Context.TodaySalePrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "sale"))" />
+                        </td>
+                    </TBody>
+                    <Pagination>
+                    </Pagination>
+                </CommonDataTable>
             }
         </div>
         <div class="modal-footer">
@@ -75,9 +97,26 @@
     [Parameter]
     public EventCallback GetData { get; set; }
 
+    PaginationObject Pagination = new();
+
+    List<Header> Headers = new();
+
+    string Sorting = "id_asc";
+
     Dictionary<int, int> InputEntryList = new();
 
     Dictionary<int, int> InputSaleList = new();
+
+    protected override void OnInitialized()
+    {
+        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
+        Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
+        Headers.Add(new Header() { Name = "Prozen", DisplayName = LRes["Prozen Meat"] + "?", Ordering = true });
+        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
+    }
 
     void OnInputChange(int meatId, int price, string inputType)
     {
@@ -110,15 +149,29 @@
 
     async Task OnSubmit()
     {
-        var result = PriceRepository.UpdateItemPrice(InputEntryList, InputSaleList);
-        if (result)
+        try
         {
-            InputEntryList.Clear();
-            InputSaleList.Clear();
-            await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["EditPriceSuccess"]);
-            await GetData.InvokeAsync();
-            return;
+            var result = PriceRepository.UpdateItemPrice(InputEntryList, InputSaleList);
+            if (result)
+            {
+                InputEntryList.Clear();
+                InputSaleList.Clear();
+                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["EditPriceSuccess"]);
+                await GetData.InvokeAsync();
+                return;
+            }
+            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["EditPriceFailed"]);
         }
-        await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["EditPriceFailed"]);
+        catch (Exception ex)
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, ex.Message);
+            throw;
+        }
+    }
+
+    void SortData(string sortingString)
+    {
+        Sorting = sortingString;
+        StateHasChanged();
     }
 }

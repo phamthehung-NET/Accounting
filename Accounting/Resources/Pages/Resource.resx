@@ -156,8 +156,20 @@
   <data name="Edit" xml:space="preserve">
     <value>Sửa</value>
   </data>
+  <data name="EditPriceFailed" xml:space="preserve">
+    <value>Cập nhật giá thất bại</value>
+  </data>
+  <data name="EditPriceSuccess" xml:space="preserve">
+    <value>Cập nhật giá thành công</value>
+  </data>
+  <data name="EditProductFailed" xml:space="preserve">
+    <value>Cập nhật thông tin sản phẩm thất bại</value>
+  </data>
   <data name="EditProductInfo" xml:space="preserve">
     <value>Sửa thông tin mặt hàng</value>
+  </data>
+  <data name="EditProductSuccess" xml:space="preserve">
+    <value>Cập nhật thông tin sản phẩm thành công</value>
   </data>
   <data name="Filter" xml:space="preserve">
     <value>Lọc</value>
