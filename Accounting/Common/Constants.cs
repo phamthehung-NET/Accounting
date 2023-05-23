@@ -19,6 +19,7 @@
         public enum RecycleBinObjectType
         {
             Meat,
+            Person
         }
 
         public enum PriceType

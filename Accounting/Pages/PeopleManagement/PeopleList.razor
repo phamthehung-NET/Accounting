@@ -1,0 +1,164 @@
+﻿@page "/people-management"
+@using Microsoft.AspNetCore.WebUtilities;
+@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<Resource> LRes
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject IPeopleRepository PeopleRepo
+@attribute [Authorize]
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between">
+        <CommonLabel DisplayText="@LRes["PeopleList"]" Color="primary"></CommonLabel>
+        <button type="button" class="btn btn-outline-primary mb-2" data-bs-toggle="modal" data-bs-target="#addPersonModal"><i class="fa-duotone fa-plus"></i> @LRes["Add"]</button>
+    </div>
+    <CommonDataTable Context="Context" 
+        Headers="Headers" 
+        TData="PersonDTO" 
+        PaginationData="People" 
+        Sorting="@Sorting" 
+        SortData="(sortingString) => SortData(sortingString)"
+        GetData="GetPaginateData"
+        PaginationObject="Pagination"
+        DisplayPaging="true">
+        <TBody>
+            <td>@Context.Name</td>
+            <td>@Context.PhoneNumber</td>
+            <td>@Context.Address</td>
+            <td>@HandleDisplayType(Context.Source)</td>
+            <td>@(Context.NearestTransaction != null ? Context.NearestTransaction : LRes["No data"])</td>
+            <td>
+                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPersonModal" @onclick="() => EditPerson(Context.Id)"><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deletePerson" + Context.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
+                <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeletePersonConfirmation"]" ModalID="@("deletePerson" + Context.Id)" SubmitEvent="async () => await DeletePerson(Context.Id)"/>
+            </td>
+        </TBody>
+    </CommonDataTable>
+    <CommonModalWrapper Id="addPersonModal">
+        <ModalContent>
+            <AddPerson GetData="GetData"/>
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonModalWrapper Id="editPersonModal">
+        <ModalContent>
+            <EditPerson GetData="GetData" Person="SelectedPerson"/>
+        </ModalContent>
+    </CommonModalWrapper>
+</div>
+
+@code {
+    List<Header> Headers = new();
+
+    string Sorting = "id_desc";
+
+    string Keyword = "";
+
+    bool? IsSource = null;
+
+    Dictionary<string, string> Query = new()
+    {
+        {"pageIndex", ""},
+        {"pageSize", ""},
+        {"keyword", ""},
+        {"isSource", ""}
+    };
+
+    PaginationObject Pagination = new();
+
+    Uri Uri;
+
+    Pagination<PersonDTO> People;
+
+    Person SelectedPerson;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetData();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
+        Headers.Add(new Header() { Name = "PhoneNumber", DisplayName = LRes["PhoneNumber"], Ordering = true });
+        Headers.Add(new Header() { Name = "Address", DisplayName = LRes["Address"], Ordering = true });
+        Headers.Add(new Header() { Name = "Source", DisplayName = LRes["Type"], Ordering = true });
+        Headers.Add(new Header() { Name = "NearestTransaction", DisplayName = LRes["NearestTransaction"], Ordering = true });
+        Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
+    }
+
+    void GetData()
+    {
+        if (Uri != null)
+        {
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("keyword", out var keyword))
+            {
+                Keyword = keyword;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageSize", out var pageSize))
+            {
+                Pagination.PageSize = !string.IsNullOrEmpty(pageSize) ? int.Parse(pageSize) : Pagination.PageSize;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageIndex", out var pageIndex))
+            {
+                Pagination.PageIndex = !string.IsNullOrEmpty(pageIndex) ? int.Parse(pageIndex) : Pagination.PageIndex;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("isSource", out var isSource))
+            {
+                IsSource = !string.IsNullOrEmpty(isSource) ? bool.Parse(isSource) : null;
+            }
+        }
+
+        People = PeopleRepo.GetAllPeople(Keyword, Sorting, IsSource, Pagination.PageIndex, Pagination.PageSize);
+        StateHasChanged();
+    }
+
+    void GetPaginateData(PaginationObject pagination)
+    {
+        Pagination.PageIndex = pagination.PageIndex;
+        Pagination.PageSize = pagination.PageSize;
+
+        Query["pageIndex"] = pagination.PageIndex.ToString();
+        Query["pageSize"] = pagination.PageSize.ToString();
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
+
+        People = PeopleRepo.GetAllPeople(Keyword, Sorting, IsSource, Pagination.PageIndex, Pagination.PageSize);
+    }
+
+    void SortData(string sortingString)
+    {
+        Sorting = sortingString;
+        StateHasChanged();
+        GetData();
+    }
+
+    void EditPerson(int id)
+    {
+        SelectedPerson = PeopleRepo.GetPersonDetail(id);
+    }
+
+    async Task DeletePerson(int id)
+    {
+        var result = PeopleRepo.DeletePerson(id);
+        if (result)
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["Move to recycle bin success"]);
+            GetData();
+            return;
+        }
+        await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["Move to reycle bin failed"]);
+    }
+
+    string HandleDisplayType(bool? type)
+    {
+        if (type != null && (bool)type)
+    {
+            return LRes["Seller"];
+        }
+        return LRes["Buyer"];
+    }
+}

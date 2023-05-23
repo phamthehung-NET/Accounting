@@ -15,9 +15,7 @@ namespace Accounting.Data
 
         public DbSet<MeatPrice> MeatPrices { get; set; }
 
-        public DbSet<MeatSalePrice> MeatSalePrices { get; set; }
-
-        public DbSet<MeatEntryPrice> MeatEntryPrices { get; set; }
+        public DbSet<MeatBillPrice> MeatBillPrices { get; set; }
 
         public DbSet<Bill> Bills { get; set; }
         

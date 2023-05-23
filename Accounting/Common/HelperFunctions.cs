@@ -8,10 +8,10 @@ namespace Accounting.Common
 {
     public class HelperFunctions
     {
-        public static Pagination<T> GetPaging<T>(int? pageIndex, int? itemPerPage, IQueryable<T> items)
-        {
-            return new Pagination<T>(items.Count(), pageIndex, itemPerPage, items);
-        }
+        //public static Pagination<T> GetPaging<T>(int? pageIndex, int? itemPerPage, IQueryable<T> items)
+        //{
+        //    return new Pagination<T>(items.Count(), pageIndex, itemPerPage, items);
+        //}
 
         public static string RenderMeatType(IStringLocalizer<Resource> LRes, int type)
         {

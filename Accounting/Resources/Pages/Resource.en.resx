@@ -123,8 +123,17 @@
   <data name="Add" xml:space="preserve">
     <value>Add New</value>
   </data>
+  <data name="AddNewPerson" xml:space="preserve">
+    <value>Add new person</value>
+  </data>
   <data name="AddNewProduct" xml:space="preserve">
     <value>Add new product</value>
+  </data>
+  <data name="AddPersonFailed" xml:space="preserve">
+    <value>Add new person failed</value>
+  </data>
+  <data name="AddPersonSuccess" xml:space="preserve">
+    <value>Add new person success</value>
   </data>
   <data name="AddProductFailed" xml:space="preserve">
     <value>Add product failed</value>
@@ -132,17 +141,26 @@
   <data name="AddProductSuccess" xml:space="preserve">
     <value>Add product successully</value>
   </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
   <data name="Beef" xml:space="preserve">
     <value>Beef</value>
   </data>
   <data name="Buffalo" xml:space="preserve">
     <value>Buffalo</value>
   </data>
+  <data name="Buyer" xml:space="preserve">
+    <value>Buyer</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
+  </data>
+  <data name="DeletePersonConfirmation" xml:space="preserve">
+    <value>Are you sure to move this person to recycle bin?</value>
   </data>
   <data name="DeleteProductConfirmation" xml:space="preserve">
     <value>Are you sure to delete this product?</value>
@@ -155,6 +173,9 @@
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
+  </data>
+  <data name="EditPerson" xml:space="preserve">
+    <value>Edit person</value>
   </data>
   <data name="EditPriceFailed" xml:space="preserve">
     <value>Edit price failed</value>
@@ -189,8 +210,11 @@
   <data name="Manage entries" xml:space="preserve">
     <value>Manage entries</value>
   </data>
+  <data name="Manage person" xml:space="preserve">
+    <value>Manage person</value>
+  </data>
   <data name="Manage Price" xml:space="preserve">
-    <value>Manage Price</value>
+    <value>Manage price</value>
   </data>
   <data name="Manage product" xml:space="preserve">
     <value>Manage product</value>
@@ -213,6 +237,9 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="NearestTransaction" xml:space="preserve">
+    <value>Nearest transaction</value>
+  </data>
   <data name="No data" xml:space="preserve">
     <value>No data</value>
   </data>
@@ -221,6 +248,12 @@
   </data>
   <data name="or click" xml:space="preserve">
     <value>or click</value>
+  </data>
+  <data name="PeopleList" xml:space="preserve">
+    <value>People list</value>
+  </data>
+  <data name="PhoneNumber" xml:space="preserve">
+    <value>Phone number</value>
   </data>
   <data name="Product List" xml:space="preserve">
     <value>Product List</value>
@@ -246,6 +279,9 @@
   <data name="Search by name" xml:space="preserve">
     <value>Search by name</value>
   </data>
+  <data name="Seller" xml:space="preserve">
+    <value>Seller</value>
+  </data>
   <data name="Showing" xml:space="preserve">
     <value>Showing</value>
   </data>
@@ -260,6 +296,12 @@
   </data>
   <data name="Today Sale Price" xml:space="preserve">
     <value>Today Sale Price</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ViewNearestTransaction" xml:space="preserve">
+    <value>View nearest transaction</value>
   </data>
   <data name="Yesterday Entry Price" xml:space="preserve">
     <value>Yesterday Entry Price</value>

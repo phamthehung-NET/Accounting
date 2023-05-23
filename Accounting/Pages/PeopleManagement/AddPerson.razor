@@ -1,5 +1,5 @@
 ﻿@using Microsoft.Extensions.Localization;
-@inject IMeatRepository MeatRepository
+@inject IPeopleRepository PeopleRepo
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
 
@@ -7,27 +7,30 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <CommonLabel DisplayText="@LRes["AddNewProduct"]" Color="primary"></CommonLabel>
+                <CommonLabel DisplayText="@LRes["AddNewPerson"]" Color="primary"></CommonLabel>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
             </div>
             <div class="modal-body">
                 <DataAnnotationsValidator/>
                 <div class="col-md-9">
                     <div class="mb-2">
-                        <label>@LRes["ProductName"]</label>
-                        <InputText @bind-Value="meat.Name" class="form-control"/>
+                        <label>@LRes["Name"]</label>
+                        <InputText @bind-Value="person.Name" class="form-control"/>
                     </div>
                     <div class="mb-2">
-                        <label>@LRes["Meat Type"]</label>
-                        <InputSelect @bind-Value="meat.Type" class="form-control">
-                            <option value="@((int)Constants.MeatType.Beef)">@LRes["Beef"]</option>
-                            <option value="@((int)Constants.MeatType.Buffalo)">@LRes["Buffalo"]</option>
-                            <option value="@((int)Constants.MeatType.Calves)">@LRes["Calves"]</option>
-                        </InputSelect>
+                        <label>@LRes["PhoneNumber"]</label>
+                        <InputText @bind-Value="person.PhoneNumber" class="form-control"/>
                     </div>
                     <div class="mb-2">
-                        <label>@LRes["Prozen Meat"]?</label>
-                        <input type="checkbox" value="@meat.Prozen" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())"/>
+                        <label>@LRes["Address"]</label>
+                        <InputText @bind-Value="person.Address" class="form-control"/>
+                    </div>
+                    <div class="mb-2">
+                        <label>@LRes["Type"]:</label>
+                        <input class="ms-2" type="radio" id="seller" name="type" @onclick="() => OnSelectType(true)" checked="@(person.Source)"/>
+                        <label for="seller" class="me-2">@LRes["Seller"]</label>
+                        <input type="radio" id="buyer" name="type" @onclick="() => OnSelectType(false)" checked="@(!person.Source)"/>
+                        <label for="buyer">@LRes["Buyer"]</label>
                     </div>
                 </div>
             </div>
@@ -43,19 +46,14 @@
 @code {
     EditContext editContext;
 
-    MeatDTO meat = new() { Prozen = false, Type = (int)Constants.MeatType.Beef };
+    Person person = new() { Source = false };
 
     [Parameter]
     public EventCallback GetData { get; set; }
 
     protected override void OnInitialized()
     {
-        editContext = new(meat);
-    }
-
-    void onChange(string value)
-    {
-        meat.Prozen = Convert.ToBoolean(value);
+        editContext = new(person);
     }
 
     async Task OnSubmit()
@@ -64,17 +62,17 @@
         {
             if (editContext.Validate())
             {
-                bool result = MeatRepository.AddMeat(meat);
+                bool result = PeopleRepo.AddPerson(person);
 
                 if (result)
                 {
-                    meat = new() { Prozen = false };
-                    editContext = new(meat);
-                    await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["AddProductSuccess"]);
+                    person = new() { Source = false };
+                    editContext = new(person);
+                    await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["AddPersonSuccess"]);
                     await GetData.InvokeAsync();
                     return;
                 }
-                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["AddProductFailed"]);
+                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["AddPersonFailed"]);
             }
         }
         catch (Exception ex)
@@ -85,7 +83,13 @@
 
     void OnCloseModal()
     {
-        meat = new() { Prozen = false, Type = (int)Constants.MeatType.Beef };
-        editContext = new(meat);
+        person = new() { Source = false };
+        editContext = new(person);
     }
+
+    void OnSelectType(bool value)
+    {
+        person.Source = value;
+    }
+}
 }

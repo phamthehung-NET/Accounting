@@ -2,8 +2,9 @@
 using Accounting.Data;
 using Accounting.Model;
 using Accounting.Model.DTO;
+using Accounting.Repositories.Interfaces;
 
-namespace Accounting.Repositories
+namespace Accounting.Repositories.Implementations
 {
     public class MeatRepository : IMeatRepository
     {
@@ -33,7 +34,7 @@ namespace Accounting.Repositories
             return false;
         }
 
-        public Pagination<MeatDTO> GetAllMeats(string keyword, int? type, bool? prozen, int pageIndex, int pageSize)
+        public Pagination<MeatDTO> GetAllMeats(string keyword, int? type, bool? prozen, int pageIndex, int pageSize, string order)
         {
             var meats = context.Meats.Select(x => new MeatDTO
             {
@@ -63,8 +64,7 @@ namespace Accounting.Repositories
 
             meats = meats.Where(x => x.IsDeleted == false);
 
-            var pagination = HelperFunctions.GetPaging(pageIndex, pageSize, meats.OrderByDescending(x => x.Id));
-            return pagination;
+            return meats.OrderBy(order).Paginate(pageIndex, pageSize);
         }
 
         public MeatDTO GetMeatDetail(int id)

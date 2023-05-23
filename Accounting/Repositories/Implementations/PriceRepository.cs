@@ -1,9 +1,10 @@
 ﻿using Accounting.Common;
 using Accounting.Data;
 using Accounting.Model;
+using Accounting.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace Accounting.Repositories
+namespace Accounting.Repositories.Implementations
 {
     public class PriceRepository : IPriceRepository
     {

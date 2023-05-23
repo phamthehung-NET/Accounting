@@ -37,6 +37,8 @@
             else if (pageIndex > totalPages)
             {
                 pageIndex = totalPages;
+                nextPage = totalPages;
+                prevPage = totalPages - 1;
             }
             else if (pageIndex == 1)
             {

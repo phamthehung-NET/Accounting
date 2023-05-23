@@ -1,6 +1,6 @@
 ﻿using Accounting.Model.DTO;
 
-namespace Accounting.Repositories
+namespace Accounting.Repositories.Interfaces
 {
     public interface IPriceRepository
     {
