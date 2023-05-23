@@ -3,9 +3,7 @@ using Accounting.Model;
 using Accounting.Repositories.Implementations;
 using Accounting.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +40,7 @@ builder.Services.AddLocalization(opt => opt.ResourcesPath = "Resources");
 builder.Services.AddScoped<IMeatRepository, MeatRepository>();
 builder.Services.AddScoped<IPriceRepository, PriceRepository>();
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
+builder.Services.AddScoped<IBillRepository, BillRepository>();
 
 builder.Services.AddHttpContextAccessor();
 
