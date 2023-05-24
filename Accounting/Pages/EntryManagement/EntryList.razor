@@ -1,10 +1,163 @@
 ﻿@page "/manage-entry"
+@using Microsoft.AspNetCore.WebUtilities;
 @using Microsoft.Extensions.Localization;
 @inject IStringLocalizer<Resource> LRes
+@inject IBillRepository BillRepo
+@inject NavigationManager NavigationManager 
 
 <div class="container-fluid">
-    <CommonLabel DisplayText="@LRes["EntryList"]" Color="primary"></CommonLabel>
+    <div class="d-flex justify-content-between">
+        <CommonLabel DisplayText="@LRes["EntryList"]" Color="primary"></CommonLabel>
+        <button class="btn btn-outline-primary mb-2"><i class="fa-duotone fa-floppy-disk"></i> @LRes["Save"]</button>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+        <div class="fw-bold">@($"{LRes["Showing"]}: {LRes["date"]} {HelperFunctions.GetLunarDate(DateTime.Now)} {LRes["LunarDate"]}")</div>
+        <div>
+            <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@Keyword" @onchange="OnKeywordChange"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card col-md-3 col-sm-12 col-lg-3 col-xl-3 mb-4 p-0">
+            <div class="card-header">
+                @LRes["Add"]
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <div class="text-center text-primary" role="button" data-bs-toggle="modal" data-bs-target="#addBillPeopleModal">
+                    <i class="fa-regular fa-circle-plus fa-2xl"></i>
+                    <div class="mt-2" style="font-size: 1.5rem">@LRes["ClickToAdd"]</div>
+                </div>
+            </div>
+        </div>
+        @if(Bills != null && Bills.Items.Any())
+        {
+            foreach(var bill in Bills.Items)
+            {
+                <div class="card col-md-3 col-sm-12 col-lg-3 col-xl-3 mb-4 p-0">
+                    <div class="card-header d-flex justify-content-between">
+                        <div>@bill.PersonName</div>
+                        <div class="d-flex">
+                            <div>@(bill.Items.Count() + " " + LRes["item(s)"])</div>
+                            @((MarkupString)HandleShowStatus(false))
+                        </div>
+                    </div>
+                    <div class="card-body overflow-auto" style="height: 15rem">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-center text-primary align-items-center" role="button">
+                                <i class="fa-regular fa-circle-plus"></i>
+                                <div class="ms-2" data-bs-toggle="modal" data-bs-target="#addBillMeatModal" @onclick="() => {SelectedBill = bill;}">@LRes["Add"]</div>
+                            </li>
+                            @foreach(var item in bill.Items)
+                            {
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div>@(item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType != null ? item.MeatType.Value : null))</div>
+                                    <div>@(item.Weight + " Kg")</div>
+                                    <div>@item.Price</div>
+                                    <div role="button" @onclick="() => HandleDeleteItemFromBill(item.Id.Value)" class="text-danger"><i class="fa-regular fa-xmark"></i></div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            @(bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND")
+                        </div>
+                        <div>
+                            <button class="btn btn-primary me-1">@LRes["Pay"]</button>
+                            <button class="btn btn-danger">@LRes["Delete"]</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <CommonModalWrapper Id="addBillPeopleModal">
+        <ModalContent>
+            <AddBillPerson GetData="GetData" PriceType="PriceType.Entry"/>
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonModalWrapper Id="addBillMeatModal">
+        <ModalContent>
+            <AddBillMeat GetData="GetData" PriceType="PriceType.Entry" BillId="SelectedBill.Id" />
+        </ModalContent>
+    </CommonModalWrapper>
 </div>
-@code {
 
+@code {
+    string Keyword = string.Empty;
+
+    Pagination<BillDTO> Bills;
+
+    PaginationObject Pagination = new();
+
+    Dictionary<string, string> Query = new()
+    {
+        {"pageSize", ""},
+        {"keyword", ""},
+    };
+
+    Uri Uri;
+
+    List<BillDTO> SaveList = new();
+
+    BillDTO SelectedBill = new();
+
+    protected override void OnInitialized()
+    {
+        Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetData();
+        }
+    }
+
+    void GetData()
+    {
+        if (Uri != null)
+        {
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("keyword", out var keyword))
+            {
+                Keyword = keyword;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageSize", out var pageSize))
+            {
+                Pagination.PageSize = !string.IsNullOrEmpty(pageSize) ? int.Parse(pageSize) : Pagination.PageSize;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageIndex", out var pageIndex))
+            {
+                Pagination.PageIndex = !string.IsNullOrEmpty(pageIndex) ? int.Parse(pageIndex) : Pagination.PageIndex;
+            }
+        } 
+
+        Bills = BillRepo.GetAll(Keyword, DateTime.Now.AddDays(-1), null, Pagination.PageIndex, Pagination.PageSize);
+        StateHasChanged();
+    }
+
+    string HandleShowStatus(bool? status)
+    {
+        if(status != null && (bool)status)
+        {
+            return $"<div class='ms-2 text-success'>{LRes["Paid"]}</div>";
+        }
+        return $"<div class='ms-2 text-warning'>{LRes["Unpaid"]}</div>";
+    }
+
+    void OnKeywordChange(ChangeEventArgs e)
+    {
+        Keyword = e.Value.ToString();
+
+        Query["keyword"] = Keyword;
+        Query["pageSize"] = Pagination.PageSize.ToString();
+
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
+        GetData();
+    }
+
+    void HandleDeleteItemFromBill(int id)
+    {
+        
+    }
 }

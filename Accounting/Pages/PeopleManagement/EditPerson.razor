@@ -73,16 +73,16 @@
 
                 if (result)
                 {
-                    await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["EditPersonSuccess"]);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["EditPersonSuccess"]);
                     await GetData.InvokeAsync();
                     return;
                 }
-                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["EditPersonFailed"]);
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["EditPersonFailed"]);
             }
         }
         catch (Exception ex)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, ex.Message);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
         }
     }
 

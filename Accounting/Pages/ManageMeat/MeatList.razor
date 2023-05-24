@@ -30,9 +30,9 @@
         <div class="col-md-1 me-2">
             <select class="form-select" onchange="@((ChangeEventArgs e) => onParamsChange(e, "Type"))">
                 <option value="">@LRes["Meat Type"]</option>
-                <option value="@((int)Constants.MeatType.Beef)" selected="@(Type == (int)Constants.MeatType.Beef)">@LRes["Beef"]</option>
-                <option value="@((int)Constants.MeatType.Buffalo)" selected="@(Type == (int)Constants.MeatType.Buffalo)">@LRes["Buffalo"]</option>
-                <option value="@((int)Constants.MeatType.Calves)" selected="@(Type == (int)Constants.MeatType.Calves)">@LRes["Calves"]</option>
+                <option value="@((int)MeatType.Beef)" selected="@(Type == (int)MeatType.Beef)">@LRes["Beef"]</option>
+                <option value="@((int)MeatType.Buffalo)" selected="@(Type == (int)MeatType.Buffalo)">@LRes["Buffalo"]</option>
+                <option value="@((int)MeatType.Calves)" selected="@(Type == (int)MeatType.Calves)">@LRes["Calves"]</option>
             </select>
         </div>
         <div class="d-flex col-md-4 justify-content-between">
@@ -54,19 +54,21 @@
         PaginationObject="Pagination"
         DisplayPaging="true">
         <TBody>
-            <td>@Context.Name</td>
-            <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
-            <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
-            <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice + " " + LRes["Thousand Dong"])</td>
-            <td>@(Context.TodayEntryPrice == null ? LRes["No data"] : Context.TodayEntryPrice + " " + LRes["Thousand Dong"])</td>
-            <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice + " " + LRes["Thousand Dong"])</td>
-            <td>@(Context.TodaySalePrice == null ? LRes["No data"] : Context.TodaySalePrice + " " + LRes["Thousand Dong"])</td>
-            <td>
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMeatModal" @onclick="() => EditMeat(Context.Id) "><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
-                @*<button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>*@
-                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deleteMeat" + Context.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
-                <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteProductConfirmation"]" ModalID="@("deleteMeat" + Context.Id)" SubmitEvent="async () => await DeleteMeat(Context.Id)"/>
-            </td>
+            <tr>
+                <td>@Context.Name</td>
+                <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
+                <td>@(Context.Prozen.Value ? LRes["Prozen Meat"] : LRes["Fresh"])</td>
+                <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice + " " + LRes["Thousand Dong"])</td>
+                <td>@(Context.TodayEntryPrice == null ? LRes["No data"] : Context.TodayEntryPrice + " " + LRes["Thousand Dong"])</td>
+                <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice + " " + LRes["Thousand Dong"])</td>
+                <td>@(Context.TodaySalePrice == null ? LRes["No data"] : Context.TodaySalePrice + " " + LRes["Thousand Dong"])</td>
+                <td>
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMeatModal" @onclick="() => EditMeat(Context.Id) "><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
+                    @*<button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>*@
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deleteMeat" + Context.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
+                    <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteProductConfirmation"]" ModalID="@("deleteMeat" + Context.Id)" SubmitEvent="async () => await DeleteMeat(Context.Id)"/>
+                </td>
+            </tr>
         </TBody>
     </CommonDataTable>
     <CommonModalWrapper Id="addMeatModal">
@@ -177,11 +179,11 @@
         var result = MeatRepository.DeleteMeat(id);
         if (result)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["Move to recycle bin success"]);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
             GetData();
             return;
         }
-        await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["Move to reycle bin failed"]);
+        await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
     }
 
     void onParamsChange(ChangeEventArgs e, string paramType)

@@ -20,9 +20,9 @@
                     <div class="mb-2">
                         <label>@LRes["Meat Type"]</label>
                         <InputSelect @bind-Value="meat.Type" class="form-control">
-                            <option value="@((int)Constants.MeatType.Beef)">@LRes["Beef"]</option>
-                            <option value="@((int)Constants.MeatType.Buffalo)">@LRes["Buffalo"]</option>
-                            <option value="@((int)Constants.MeatType.Calves)">@LRes["Calves"]</option>
+                            <option value="@((int)MeatType.Beef)">@LRes["Beef"]</option>
+                            <option value="@((int)MeatType.Buffalo)">@LRes["Buffalo"]</option>
+                            <option value="@((int)MeatType.Calves)">@LRes["Calves"]</option>
                         </InputSelect>
                     </div>
                     <div class="mb-2">
@@ -43,7 +43,7 @@
 @code {
     EditContext editContext;
 
-    MeatDTO meat = new() { Prozen = false, Type = (int)Constants.MeatType.Beef };
+    MeatDTO meat = new() { Prozen = false, Type = (int)MeatType.Beef };
 
     [Parameter]
     public EventCallback GetData { get; set; }
@@ -80,16 +80,16 @@
 
                 if (result)
                 {
-                    await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["EditProductSuccess"]);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["EditProductSuccess"]);
                     await GetData.InvokeAsync();
                     return;
                 }
-                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["EditProductFailed"]);
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["EditProductFailed"]);
             }
         }
         catch (Exception ex)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, ex.Message);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
         }
     }
 }

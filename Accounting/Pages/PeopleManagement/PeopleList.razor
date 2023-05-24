@@ -22,17 +22,19 @@
         PaginationObject="Pagination"
         DisplayPaging="true">
         <TBody>
-            <td>@Context.Name</td>
-            <td>@Context.PhoneNumber</td>
-            <td>@Context.Address</td>
-            <td>@HandleDisplayType(Context.Source)</td>
-            <td>@(Context.NearestTransaction != null ? Context.NearestTransaction : LRes["No data"])</td>
-            <td>
-                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPersonModal" @onclick="() => EditPerson(Context.Id)"><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
-                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deletePerson" + Context.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
-                <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeletePersonConfirmation"]" ModalID="@("deletePerson" + Context.Id)" SubmitEvent="async () => await DeletePerson(Context.Id)"/>
-            </td>
+            <tr>
+                <td>@Context.Name</td>
+                <td>@Context.PhoneNumber</td>
+                <td>@Context.Address</td>
+                <td>@HandleDisplayType(Context.Source)</td>
+                <td>@(Context.NearestTransaction != null ? Context.NearestTransaction : LRes["No data"])</td>
+                <td>
+                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPersonModal" @onclick="() => EditPerson(Context.Id)"><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deletePerson" + Context.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
+                    <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeletePersonConfirmation"]" ModalID="@("deletePerson" + Context.Id)" SubmitEvent="async () => await DeletePerson(Context.Id)"/>
+                </td>
+            </tr>
         </TBody>
     </CommonDataTable>
     <CommonModalWrapper Id="addPersonModal">
@@ -146,17 +148,17 @@
         var result = PeopleRepo.DeletePerson(id);
         if (result)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, "success", LRes["Move to recycle bin success"]);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
             GetData();
             return;
         }
-        await HelperFunctions.ShowNotification(JsRuntime, "danger", LRes["Move to reycle bin failed"]);
+        await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
     }
 
     string HandleDisplayType(bool? type)
     {
         if (type != null && (bool)type)
-    {
+        {
             return LRes["Seller"];
         }
         return LRes["Buyer"];

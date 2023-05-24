@@ -68,16 +68,16 @@
                 {
                     person = new() { Source = false };
                     editContext = new(person);
-                    await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["AddPersonSuccess"]);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["AddPersonSuccess"]);
                     await GetData.InvokeAsync();
                     return;
                 }
-                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["AddPersonFailed"]);
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddPersonFailed"]);
             }
         }
         catch (Exception ex)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, ex.Message);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
         }
     }
 

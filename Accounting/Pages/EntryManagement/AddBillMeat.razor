@@ -1,0 +1,109 @@
+﻿@using Microsoft.Extensions.Localization;
+@inject IMeatRepository MeatRepo
+@inject IBillRepository BillRepo
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["ChooseMeat"]" Color="warning"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-2">
+                <label>@LRes["Weight"]</label>
+                <input class="form-control" type="number" value="@Weight" placeholder="@LRes["EnterWeight"]" min="0" @onchange="(ChangeEventArgs e) => { Weight = decimal.Parse(e.Value.ToString().Replace('.', ',')); }"/>
+            </div>
+            <div class="mb-2">
+                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => {Keyword = e.Value.ToString(); GetMeatData();})"/>
+            </div>
+                @if (Meats != null && Meats.Items.Any())
+                {
+                    <CommonDataTable Context="Context"
+                        Headers="Headers"
+                        TData="MeatDTO"
+                        PaginationData="Meats"
+                        DisplayPaging="false">
+                        <TBody>
+                            <tr role="button" @onclick="() => OnSelectMeat(Context.Id)">
+                                <td>@Context.Name</td>
+                                <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
+                                <td>@(Context.Prozen.Value ? LRes["Prozen Meat"] : LRes["Fresh"])</td>
+                            </tr>
+                        </TBody>
+                    </CommonDataTable>
+                }
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public Action GetData { get; set; }
+
+    [Parameter]
+    public int BillId { get; set; }
+
+    [Parameter]
+    public PriceType PriceType { get; set; }
+
+    public List<Header> Headers = new();
+
+    Pagination<MeatDTO> Meats;
+
+    decimal Weight = 0;
+
+    string Keyword = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"] });
+        Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"] });
+        Headers.Add(new Header() { Name = "Prozen", DisplayName = LRes["Prozen Meat"] + "?" });
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetMeatData();
+        }
+    }
+
+    void GetMeatData()
+    {
+        Meats = MeatRepo.GetAllMeats(Keyword, null, null, 1, 10000, "");
+        StateHasChanged();
+    }
+
+    string HandleDisplayType(bool? type)
+    {
+        if (type != null && (bool)type)
+        {
+            return LRes["Seller"];
+        }
+        return LRes["Buyer"];
+    }
+
+    async Task OnSelectMeat(int id)
+    {
+        if (BillRepo.AddMeatToBill(id, Weight, BillId, PriceType))
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillMeat"]);
+            await HelperFunctions.HideModal(JsRuntime, "addBillMeatModal");
+            GetData.Invoke();
+            Weight = 0;
+            BillId = 0;
+        }
+        else
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddBillMeatFailed"]);
+            Weight = 0;
+        }
+    }
+}

@@ -1,0 +1,105 @@
+﻿@using Microsoft.Extensions.Localization;
+@inject IPeopleRepository PeopleRepo
+@inject IBillRepository BillRepo
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["ChoosePerson"]" Color="warning"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-2">
+                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => {Keyword = e.Value.ToString(); GetPeopleData();})"/>
+            </div>
+                @if (People != null && People.Items.Any())
+                {
+                    <CommonDataTable Context="Context"
+                        Headers="Headers"
+                        TData="PersonDTO"
+                        PaginationData="People"
+                        DisplayPaging="false">
+                        <TBody>
+                            <tr role="button" @onclick="() => OnSelectPerson(Context.Id)">
+                                <td>@Context.Name</td>
+                                <td>@Context.PhoneNumber</td>
+                                <td>@Context.Address</td>
+                                <td>@HandleDisplayType(Context.Source)</td>
+                            </tr>
+                        </TBody>
+                    </CommonDataTable>
+                }
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public Action GetData { get; set; }
+
+    [Parameter]
+    public PriceType PriceType { get; set; }
+
+    public List<Header> Headers = new();
+
+    Pagination<PersonDTO> People;
+
+    string Keyword = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"] });
+        Headers.Add(new Header() { Name = "PhoneNumber", DisplayName = LRes["PhoneNumber"] });
+        Headers.Add(new Header() { Name = "Address", DisplayName = LRes["Address"] });
+        Headers.Add(new Header() { Name = "Source", DisplayName = LRes["Type"] });
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetPeopleData();
+        }
+    }
+
+    void GetPeopleData()
+    {
+        People = PeopleRepo.GetAllPeople(Keyword, "", null, 1, 10000);
+        StateHasChanged();
+    }
+
+    string HandleDisplayType(bool? type)
+    {
+        if (type != null && (bool)type)
+        {
+            return LRes["Seller"];
+        }
+        return LRes["Buyer"];
+    }
+
+    async Task OnSelectPerson(int id)
+    {
+        BillDTO bill = new()
+        {
+            PersonId = id,
+            Type = (int)PriceType
+        };
+
+        if (BillRepo.AddBill(bill))
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillPerson"]);
+            await HelperFunctions.HideModal(JsRuntime, "addBillPeopleModal");
+            GetData.Invoke();
+        }
+        else
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["ThisPersonIsExisted"]);
+        }
+    }
+}

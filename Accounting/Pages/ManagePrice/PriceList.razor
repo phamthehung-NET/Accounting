@@ -13,52 +13,6 @@
         <div class="modal-body">
             @if (Meats != null)
             {
-                @*<table class="table table-bordered table-striped text-center">
-                    <thead>
-                        <tr>
-                            <th class="align-middle">@LRes["Name"]</th>
-                            <th class="align-middle">@LRes["Meat Type"]</th>
-                            <th class="align-middle">@LRes["Prozen Meat"]?</th>
-                            <th>
-                                @LRes["Yesterday Entry Price"]/Kg
-                                <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
-                            </th>
-                            <th>
-                                @LRes["Today Entry Price"]/Kg
-                                <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
-                            </th>
-                            <th>
-                                @LRes["Yesterday Sale Price"]/Kg
-                                <div>@HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))</div>
-                            </th>
-                            <th>
-                                @LRes["Today Sale Price"]/Kg
-                                <div>@HelperFunctions.GetLunarDate(DateTime.Now)</div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Meats.Items.Any())
-                        {
-                            foreach (var meat in Meats.Items)
-                            {
-                                <tr>
-                                    <td>@meat.Name</td>
-                                    <td>@HelperFunctions.RenderMeatType(LRes, meat.Type.Value)</td>
-                                    <td>@(meat.Prozen.Value ? "✔️" : "❌")</td>
-                                    <td>@(meat.YesterdayEntryPrice == null ? LRes["No data"] : meat.YesterdayEntryPrice)</td>
-                                    <td>
-                                        <input type="number" min=0 value="@(meat.TodayEntryPrice == null ? (InputEntryList.TryGetValue(meat.Id, out int value) ? value : null) : meat.TodayEntryPrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "entry"))"/>
-                                    </td>
-                                    <td>@(meat.YesterdaySalePrice == null ? LRes["No data"] : meat.YesterdaySalePrice)</td>
-                                    <td>
-                                        <input type="number" min=0 value="@(meat.TodaySalePrice == null ? (InputSaleList.TryGetValue(meat.Id, out int saleval) ? saleval : null) : meat.TodaySalePrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(meat.Id, int.Parse(e.Value.ToString()), "sale"))" />
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>*@
                 <CommonDataTable Context="Context" 
                     Headers="Headers" 
                     TData="MeatDTO" 
@@ -66,17 +20,19 @@
                     Sorting="@Sorting" 
                     SortData="(sortingString) => SortData(sortingString)">
                     <TBody>
-                        <td>@Context.Name</td>
-                        <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
-                        <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
-                        <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice)</td>
-                        <td>
-                            <input type="number" min=0 value="@(Context.TodayEntryPrice == null ? (InputEntryList.TryGetValue(Context.Id, out int value) ? value : null) : Context.TodayEntryPrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "entry"))"/>
-                        </td>
-                        <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice)</td>
-                        <td>
-                            <input type="number" min=0 value="@(Context.TodaySalePrice == null ? (InputSaleList.TryGetValue(Context.Id, out int saleval) ? saleval : null) : Context.TodaySalePrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "sale"))" />
-                        </td>
+                        <tr>
+                            <td>@Context.Name</td>
+                            <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
+                            <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
+                            <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice)</td>
+                            <td>
+                                <input type="number" min=0 value="@(Context.TodayEntryPrice == null ? (InputEntryList.TryGetValue(Context.Id, out int? value) ? value : null) : Context.TodayEntryPrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "entry"))"/>
+                            </td>
+                            <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice)</td>
+                            <td>
+                                <input type="number" min=0 value="@(Context.TodaySalePrice == null ? (InputSaleList.TryGetValue(Context.Id, out int? saleval) ? saleval : null) : Context.TodaySalePrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "sale"))" />
+                            </td>
+                        </tr>
                     </TBody>
                     <Pagination>
                     </Pagination>
@@ -103,9 +59,9 @@
 
     string Sorting = "id_asc";
 
-    Dictionary<int, int> InputEntryList = new();
+    Dictionary<int, int?> InputEntryList = new();
 
-    Dictionary<int, int> InputSaleList = new();
+    Dictionary<int, int?> InputSaleList = new();
 
     protected override void OnInitialized()
     {
@@ -156,15 +112,15 @@
             {
                 InputEntryList.Clear();
                 InputSaleList.Clear();
-                await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastSuccess, LRes["EditPriceSuccess"]);
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["EditPriceSuccess"]);
                 await GetData.InvokeAsync();
                 return;
             }
-            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, LRes["EditPriceFailed"]);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["EditPriceFailed"]);
         }
         catch (Exception ex)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, Constants.ToastError, ex.Message);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
             throw;
         }
     }

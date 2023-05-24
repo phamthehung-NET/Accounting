@@ -51,7 +51,7 @@
             }
             else if (!user.Identity.IsAuthenticated && Uri.AbsolutePath.Equals("/unauthorized"))
             {
-                await HelperFunctions.ShowNotification(JsRuntime, "warning", "Unauthorized");
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Warning, "Unauthorized");
             }
         }
     }

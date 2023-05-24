@@ -43,10 +43,10 @@ namespace Accounting.Repositories.Implementations
                 Type = x.Type,
                 Prozen = x.Prozen,
                 IsDeleted = x.IsDeleted,
-                YesterdayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == (int)Constants.PriceType.Entry).Price,
-                TodayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == (int)Constants.PriceType.Entry).Price,
-                YesterdaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == (int)Constants.PriceType.Sale).Price,
-                TodaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == (int)Constants.PriceType.Sale).Price,
+                YesterdayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == (int)PriceType.Entry).Price,
+                TodayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == (int)PriceType.Entry).Price,
+                YesterdaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == (int)PriceType.Sale).Price,
+                TodaySalePrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == (int)PriceType.Sale).Price,
             });
 
             if (!string.IsNullOrEmpty(keyword))
@@ -107,7 +107,7 @@ namespace Accounting.Repositories.Implementations
                 RecycleBin recycle = new()
                 {
                     ObjectId = id,
-                    Type = (int)Constants.RecycleBinObjectType.Meat,
+                    Type = (int)RecycleBinObjectType.Meat,
                     CreatedDate = DateTime.Now,
                 };
                 context.RecycleBins.Add(recycle);

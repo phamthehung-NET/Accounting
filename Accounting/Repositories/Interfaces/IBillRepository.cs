@@ -14,5 +14,7 @@ namespace Accounting.Repositories.Interfaces
         bool DeleteBill(int id);
 
         bool PayingBill(int id);
+
+        bool AddMeatToBill(int id, decimal weight, int billId, PriceType priceType);
     }
 }

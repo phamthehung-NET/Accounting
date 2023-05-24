@@ -9,7 +9,7 @@ namespace Accounting.Model
 
         public int? MeatId { get; set; }
 
-        public double? Price { get; set; }
+        public decimal? Price { get; set; }
 
         public int PriceType { get; set; }
 

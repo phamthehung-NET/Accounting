@@ -32,7 +32,7 @@ namespace Accounting.Repositories.Implementations
                 RecycleBin recycle = new()
                 {
                     ObjectId = id,
-                    Type = (int)Constants.RecycleBinObjectType.Person,
+                    Type = (int)RecycleBinObjectType.Person,
                     CreatedDate = DateTime.Now,
                 };
                 context.Add(recycle);
@@ -56,16 +56,16 @@ namespace Accounting.Repositories.Implementations
 
             if(!string.IsNullOrEmpty(keyword))
             {
-                people.Where(x => x.Name.ToLower().Contains(keyword.ToLower())
+                 people = people.Where(x => x.Name.ToLower().Contains(keyword.ToLower())
                     || x.PhoneNumber.ToLower().Contains(keyword.ToLower())
                     || x.Address.ToLower().Contains(keyword.ToLower()));
             }
             if(isSource != null)
             {
-                people.Where(x => x.Source == isSource);
+                people = people.Where(x => x.Source == isSource);
             }
 
-            people.Where(x => x.IsDeleted == false);
+            people = people.Where(x => x.IsDeleted == false);
 
             return people.OrderBy(order).Paginate(pageIndex, pageSize);
         }

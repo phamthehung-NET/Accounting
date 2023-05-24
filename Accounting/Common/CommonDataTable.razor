@@ -13,20 +13,27 @@
             <tr>
                 @foreach (var header in Headers)
                 {
-                    if (header.Ordering && Sorting.ToLower().Contains(header.Name.ToLower()))
+                    if (!string.IsNullOrEmpty(Sorting))
                     {
-                        if (Sorting.ToLower().Contains("asc"))
+                        if (header.Ordering && Sorting.ToLower().Contains(header.Name.ToLower()))
                         {
-                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down fa-rotate-180 float-end"></i></th>
+                            if (Sorting.ToLower().Contains("asc"))
+                            {
+                                <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down fa-rotate-180 float-end"></i></th>
+                            }
+                            else
+                            {
+                                <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down float-end"></i></th>
+                            }
+                        }
+                        else if (header.Ordering && !Sorting.ToLower().Contains(header.Name.ToLower()))
+                        {
+                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName)<i class="fa-solid fa-arrow-up-arrow-down float-end" style="color: #a5acb9;"></i></th>
                         }
                         else
                         {
-                            <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName) <i class="fa-duotone fa-arrow-up-arrow-down float-end"></i></th>
+                            <th>@((MarkupString)header.DisplayName)</th>
                         }
-                    }
-                    else if (header.Ordering && !Sorting.ToLower().Contains(header.Name.ToLower()))
-                    {
-                        <th role="button" onclick="@(() => OnHeaderClick(header.Name))">@((MarkupString)header.DisplayName)<i class="fa-solid fa-arrow-up-arrow-down float-end" style="color: #a5acb9;"></i></th>
                     }
                     else
                     {
@@ -41,7 +48,7 @@
         {
             @foreach (var item in PaginationData.Items)
             {
-                <tr>@TBody(item)</tr>
+                @TBody(item)
             }
         }
         else

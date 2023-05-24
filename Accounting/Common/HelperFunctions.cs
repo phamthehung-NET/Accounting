@@ -13,22 +13,42 @@ namespace Accounting.Common
         //    return new Pagination<T>(items.Count(), pageIndex, itemPerPage, items);
         //}
 
-        public static string RenderMeatType(IStringLocalizer<Resource> LRes, int type)
+        public static string RenderMeatType(IStringLocalizer<Resource> LRes, int? type)
         {
-            if (type == (int)Constants.MeatType.Buffalo)
+            if(type == null)
             {
-                return LRes["Buffalo"];
+                return string.Empty;
             }
-            return LRes["Beef"];
+            else
+            {
+                if (type == (int)MeatType.Buffalo)
+                {
+                    return LRes["Buffalo"];
+                }
+                return LRes["Beef"];
+            }
         }
 
-        public static void NavigateUrl(NavigationManager navigation, string url)
+        public async static Task ShowNotification(IJSRuntime jsRuntime, ToastType toastType, string content)
         {
-            navigation.NavigateTo(url);
-        }
-
-        public async static Task ShowNotification(IJSRuntime jsRuntime, string bootstrapColor, string content)
-        {
+            var bootstrapColor = "info";
+            switch (toastType)
+            {
+                case ToastType.Error:
+                    bootstrapColor = "danger";
+                    break;
+                case ToastType.Notification:
+                    bootstrapColor = "info";
+                    break;
+                case ToastType.Success:
+                    bootstrapColor = "success";
+                    break;
+                case ToastType.Warning:
+                    bootstrapColor = "warning";
+                    break;
+                default:
+                    break;
+            }
             await jsRuntime.InvokeVoidAsync("showToast", bootstrapColor, content);
         }
 
@@ -43,6 +63,11 @@ namespace Accounting.Common
         public static async Task TriggerBtn(IJSRuntime jSRuntime, string btnId)
         {
             await jSRuntime.InvokeVoidAsync("triggerBtn", btnId);
+        }
+
+        public static async Task HideModal(IJSRuntime jSRuntime, string modalId)
+        {
+            await jSRuntime.InvokeVoidAsync("hideModal", modalId);
         }
     }
 }

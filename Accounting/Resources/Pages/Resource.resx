@@ -123,6 +123,9 @@
   <data name="Add" xml:space="preserve">
     <value>Thêm mới</value>
   </data>
+  <data name="AddBillMeatFailed" xml:space="preserve">
+    <value>Thêm mặt hàng vào hóa đơn thất bại</value>
+  </data>
   <data name="AddNewPerson" xml:space="preserve">
     <value>Tạo người mua/bán mới</value>
   </data>
@@ -153,8 +156,20 @@
   <data name="Buyer" xml:space="preserve">
     <value>Người mua</value>
   </data>
+  <data name="ChooseMeat" xml:space="preserve">
+    <value>Chọn mặt hàng</value>
+  </data>
+  <data name="ChoosePerson" xml:space="preserve">
+    <value>Chọn người mua/bán</value>
+  </data>
+  <data name="ClickToAdd" xml:space="preserve">
+    <value>Chọn để thêm mới</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>Đóng</value>
+  </data>
+  <data name="date" xml:space="preserve">
+    <value>ngày</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Xóa</value>
@@ -192,8 +207,17 @@
   <data name="EditProductSuccess" xml:space="preserve">
     <value>Cập nhật thông tin sản phẩm thành công</value>
   </data>
+  <data name="EnterWeight" xml:space="preserve">
+    <value>Nhập cân nặng</value>
+  </data>
+  <data name="EntryList" xml:space="preserve">
+    <value>Danh sách nhập hàng</value>
+  </data>
   <data name="Filter" xml:space="preserve">
     <value>Lọc</value>
+  </data>
+  <data name="Fresh" xml:space="preserve">
+    <value>Tươi sống</value>
   </data>
   <data name="from" xml:space="preserve">
     <value>từ</value>
@@ -206,6 +230,9 @@
   </data>
   <data name="item(s)" xml:space="preserve">
     <value>sản phẩm</value>
+  </data>
+  <data name="LunarDate" xml:space="preserve">
+    <value>Âm lịch</value>
   </data>
   <data name="Manage entries" xml:space="preserve">
     <value>Quản lý nhập vào</value>
@@ -249,6 +276,12 @@
   <data name="or click" xml:space="preserve">
     <value>hoặc nhấp vào</value>
   </data>
+  <data name="Paid" xml:space="preserve">
+    <value>Đã thanh toán</value>
+  </data>
+  <data name="Pay" xml:space="preserve">
+    <value>Thanh toán</value>
+  </data>
   <data name="PeopleList" xml:space="preserve">
     <value>Danh sách người mua/bán</value>
   </data>
@@ -276,6 +309,9 @@
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Chuyển hướng đến trang đăng nhập trong</value>
   </data>
+  <data name="Save" xml:space="preserve">
+    <value>Lưu</value>
+  </data>
   <data name="Search by name" xml:space="preserve">
     <value>Tìm theo tên</value>
   </data>
@@ -284,6 +320,15 @@
   </data>
   <data name="Showing" xml:space="preserve">
     <value>Đang hiển thị</value>
+  </data>
+  <data name="SuccessfullyAddBillMeat" xml:space="preserve">
+    <value>Thêm mặt hàng vào hóa đơn thành công</value>
+  </data>
+  <data name="SuccessfullyAddBillPerson" xml:space="preserve">
+    <value>Tạo hóa đơn thành công</value>
+  </data>
+  <data name="ThisPersonIsExisted" xml:space="preserve">
+    <value>Hóa đơn cho người này đã tồn tại, vui lòng kiểm tra lại</value>
   </data>
   <data name="Thousand Dong" xml:space="preserve">
     <value>nghìn đồng</value>
@@ -300,8 +345,14 @@
   <data name="Type" xml:space="preserve">
     <value>Kiểu</value>
   </data>
+  <data name="Unpaid" xml:space="preserve">
+    <value>Chưa thanh toán</value>
+  </data>
   <data name="ViewNearestTransaction" xml:space="preserve">
     <value>Xem thông tin giao dịch gần nhất</value>
+  </data>
+  <data name="Weight" xml:space="preserve">
+    <value>Cân nặng</value>
   </data>
   <data name="Yesterday Entry Price" xml:space="preserve">
     <value>Giá Nhập Hôm Qua</value>

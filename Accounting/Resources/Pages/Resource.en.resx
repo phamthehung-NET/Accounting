@@ -123,6 +123,9 @@
   <data name="Add" xml:space="preserve">
     <value>Add New</value>
   </data>
+  <data name="AddBillMeatFailed" xml:space="preserve">
+    <value>Add product to bill failed</value>
+  </data>
   <data name="AddNewPerson" xml:space="preserve">
     <value>Add new person</value>
   </data>
@@ -153,8 +156,20 @@
   <data name="Buyer" xml:space="preserve">
     <value>Buyer</value>
   </data>
+  <data name="ChooseMeat" xml:space="preserve">
+    <value>Choose the product</value>
+  </data>
+  <data name="ChoosePerson" xml:space="preserve">
+    <value>Choose person</value>
+  </data>
+  <data name="ClickToAdd" xml:space="preserve">
+    <value>Click here to add</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
+  </data>
+  <data name="date" xml:space="preserve">
+    <value>date</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
@@ -192,8 +207,17 @@
   <data name="EditProductSuccess" xml:space="preserve">
     <value>Edit product successully</value>
   </data>
+  <data name="EnterWeight" xml:space="preserve">
+    <value>Enter weight</value>
+  </data>
+  <data name="EntryList" xml:space="preserve">
+    <value>Entry list</value>
+  </data>
   <data name="Filter" xml:space="preserve">
     <value>Filter</value>
+  </data>
+  <data name="Fresh" xml:space="preserve">
+    <value>Fresh</value>
   </data>
   <data name="from" xml:space="preserve">
     <value>from</value>
@@ -206,6 +230,9 @@
   </data>
   <data name="item(s)" xml:space="preserve">
     <value>item(s)</value>
+  </data>
+  <data name="LunarDate" xml:space="preserve">
+    <value>Lunar date</value>
   </data>
   <data name="Manage entries" xml:space="preserve">
     <value>Manage entries</value>
@@ -249,6 +276,12 @@
   <data name="or click" xml:space="preserve">
     <value>or click</value>
   </data>
+  <data name="Paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="Pay" xml:space="preserve">
+    <value>Pay</value>
+  </data>
   <data name="PeopleList" xml:space="preserve">
     <value>People list</value>
   </data>
@@ -268,13 +301,16 @@
     <value>Product name</value>
   </data>
   <data name="Prozen Meat" xml:space="preserve">
-    <value>Prozen</value>
+    <value>Frozen</value>
   </data>
   <data name="Recycle bin" xml:space="preserve">
     <value>Recycle bin</value>
   </data>
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Redirecting to login in</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
   </data>
   <data name="Search by name" xml:space="preserve">
     <value>Search by name</value>
@@ -284,6 +320,15 @@
   </data>
   <data name="Showing" xml:space="preserve">
     <value>Showing</value>
+  </data>
+  <data name="SuccessfullyAddBillMeat" xml:space="preserve">
+    <value>Add product to bill successfully</value>
+  </data>
+  <data name="SuccessfullyAddBillPerson" xml:space="preserve">
+    <value>Add bill successfully</value>
+  </data>
+  <data name="ThisPersonIsExisted" xml:space="preserve">
+    <value>Bill for this person is already existed, please check again</value>
   </data>
   <data name="Thousand Dong" xml:space="preserve">
     <value>thousand dong</value>
@@ -300,8 +345,14 @@
   <data name="Type" xml:space="preserve">
     <value>Type</value>
   </data>
+  <data name="Unpaid" xml:space="preserve">
+    <value>Unpaid</value>
+  </data>
   <data name="ViewNearestTransaction" xml:space="preserve">
     <value>View nearest transaction</value>
+  </data>
+  <data name="Weight" xml:space="preserve">
+    <value>Weight</value>
   </data>
   <data name="Yesterday Entry Price" xml:space="preserve">
     <value>Yesterday Entry Price</value>

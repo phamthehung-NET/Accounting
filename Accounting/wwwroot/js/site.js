@@ -16,3 +16,7 @@
 window.triggerBtn = (id) => {
     $(`#${id}`).trigger('click');
 }
+
+window.hideModal = (id) => {
+    $(`#${id}`).modal('toggle');
+}

@@ -12,12 +12,14 @@
 
         public bool? IsDeleted { get; set; }
 
-        public double? YesterdayEntryPrice { get; set; }
+        public decimal? Weight { get; set; }
 
-        public double? TodayEntryPrice { get; set; }
+        public decimal? YesterdayEntryPrice { get; set; }
 
-        public double? YesterdaySalePrice { get; set; }
+        public decimal? TodayEntryPrice { get; set; }
 
-        public double? TodaySalePrice { get; set; }
+        public decimal? YesterdaySalePrice { get; set; }
+
+        public decimal? TodaySalePrice { get; set; }
     }
 }
