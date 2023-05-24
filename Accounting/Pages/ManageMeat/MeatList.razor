@@ -58,10 +58,10 @@
                 <td>@Context.Name</td>
                 <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
                 <td>@(Context.Prozen.Value ? LRes["Prozen Meat"] : LRes["Fresh"])</td>
-                <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice + " " + LRes["Thousand Dong"])</td>
-                <td>@(Context.TodayEntryPrice == null ? LRes["No data"] : Context.TodayEntryPrice + " " + LRes["Thousand Dong"])</td>
-                <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice + " " + LRes["Thousand Dong"])</td>
-                <td>@(Context.TodaySalePrice == null ? LRes["No data"] : Context.TodaySalePrice + " " + LRes["Thousand Dong"])</td>
+                <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice.Value.ToString("n0") + " " + LRes["Thousand Dong"])</td>
+                <td>@(Context.TodayEntryPrice == null ? LRes["No data"] : Context.TodayEntryPrice.Value.ToString("n0") + " " + LRes["Thousand Dong"])</td>
+                <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice.Value.ToString("n0") + " " + LRes["Thousand Dong"])</td>
+                <td>@(Context.TodaySalePrice == null ? LRes["No data"] : Context.TodaySalePrice.Value.ToString("n0") + " " + LRes["Thousand Dong"])</td>
                 <td>
                     <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMeatModal" @onclick="() => EditMeat(Context.Id) "><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
                     @*<button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>*@

@@ -26,11 +26,11 @@
                             <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
                             <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice)</td>
                             <td>
-                                <input type="number" min=0 value="@(Context.TodayEntryPrice == null ? (InputEntryList.TryGetValue(Context.Id, out int? value) ? value : null) : Context.TodayEntryPrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "entry"))"/>
+                                <input type="number" min=0 value="@(Context.TodayEntryPrice == null ? (InputEntryList.TryGetValue(Context.Id, out int? value) ? value : null) : Convert.ToInt32(Context.TodayEntryPrice.Value.ToString("n0")))" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "entry"))"/>
                             </td>
                             <td>@(Context.YesterdaySalePrice == null ? LRes["No data"] : Context.YesterdaySalePrice)</td>
                             <td>
-                                <input type="number" min=0 value="@(Context.TodaySalePrice == null ? (InputSaleList.TryGetValue(Context.Id, out int? saleval) ? saleval : null) : Context.TodaySalePrice)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "sale"))" />
+                                <input type="number" min=0 value="@(Context.TodaySalePrice == null ? (InputSaleList.TryGetValue(Context.Id, out int? saleval) ? saleval : null) : Convert.ToInt32(Context.TodaySalePrice.Value.ToString("n0")))" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "sale"))" />
                             </td>
                         </tr>
                     </TBody>

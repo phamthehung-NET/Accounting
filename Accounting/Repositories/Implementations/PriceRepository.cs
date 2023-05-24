@@ -24,7 +24,34 @@ namespace Accounting.Repositories.Implementations
             var user = userManager.FindByNameAsync(httpContext.HttpContext.User.Identity.Name).Result;
             if (!inputEntryPrice.Any() && !inputSalePrice.Any())
             {
-                return false;
+                List<MeatPrice> addList = new();
+                var priceDb = context.MeatPrices.Where(x => x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0);
+                if (!priceDb.Any())
+                {
+                    var yesterdayPriceDb = context.MeatPrices.Where(x => x.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0);
+                    foreach (var x in yesterdayPriceDb)
+                    {
+                        if (x.Price == null)
+                        {
+                            var lastestPrice = context.MeatPrices
+                                .Where(y => y.MeatId == x.MeatId && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) < 0 && y.PriceType == x.PriceType && y.Price != null);
+                            x.Price = lastestPrice.Any() ? lastestPrice.MaxBy(y => y.ActiveDate).Price : null;
+                        }
+                        else
+                        {
+                            MeatPrice meatPrice = new()
+                            {
+                                MeatId = x.MeatId,
+                                ActiveDate = DateTime.Now,
+                                CreatedDate = DateTime.Now,
+                                PriceType = x.PriceType,
+                                Price = x.Price != null ? x.Price : null,
+                            };
+                            addList.Add(meatPrice);
+                        }
+                    }
+                    context.AddRange(addList);
+                }
             }
             List<MeatPrice> priceList = new();
             foreach (var item in inputEntryPrice)
@@ -39,7 +66,7 @@ namespace Accounting.Repositories.Implementations
                         CreatedDate = DateTime.Now,
                         PriceType = (int)PriceType.Entry,
                     };
-                    
+
                     if (item.Value == null)
                     {
                         var lastestPrice = context.MeatPrices
@@ -73,7 +100,7 @@ namespace Accounting.Repositories.Implementations
                         PriceType = (int)PriceType.Sale,
                     };
 
-                    if(item.Value == null)
+                    if (item.Value == null)
                     {
                         var lastestPrice = context.MeatPrices
                             .Where(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) < 0 && x.PriceType == (int)PriceType.Sale && x.Price != null)

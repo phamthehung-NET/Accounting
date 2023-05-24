@@ -13,7 +13,7 @@
         <div class="modal-body">
             <div class="mb-2">
                 <label>@LRes["Weight"]</label>
-                <input class="form-control" type="number" value="@Weight" placeholder="@LRes["EnterWeight"]" min="0" @onchange="(ChangeEventArgs e) => { Weight = decimal.Parse(e.Value.ToString().Replace('.', ',')); }"/>
+                <input class="form-control" type="number" value="@(Weight == 0 ? null : Weight)" placeholder="@LRes["EnterWeight"]" min="0" @onchange="(ChangeEventArgs e) => { Weight = decimal.Parse(e.Value.ToString().Replace('.', ',')); }"/>
             </div>
             <div class="mb-2">
                 <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => {Keyword = e.Value.ToString(); GetMeatData();})"/>

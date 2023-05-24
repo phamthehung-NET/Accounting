@@ -19,7 +19,7 @@ namespace Accounting.Repositories.Implementations
         {
             var currentDate = DateTime.Now;
             var billDb = context.Bills.FirstOrDefault(x => x.PersonId == res.PersonId && x.ActiveDate.Value.Date == currentDate.Date && x.Type == res.Type);
-            if(billDb == null)
+            if (billDb == null)
             {
                 Bill bill = new()
                 {
@@ -103,8 +103,8 @@ namespace Accounting.Repositories.Implementations
             var currentDate = DateTime.Now;
             var bill = context.Bills.FirstOrDefault(x => x.Id == billId);
             var meat = context.Meats.FirstOrDefault(x => x.Id == id);
-            var meatPrice = context.MeatPrices.FirstOrDefault(x => x.ActiveDate.Value.Date.CompareTo(currentDate.Date) == 0 && x.Id == id && x.PriceType == (int)priceType);
-            if(bill != null && meat != null && meatPrice != null)
+            var meatPrice = context.MeatPrices.FirstOrDefault(x => x.ActiveDate.Value.Date.CompareTo(currentDate.Date) == 0 && x.MeatId == id && x.PriceType == (int)priceType);
+            if (bill != null && meat != null && meatPrice != null)
             {
                 MeatBillPrice meatBill = new()
                 {
