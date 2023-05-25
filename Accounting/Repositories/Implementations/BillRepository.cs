@@ -43,7 +43,7 @@ namespace Accounting.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize)
+        public Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize, PriceType priceType)
         {
             var bills = (from b in context.Bills
                          join p in context.People on b.PersonId equals p.Id
@@ -51,12 +51,13 @@ namespace Accounting.Repositories.Implementations
                          from mbp in meatBillPrices.DefaultIfEmpty()
                          join m in context.Meats on mbp.MeatId equals m.Id into meats
                          from m in meats.DefaultIfEmpty()
-                         where !string.IsNullOrEmpty(keyword) ? p.Name.Contains(keyword) : true
+                         where (string.IsNullOrEmpty(keyword) || p.Name.Contains(keyword))
                              && (startDate != null && endDate == null ?
-                                    (b.ActiveDate.Value.Date > startDate.Value.Date && b.ActiveDate.Value.Date <= DateTime.Now.Date)
+                                    (b.ActiveDate.Value.Date.CompareTo(startDate.Value.Date) >= 0 && b.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) <= 0)
                                     : startDate == null && endDate != null ?
-                                        (b.ActiveDate.Value.Date <= endDate.Value.Date && b.ActiveDate.Value.Date > endDate.Value.Date.AddDays(-5))
-                                            : startDate != null && endDate != null ? (b.ActiveDate.Value.Date > startDate.Value.Date && b.ActiveDate.Value.Date <= endDate.Value.Date) : true)
+                                        (b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date) <= 0 && b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date.AddDays(-5)) >= 0)
+                                            : startDate == null || endDate == null || (b.ActiveDate.Value.Date.CompareTo(startDate.Value.Date) >= 0 && b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date) <= 0))
+                            && b.Type == (int)priceType
                          select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
                         .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.IsPaid })
                         .Select(x => new BillDTO

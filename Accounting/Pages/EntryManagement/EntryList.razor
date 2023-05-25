@@ -1,4 +1,5 @@
 ﻿@page "/manage-entry"
+@using BlazorDateRangePicker
 @using Microsoft.AspNetCore.WebUtilities;
 @using Microsoft.Extensions.Localization;
 @inject IStringLocalizer<Resource> LRes
@@ -6,11 +7,21 @@
 @inject NavigationManager NavigationManager 
 
 <div class="container-fluid">
-    <CommonLabel DisplayText="@LRes["EntryList"]" Color="primary"></CommonLabel>
     <div class="d-flex justify-content-between mb-2">
-        <div class="fw-bold">@($"{LRes["Showing"]}: {LRes["date"]} {HelperFunctions.GetLunarDate(DateTime.Now)} {LRes["LunarDate"]}")</div>
-        <div>
-            <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@Keyword" @onchange="OnKeywordChange"/>
+        <CommonLabel DisplayText="@LRes["EntryList"]" Color="primary"></CommonLabel>
+        <div class="fw-bold">@ShowingDate</div>
+    </div>
+    <div class="d-flex justify-content-end mb-2">
+        <div class="col-md-3 col-lg-3 col-sm-12 me-2">
+            <DateRangePicker class="form-control" @bind-StartDate="@(DateRange.StartDate)" @bind-EndDate="@(DateRange.EndDate)" placeholder="@LRes["ChooseDate"]" OnRangeSelect="OnRangeSelect" MinDate="DateTime.Now.AddYears(-10)" MaxDate="DateTime.Now"/>
+        </div>
+        <div class="d-flex col-md-4 col-lg-4 col-sm-12 justify-content-between">
+            <div class="col-md-10 pe-1">
+                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@Keyword" onchange="@((ChangeEventArgs e) => OnParamChange(e, "keyword"))" />
+            </div>
+            <div class="col-md-2 col-lg-2 col-sm-12">
+                <button class="btn btn-primary w-100" @onclick="() => OnParamSubmit()"><i class="fa-regular fa-filter"></i> @LRes["Filter"]</button>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -39,10 +50,15 @@
                     </div>
                     <div class="card-body overflow-auto" style="height: 15rem">
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-center text-primary align-items-center" role="button">
-                                <i class="fa-regular fa-circle-plus"></i>
-                                <div class="ms-2" data-bs-toggle="modal" data-bs-target="#addBillMeatModal" @onclick="() => {SelectedBill = bill;}">@LRes["Add"]</div>
-                            </li>
+                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date)
+                            {
+                                <li class="list-group-item">
+                                    <button class="btn border-0 bg-transparent text-primary w-100 py-0" data-bs-toggle="modal" data-bs-target="#addBillMeatModal" @onclick="() => {SelectedBill = bill;}">
+                                        <i class="fa-regular fa-circle-plus"></i>
+                                        <span>@LRes["Add"]</span>
+                                    </button>
+                                </li>
+                            }
                             @foreach(var item in bill.Items)
                             {
                                 <li class="list-group-item d-flex justify-content-between">
@@ -59,8 +75,14 @@
                             @(bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND")
                         </div>
                         <div>
-                            <button class="btn btn-primary me-1">@LRes["Pay"]</button>
-                            <button class="btn btn-danger">@LRes["Delete"]</button>
+                            @if (bill.IsPaid == null || !bill.IsPaid.Value)
+                            {
+                                <button class="btn btn-primary me-1">@LRes["Pay"]</button>
+                            }
+                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date)
+                            {
+                                <button class="btn btn-danger">@LRes["Delete"]</button>
+                            }
                         </div>
                     </div>
                 </div>
@@ -90,6 +112,8 @@
     {
         {"pageSize", ""},
         {"keyword", ""},
+        {"startDate", ""},
+        {"endDate", ""},
     };
 
     Uri Uri;
@@ -98,9 +122,18 @@
 
     BillDTO SelectedBill = new();
 
+    DateRangeDTO DateRange = new()
+    {
+        StartDate = DateTimeOffset.Now,
+        EndDate = DateTimeOffset.Now,
+    };
+
+    string ShowingDate = string.Empty;
+
     protected override void OnInitialized()
     {
         Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        ShowingDate = HandleShowDate();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -117,7 +150,7 @@
         {
             if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("keyword", out var keyword))
             {
-                Keyword = keyword;
+                Keyword = !string.IsNullOrEmpty(Keyword) ? Keyword : keyword;
             }
             if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageSize", out var pageSize))
             {
@@ -127,9 +160,17 @@
             {
                 Pagination.PageIndex = !string.IsNullOrEmpty(pageIndex) ? int.Parse(pageIndex) : Pagination.PageIndex;
             }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("startDate", out var startDate))
+            {
+                DateRange.StartDate = !string.IsNullOrEmpty(startDate) && DateRange.StartDate == null  ? DateTimeOffset.Parse(startDate) : DateRange.StartDate;
+            }
+            if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("endDate", out var endDate))
+            {
+                DateRange.EndDate = !string.IsNullOrEmpty(endDate) && DateRange.EndDate == null ? DateTimeOffset.Parse(endDate) : DateRange.EndDate;
+            }
         } 
 
-        Bills = BillRepo.GetAll(Keyword, DateTime.Now.AddDays(-1), null, Pagination.PageIndex, Pagination.PageSize);
+        Bills = BillRepo.GetAll(Keyword, DateRange.StartDate != null ? DateRange.StartDate.Value.DateTime : null, DateRange.EndDate != null ? DateRange.EndDate.Value.DateTime : null, Pagination.PageIndex, Pagination.PageSize, PriceType.Entry);
         StateHasChanged();
     }
 
@@ -142,19 +183,56 @@
         return $"<div class='ms-2 text-warning'>{LRes["Unpaid"]}</div>";
     }
 
-    void OnKeywordChange(ChangeEventArgs e)
+    void OnParamChange(ChangeEventArgs e, string paramType)
     {
-        Keyword = e.Value.ToString();
-
-        Query["keyword"] = Keyword;
-        Query["pageSize"] = Pagination.PageSize.ToString();
-
-        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
-        GetData();
+        switch (paramType)
+        {
+            case "startDate":
+                DateRange.StartDate = !string.IsNullOrEmpty(e.Value.ToString()) ? DateTime.Parse(e.Value.ToString()) : null;
+                break;
+            case "endDate":
+                DateRange.EndDate = !string.IsNullOrEmpty(e.Value.ToString()) ? DateTime.Parse(e.Value.ToString()) : null;
+                break;
+            case "keyword":
+                Keyword = e.Value.ToString();
+                break;
+            default:
+                break;
+        }
     }
 
     void HandleDeleteItemFromBill(int id)
     {
-        
+
+    }
+
+    void OnRangeSelect(BlazorDateRangePicker.DateRange range)
+    {
+        DateRange.StartDate = range.Start;
+        DateRange.EndDate = range.End;
+    }
+
+    void OnParamSubmit()
+    {
+        Query["keyword"] = Keyword;
+        Query["startDate"] = DateRange.StartDate != null ? DateRange.StartDate.Value.ToString("dd-MM-yyyy") : "";
+        Query["endDate"] = DateRange.EndDate != null ? DateRange.EndDate.Value.ToString("dd-MM-yyyy") : "";
+
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
+
+        ShowingDate = HandleShowDate();
+        GetData();
+    }
+
+    string HandleShowDate()
+    {
+        if(DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
+        {
+            return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
+        }
+        else
+        {
+            return $"{LRes["Showing"]}: {LRes["date"]} {LRes["from"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]}) {LRes["to"]} {DateRange.EndDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(DateRange.EndDate.Value.DateTime)} {LRes["LunarDate"]})";
+        }
     }
 }

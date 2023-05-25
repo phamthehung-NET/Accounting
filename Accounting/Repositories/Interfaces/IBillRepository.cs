@@ -5,7 +5,7 @@ namespace Accounting.Repositories.Interfaces
 {
     public interface IBillRepository
     {
-        Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize);
+        Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize, PriceType priceType);
 
         bool AddBill(BillDTO res);
 

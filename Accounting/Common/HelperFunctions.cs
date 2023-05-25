@@ -56,7 +56,7 @@ namespace Accounting.Common
         {
             ChineseLunisolarCalendar lunarCalendar = new();
             var day = lunarCalendar.GetDayOfMonth(dateInput);
-            var month = lunarCalendar.GetMonth(dateInput);
+            var month = lunarCalendar.GetMonth(dateInput) - 1;
             return string.Join("/", new int[] { day, month });
         }
 

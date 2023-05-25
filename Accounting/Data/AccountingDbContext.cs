@@ -1,4 +1,5 @@
-﻿using Accounting.Model;
+﻿using Accounting.Common;
+using Accounting.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Data

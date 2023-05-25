@@ -288,6 +288,9 @@
   <data name="PhoneNumber" xml:space="preserve">
     <value>Điện thoại</value>
   </data>
+  <data name="PleseEnterWeight" xml:space="preserve">
+    <value>Vui lòng nhập số cân</value>
+  </data>
   <data name="Product List" xml:space="preserve">
     <value>Danh sách mặt hàng</value>
   </data>

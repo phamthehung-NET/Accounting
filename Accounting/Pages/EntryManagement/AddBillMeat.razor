@@ -8,12 +8,13 @@
     <div class="modal-content">
         <div class="modal-header">
             <CommonLabel DisplayText="@LRes["ChooseMeat"]" Color="warning"></CommonLabel>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
         </div>
         <div class="modal-body">
             <div class="mb-2">
                 <label>@LRes["Weight"]</label>
-                <input class="form-control" type="number" value="@(Weight == 0 ? null : Weight)" placeholder="@LRes["EnterWeight"]" min="0" @onchange="(ChangeEventArgs e) => { Weight = decimal.Parse(e.Value.ToString().Replace('.', ',')); }"/>
+                <input class="form-control @(!string.IsNullOrEmpty(ErrorMsg) ? "is-invalid" : "")" type="number" value="@(Weight == 0 ? null : Weight)" placeholder="@LRes["EnterWeight"]" min="0" @onchange="OnWeightChange"/>
+                <div class="text-danger">@ErrorMsg</div>
             </div>
             <div class="mb-2">
                 <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => {Keyword = e.Value.ToString(); GetMeatData();})"/>
@@ -29,14 +30,14 @@
                             <tr role="button" @onclick="() => OnSelectMeat(Context.Id)">
                                 <td>@Context.Name</td>
                                 <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
-                                <td>@(Context.Prozen.Value ? LRes["Prozen Meat"] : LRes["Fresh"])</td>
+                                <td>@(Context.Prozen.Value ? LRes["Prozen Meat"] : LRes["Normal Meat"])</td>
                             </tr>
                         </TBody>
                     </CommonDataTable>
                 }
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+            <button class="btn btn-primary" data-bs-dismiss="modal" @onclick="OnDismiss">@LRes["Done"]</button>
         </div>
     </div>
 </div>
@@ -59,6 +60,8 @@
     decimal Weight = 0;
 
     string Keyword = string.Empty;
+
+    string ErrorMsg = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -92,18 +95,37 @@
 
     async Task OnSelectMeat(int id)
     {
-        if (BillRepo.AddMeatToBill(id, Weight, BillId, PriceType))
+        ErrorMsg = string.Empty;
+        if(Weight > 0)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillMeat"]);
-            await HelperFunctions.HideModal(JsRuntime, "addBillMeatModal");
-            GetData.Invoke();
-            Weight = 0;
-            BillId = 0;
+            if (BillRepo.AddMeatToBill(id, Weight, BillId, PriceType))
+            {
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillMeat"]);
+                await HelperFunctions.HideModal(JsRuntime, "addBillMeatModal");
+                GetData.Invoke();
+                Weight = 0;
+                BillId = 0;
+            }
+            else
+            {
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddBillMeatFailed"]);
+                Weight = 0;
+            }
         }
         else
         {
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddBillMeatFailed"]);
-            Weight = 0;
+            ErrorMsg = LRes["PleseEnterWeight"];
         }
+    }
+
+    void OnWeightChange(ChangeEventArgs e)
+    {
+        Weight = decimal.Parse(!string.IsNullOrEmpty(e.Value.ToString()) ? e.Value.ToString().Replace('.', ',') : "0");
+    }
+
+    void OnDismiss()
+    {
+        Weight = 0;
+        ErrorMsg = string.Empty;
     }
 }
