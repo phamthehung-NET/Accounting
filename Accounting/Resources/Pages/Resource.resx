@@ -150,11 +150,26 @@
   <data name="Beef" xml:space="preserve">
     <value>Bò</value>
   </data>
+  <data name="BillIsCreated" xml:space="preserve">
+    <value>Hóa được tạo mới</value>
+  </data>
+  <data name="BillIsRemoved" xml:space="preserve">
+    <value>Chuyển vào thùng rác</value>
+  </data>
+  <data name="billwithprice" xml:space="preserve">
+    <value>hóa đơn trị giá</value>
+  </data>
   <data name="Buffalo" xml:space="preserve">
     <value>Trâu</value>
   </data>
   <data name="Buyer" xml:space="preserve">
     <value>Người mua</value>
+  </data>
+  <data name="Calves" xml:space="preserve">
+    <value>Bê</value>
+  </data>
+  <data name="ChooseBillType" xml:space="preserve">
+    <value>Chọn loại hóa đơn</value>
   </data>
   <data name="ChooseMeat" xml:space="preserve">
     <value>Chọn mặt hàng</value>
@@ -168,11 +183,17 @@
   <data name="Close" xml:space="preserve">
     <value>Đóng</value>
   </data>
+  <data name="CommonErrMsg" xml:space="preserve">
+    <value>Có lỗi xảy ra, vui lòng liên hệ nhà phát triển để biết thêm thông tin chi tiết</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>ngày</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Xóa</value>
+  </data>
+  <data name="DeleteBillConfimation" xml:space="preserve">
+    <value>Bạn có chắc chắn muốn chuyển hóa đơn này vào thùng rác?</value>
   </data>
   <data name="DeletePersonConfirmation" xml:space="preserve">
     <value>Bạn có chắc chắn muốn chuyển người mua/bán này vào thùng rác?</value>
@@ -188,6 +209,9 @@
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Sửa</value>
+  </data>
+  <data name="EditItemsPrice" xml:space="preserve">
+    <value>Sửa giá các sản phẩm</value>
   </data>
   <data name="EditPerson" xml:space="preserve">
     <value>Sửa thông tin người mua/bán</value>
@@ -221,6 +245,9 @@
   </data>
   <data name="from" xml:space="preserve">
     <value>từ</value>
+  </data>
+  <data name="Frozen Meat" xml:space="preserve">
+    <value>Đông lạnh</value>
   </data>
   <data name="here" xml:space="preserve">
     <value>đây</value>
@@ -282,6 +309,12 @@
   <data name="Pay" xml:space="preserve">
     <value>Thanh toán</value>
   </data>
+  <data name="PayingBillConfimation" xml:space="preserve">
+    <value>Bạn có chắc chắn muốn thanh toán hóa đơn này?</value>
+  </data>
+  <data name="PayingTitle" xml:space="preserve">
+    <value>Xác nhận thanh toán</value>
+  </data>
   <data name="PeopleList" xml:space="preserve">
     <value>Danh sách người mua/bán</value>
   </data>
@@ -303,14 +336,17 @@
   <data name="ProductName" xml:space="preserve">
     <value>Tên mặt hàng</value>
   </data>
-  <data name="Prozen Meat" xml:space="preserve">
-    <value>Đông lạnh</value>
-  </data>
   <data name="Recycle bin" xml:space="preserve">
     <value>Thùng rác</value>
   </data>
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Chuyển hướng đến trang đăng nhập trong</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="SaleList" xml:space="preserve">
+    <value>Danh sách bán hàng</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Lưu</value>
@@ -323,6 +359,9 @@
   </data>
   <data name="Showing" xml:space="preserve">
     <value>Đang hiển thị</value>
+  </data>
+  <data name="ShowMore" xml:space="preserve">
+    <value>Hiển thị thêm</value>
   </data>
   <data name="SuccessfullyAddBillMeat" xml:space="preserve">
     <value>Thêm mặt hàng vào hóa đơn thành công</value>
@@ -351,11 +390,17 @@
   <data name="Unpaid" xml:space="preserve">
     <value>Chưa thanh toán</value>
   </data>
+  <data name="ViewHistory" xml:space="preserve">
+    <value>Xem lịch sử</value>
+  </data>
   <data name="ViewNearestTransaction" xml:space="preserve">
     <value>Xem thông tin giao dịch gần nhất</value>
   </data>
   <data name="Weight" xml:space="preserve">
     <value>Cân nặng</value>
+  </data>
+  <data name="withPrice" xml:space="preserve">
+    <value>với giá</value>
   </data>
   <data name="Yesterday Entry Price" xml:space="preserve">
     <value>Giá Nhập Hôm Qua</value>

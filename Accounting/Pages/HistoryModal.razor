@@ -1,0 +1,75 @@
+﻿@using Microsoft.Extensions.Localization;
+@inject IJSRuntime JsRuntime
+@inject IHistoryRepository HistoryRepo
+@inject IStringLocalizer<Resource> LRes
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["ChooseMeat"]" Color="warning"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
+        </div>
+        <div class="modal-body">
+            @if (Histories != null && Histories.Items.Any())
+            {
+                <CommonDataTable Context="Context"
+                        Headers="Headers"
+                        TData="History"
+                        PaginationData="Histories"
+                        DisplayPaging="false">
+                    <TBody>
+                        <tr>
+                            <td>@Context.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                            <td>@Context.Action</td>
+                            <td>@Context.Content</td>
+                        </tr>
+                    </TBody>
+                </CommonDataTable>
+            }
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-dismiss="modal" @onclick="OnDismiss">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int BillId { get; set; }
+
+    [Parameter]
+    public HistoryType HistoryType { get; set; }
+
+    public List<Header> Headers = new();
+
+    Pagination<History> Histories;
+
+    protected override void OnInitialized()
+    {
+        //Headers.Add(new Header() { Name = "No.", DisplayName = LRes["No."] });
+        Headers.Add(new Header() { Name = "Date", DisplayName = LRes["Date"] });
+        Headers.Add(new Header() { Name = "Action", DisplayName = LRes["Action"] });
+        Headers.Add(new Header() { Name = "Content", DisplayName = LRes["Content"] });
+    }
+
+    protected override void OnParametersSet()
+    {
+        if(BillId > 0)
+        {
+            GetData();
+        }
+    }
+
+    void GetData()
+    {
+        Histories = HistoryRepo.GetAllHistoryByObject(BillId, HistoryType);
+        StateHasChanged();
+    }
+
+    void OnDismiss()
+    {
+        BillId = 0;
+        Histories = new();
+    }
+}

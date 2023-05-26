@@ -1,10 +1,9 @@
 ﻿using Accounting.Pages;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using System.Globalization;
 
-namespace Accounting.Common
+namespace Accounting.Utilities
 {
     public class HelperFunctions
     {
@@ -15,18 +14,13 @@ namespace Accounting.Common
 
         public static string RenderMeatType(IStringLocalizer<Resource> LRes, int? type)
         {
-            if(type == null)
+            return type switch
             {
-                return string.Empty;
-            }
-            else
-            {
-                if (type == (int)MeatType.Buffalo)
-                {
-                    return LRes["Buffalo"];
-                }
-                return LRes["Beef"];
-            }
+                (int)MeatType.Buffalo => (string)LRes["Buffalo"],
+                (int)MeatType.Beef => (string)LRes["Beef"],
+                (int)MeatType.Calves => (string)LRes["Calves"],
+                _ => string.Empty,
+            };
         }
 
         public async static Task ShowNotification(IJSRuntime jsRuntime, ToastType toastType, string content)
@@ -68,6 +62,16 @@ namespace Accounting.Common
         public static async Task HideModal(IJSRuntime jSRuntime, string modalId)
         {
             await jSRuntime.InvokeVoidAsync("hideModal", modalId);
+        }
+
+        public static async Task AddIndicator(IJSRuntime jSRuntime)
+        {
+            await jSRuntime.InvokeVoidAsync("addIndicator");
+        }
+
+        public static async Task RemoveIndicator(IJSRuntime jSRuntime)
+        {
+            await jSRuntime.InvokeVoidAsync("removeIndicator");
         }
     }
 }

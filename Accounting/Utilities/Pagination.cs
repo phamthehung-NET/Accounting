@@ -1,4 +1,4 @@
-﻿namespace Accounting.Common
+﻿namespace Accounting.Utilities
 {
     public class Pagination<T>
     {
@@ -18,6 +18,11 @@
 
         public Pagination(int totalItems, int? pageIndex, int? itemPerPage, IQueryable<T> items)
         {
+            if(itemPerPage <= 0)
+            {
+                itemPerPage = 1;
+            }
+
             var totalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)itemPerPage);
 
             var nextPage = pageIndex + 1;

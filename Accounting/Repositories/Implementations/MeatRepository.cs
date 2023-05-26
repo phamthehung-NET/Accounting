@@ -1,4 +1,4 @@
-﻿using Accounting.Common;
+﻿using Accounting.Utilities;
 using Accounting.Data;
 using Accounting.Model;
 using Accounting.Model.DTO;
@@ -22,7 +22,7 @@ namespace Accounting.Repositories.Implementations
                 Meat meat = new()
                 {
                     Name = req.Name,
-                    Prozen = req.Prozen,
+                    Frozen = req.Frozen,
                     Type = req.Type,
                     IsDeleted = false
                 };
@@ -34,14 +34,14 @@ namespace Accounting.Repositories.Implementations
             return false;
         }
 
-        public Pagination<MeatDTO> GetAllMeats(string keyword, int? type, bool? prozen, int pageIndex, int pageSize, string order)
+        public Pagination<MeatDTO> GetAllMeats(string keyword, int? type, bool? frozen, int pageIndex, int pageSize, string order)
         {
             var meats = context.Meats.Select(x => new MeatDTO
             {
                 Id = x.Id,
                 Name = x.Name,
                 Type = x.Type,
-                Prozen = x.Prozen,
+                Frozen = x.Frozen,
                 IsDeleted = x.IsDeleted,
                 YesterdayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0 && y.PriceType == (int)PriceType.Entry).Price,
                 TodayEntryPrice = context.MeatPrices.FirstOrDefault(y => y.MeatId == x.Id && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && y.PriceType == (int)PriceType.Entry).Price,
@@ -57,9 +57,9 @@ namespace Accounting.Repositories.Implementations
             {
                 meats = meats.Where(x => x.Type == type);
             }
-            if (prozen != null)
+            if (frozen != null)
             {
-                meats = meats.Where(x => x.Prozen == prozen);
+                meats = meats.Where(x => x.Frozen == frozen);
             }
 
             meats = meats.Where(x => x.IsDeleted == false);
@@ -74,7 +74,7 @@ namespace Accounting.Repositories.Implementations
                 Id = x.Id,
                 IsDeleted = x.IsDeleted,
                 Name = x.Name,
-                Prozen = x.Prozen,
+                Frozen = x.Frozen,
                 Type = x.Type,
             }).FirstOrDefault(x => x.Id == id);
             if (meat != null)
@@ -91,7 +91,7 @@ namespace Accounting.Repositories.Implementations
             {
                 meatDb.Name = req.Name;
                 meatDb.Type = req.Type;
-                meatDb.Prozen = req.Prozen;
+                meatDb.Frozen = req.Frozen;
                 context.SaveChanges();
                 return true;
             }
@@ -119,7 +119,7 @@ namespace Accounting.Repositories.Implementations
 
         private bool IsMeatExits(MeatDTO meat)
         {
-            var db = context.Meats.FirstOrDefault(x => x.Name.Equals(meat.Name) && x.Type == meat.Type && x.Prozen == meat.Prozen);
+            var db = context.Meats.FirstOrDefault(x => x.Name.Equals(meat.Name) && x.Type == meat.Type && x.Frozen == meat.Frozen);
             if (db != null)
             {
                 if (meat.Id > 0 && db.Id == meat.Id)

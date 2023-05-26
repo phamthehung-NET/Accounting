@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Accounting.Common
+namespace Accounting.Utilities
 {
     public static class DateTimeExtension
     {

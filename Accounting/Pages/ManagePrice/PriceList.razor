@@ -23,7 +23,7 @@
                         <tr>
                             <td>@Context.Name</td>
                             <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
-                            <td>@(Context.Prozen.Value ? "✔️" : "❌")</td>
+                            <td>@(Context.Frozen.Value ? "✔️" : "❌")</td>
                             <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice)</td>
                             <td>
                                 <input type="number" min=0 value="@(Context.TodayEntryPrice == null ? (InputEntryList.TryGetValue(Context.Id, out int? value) ? value : null) : Convert.ToInt32(Context.TodayEntryPrice.Value.ToString("n0")))" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "entry"))"/>
@@ -67,7 +67,7 @@
     {
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
         Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "Prozen", DisplayName = LRes["Prozen Meat"] + "?", Ordering = true });
+        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Prozen Meat"] + "?", Ordering = true });
         Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
@@ -107,7 +107,9 @@
     {
         try
         {
+            await HelperFunctions.AddIndicator(JsRuntime);
             var result = PriceRepository.UpdateItemPrice(InputEntryList, InputSaleList);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
             if (result)
             {
                 InputEntryList.Clear();
@@ -120,8 +122,7 @@
         }
         catch (Exception ex)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
-            throw;
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 

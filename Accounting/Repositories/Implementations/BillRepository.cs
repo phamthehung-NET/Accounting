@@ -1,24 +1,28 @@
-﻿using Accounting.Common;
+﻿using Accounting.Utilities;
 using Accounting.Data;
 using Accounting.Model;
 using Accounting.Model.DTO;
 using Accounting.Repositories.Interfaces;
+using Microsoft.Extensions.Localization;
+using Accounting.Pages;
 
 namespace Accounting.Repositories.Implementations
 {
     public class BillRepository : IBillRepository
     {
         private readonly AccountingDbContext context;
+        private readonly IStringLocalizer<Resource> Lres;
 
-        public BillRepository(AccountingDbContext _context)
+        public BillRepository(AccountingDbContext _context, IStringLocalizer<Resource> _Lres)
         {
             context = _context;
+            Lres = _Lres;
         }
 
         public bool AddBill(BillDTO res)
         {
             var currentDate = DateTime.Now;
-            var billDb = context.Bills.FirstOrDefault(x => x.PersonId == res.PersonId && x.ActiveDate.Value.Date == currentDate.Date && x.Type == res.Type);
+            var billDb = context.Bills.FirstOrDefault(x => x.PersonId == res.PersonId && x.ActiveDate.Value.Date == currentDate.Date && x.Type == res.Type && x.IsDeleted == false);
             if (billDb == null)
             {
                 Bill bill = new()
@@ -33,6 +37,21 @@ namespace Accounting.Repositories.Implementations
 
                 context.Add(bill);
                 context.SaveChanges();
+
+                if(bill.Id > 0)
+                {
+                    History history = new()
+                    {
+                        ObjectId = bill.Id,
+                        Action = (int)HistoryAction.Create,
+                        Content = Lres["BillIsCreated"],
+                        CreatedDate = currentDate,
+                        Type = (int)HistoryType.Bill,
+                    };
+                    context.Add(history);
+                    context.SaveChanges();
+                }
+
                 return bill.Id > 0;
             }
             return false;
@@ -40,10 +59,35 @@ namespace Accounting.Repositories.Implementations
 
         public bool DeleteBill(int id)
         {
-            throw new NotImplementedException();
+            var bill = context.Bills.FirstOrDefault(x => x.Id == id);
+            if (bill != null)
+            {
+                bill.IsDeleted = true;
+                History history = new()
+                {
+                    ObjectId = id,
+                    Action = (int)HistoryAction.Remove,
+                    Content = $"{Lres["BillIsRemoved"]}",
+                    CreatedDate = DateTime.Now,
+                    Type = (int)HistoryType.Bill,
+                };
+
+                RecycleBin recycle = new()
+                {
+                    ObjectId = id,
+                    Type = (int)RecycleBinObjectType.Bill,
+                    CreatedDate = DateTime.Now,
+                };
+                context.Add(history);
+                context.Add(recycle);
+                context.SaveChanges();
+                return true;
+            }
+
+            return false;
         }
 
-        public Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize, PriceType priceType)
+        public Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize, PriceType priceType, bool? isPaid)
         {
             var bills = (from b in context.Bills
                          join p in context.People on b.PersonId equals p.Id
@@ -57,7 +101,8 @@ namespace Accounting.Repositories.Implementations
                                     : startDate == null && endDate != null ?
                                         (b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date) <= 0 && b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date.AddDays(-5)) >= 0)
                                             : startDate == null || endDate == null || (b.ActiveDate.Value.Date.CompareTo(startDate.Value.Date) >= 0 && b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date) <= 0))
-                            && b.Type == (int)priceType
+                            && (isPaid == null || b.IsPaid == isPaid)
+                            && b.Type == (int)priceType && !b.IsDeleted
                          select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
                         .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.IsPaid })
                         .Select(x => new BillDTO
@@ -86,15 +131,32 @@ namespace Accounting.Repositories.Implementations
                             }).Where(y => y.Id != null),
                         });
 
-            return bills.Paginate(pageIndex, pageSize);
+            return bills.OrderByDescending(x => x.Id).Paginate(pageIndex, pageSize);
         }
 
-        public bool PayingBill(int id)
+        public bool PayingBill(int id, decimal totalPrice)
         {
-            throw new NotImplementedException();
+           var bill = context.Bills.FirstOrDefault(x => x.Id == id);
+            if(bill != null)
+            {
+                bill.IsPaid = true;
+                History history = new()
+                {
+                    ObjectId = id,
+                    Action = (int)HistoryAction.Pay,
+                    Content = $"{Lres["Pay"]} {Lres["billwithprice"]}: {totalPrice:n0}.000 VND",
+                    CreatedDate = DateTime.Now,
+                    Type = (int)HistoryType.Bill,
+                };
+                context.Add(history);
+                context.SaveChanges();
+                return true;
+            }
+
+            return false;
         }
 
-        public bool UpdateBill(BillDTO bill)
+        public bool UpdateBillItems(BillDTO bill)
         {
             throw new NotImplementedException();
         }
@@ -121,8 +183,48 @@ namespace Accounting.Repositories.Implementations
 
                 context.Add(meatBill);
                 context.SaveChanges();
+
+                if(meatBill.Id > 0)
+                {
+                    History history = new()
+                    {
+                        ObjectId = bill.Id,
+                        Action = (int)HistoryAction.AddItem,
+                        Content = $"{Lres["Add"]} {weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatPrice.Price}" ,
+                        CreatedDate = currentDate,
+                        Type = (int)HistoryType.Bill,
+                    };
+                    context.Add(history);
+                    context.SaveChanges();
+                }
+
                 return meatBill.Id > 0;
             }
+            return false;
+        }
+
+        public bool RemoveMeatFromBill(int meatpriceId)
+        {
+            var meatprice = context.MeatBillPrices.FirstOrDefault(x => x.Id == meatpriceId);
+            if(meatprice != null)
+            {
+                var meat = context.Meats.FirstOrDefault(x => x.Id == meatprice.MeatId);
+                History history = new()
+                {
+                    ObjectId = meatprice.BillId.Value,
+                    Action = (int)HistoryAction.RemoveItem,
+                    Content = $"{Lres["Remove"]} {meatprice.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatprice.Price}",
+                    CreatedDate = DateTime.Now,
+                    Type = (int)HistoryType.Bill,
+                };
+
+                context.Remove(meatprice);
+                context.Add(history);
+                context.SaveChanges();
+                
+                return true;
+            }
+
             return false;
         }
     }

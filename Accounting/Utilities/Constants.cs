@@ -1,4 +1,4 @@
-﻿namespace Accounting.Common
+﻿namespace Accounting.Utilities
 {
     public class Constants
     {
@@ -26,12 +26,29 @@
     public enum RecycleBinObjectType
     {
         Meat,
-        Person
+        Person,
+        Bill,
     }
 
     public enum PriceType
     {
         Entry,
         Sale
+    }
+
+    public enum HistoryType
+    {
+        Bill,
+    }
+
+    public enum HistoryAction
+    {
+        Create,
+        Remove,
+        Pay,
+        RemoveItem,
+        AddItem,
+        EditItemPrice,
+        Restore,
     }
 }

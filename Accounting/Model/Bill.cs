@@ -11,12 +11,14 @@ namespace Accounting.Model
 
         public int Type { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public DateTime? ActiveDate { get; set; }
 
         public DateTime? CreatedDate { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
 
-        public bool? IsPaid { get; set; }
+        public bool IsPaid { get; set; }
     }
 }

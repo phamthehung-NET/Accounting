@@ -11,7 +11,7 @@ namespace Accounting.Model
 
         public int? Type { get; set; }
 
-        public bool? Prozen { get; set; }
+        public bool? Frozen { get; set; }
 
         public bool? IsDeleted { get; set; }
     }

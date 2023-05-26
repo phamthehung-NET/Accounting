@@ -1,4 +1,4 @@
-﻿namespace Accounting.Common
+﻿namespace Accounting.Utilities
 {
     public class PaginationObject
     {

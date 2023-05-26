@@ -30,7 +30,7 @@
                             <tr role="button" @onclick="() => OnSelectMeat(Context.Id)">
                                 <td>@Context.Name</td>
                                 <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
-                                <td>@(Context.Prozen.Value ? LRes["Prozen Meat"] : LRes["Normal Meat"])</td>
+                                <td>@(Context.Frozen.Value ? LRes["Frozen Meat"] : LRes["Normal Meat"])</td>
                             </tr>
                         </TBody>
                     </CommonDataTable>
@@ -67,7 +67,7 @@
     {
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"] });
         Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"] });
-        Headers.Add(new Header() { Name = "Prozen", DisplayName = LRes["Prozen Meat"] + "?" });
+        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Frozen Meat"] + "?" });
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -98,8 +98,10 @@
         ErrorMsg = string.Empty;
         if(Weight > 0)
         {
+            await HelperFunctions.AddIndicator(JsRuntime);
             if (BillRepo.AddMeatToBill(id, Weight, BillId, PriceType))
             {
+                await HelperFunctions.RemoveIndicator(JsRuntime);
                 await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillMeat"]);
                 await HelperFunctions.HideModal(JsRuntime, "addBillMeatModal");
                 GetData.Invoke();
@@ -108,6 +110,7 @@
             }
             else
             {
+                await HelperFunctions.RemoveIndicator(JsRuntime);
                 await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddBillMeatFailed"]);
                 Weight = 0;
             }

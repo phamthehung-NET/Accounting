@@ -69,7 +69,9 @@
         {
             if (editContext.Validate())
             {
+                await HelperFunctions.AddIndicator(JsRuntime);
                 bool result = PeopleRepo.UpdatePerson(person);
+                await HelperFunctions.RemoveIndicator(JsRuntime);
 
                 if (result)
                 {

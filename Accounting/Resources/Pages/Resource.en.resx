@@ -150,11 +150,23 @@
   <data name="Beef" xml:space="preserve">
     <value>Beef</value>
   </data>
+  <data name="BillIsCreated" xml:space="preserve">
+    <value>Bill is created</value>
+  </data>
+  <data name="billwithprice" xml:space="preserve">
+    <value>bill with prices</value>
+  </data>
   <data name="Buffalo" xml:space="preserve">
     <value>Buffalo</value>
   </data>
   <data name="Buyer" xml:space="preserve">
     <value>Buyer</value>
+  </data>
+  <data name="Calves" xml:space="preserve">
+    <value>Calves</value>
+  </data>
+  <data name="ChooseBillType" xml:space="preserve">
+    <value>Choose bill type</value>
   </data>
   <data name="ChooseMeat" xml:space="preserve">
     <value>Choose the product</value>
@@ -168,17 +180,23 @@
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="CommonErrMsg" xml:space="preserve">
+    <value>Something went wrong, please contact to developer for more detail</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>date</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="DeleteBillConfimation" xml:space="preserve">
+    <value>Are you sure to move this bill to recycle bin?</value>
+  </data>
   <data name="DeletePersonConfirmation" xml:space="preserve">
     <value>Are you sure to move this person to recycle bin?</value>
   </data>
   <data name="DeleteProductConfirmation" xml:space="preserve">
-    <value>Are you sure to delete this product?</value>
+    <value>Are you sure to move this product to recycle bin?</value>
   </data>
   <data name="DeleteTitle" xml:space="preserve">
     <value>Confirm delete</value>
@@ -188,6 +206,9 @@
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
+  </data>
+  <data name="EditItemsPrice" xml:space="preserve">
+    <value>Edit items price</value>
   </data>
   <data name="EditPerson" xml:space="preserve">
     <value>Edit person</value>
@@ -221,6 +242,9 @@
   </data>
   <data name="from" xml:space="preserve">
     <value>from</value>
+  </data>
+  <data name="Frozen Meat" xml:space="preserve">
+    <value>Frozen</value>
   </data>
   <data name="here" xml:space="preserve">
     <value>here</value>
@@ -282,6 +306,12 @@
   <data name="Pay" xml:space="preserve">
     <value>Pay</value>
   </data>
+  <data name="PayingBillConfimation" xml:space="preserve">
+    <value>Are you sure to pay this bill?</value>
+  </data>
+  <data name="PayingTitle" xml:space="preserve">
+    <value>Confirm payment</value>
+  </data>
   <data name="PeopleList" xml:space="preserve">
     <value>People list</value>
   </data>
@@ -303,14 +333,17 @@
   <data name="ProductName" xml:space="preserve">
     <value>Product name</value>
   </data>
-  <data name="Prozen Meat" xml:space="preserve">
-    <value>Frozen</value>
-  </data>
   <data name="Recycle bin" xml:space="preserve">
     <value>Recycle bin</value>
   </data>
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Redirecting to login in</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SaleList" xml:space="preserve">
+    <value>Sale list</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
@@ -323,6 +356,9 @@
   </data>
   <data name="Showing" xml:space="preserve">
     <value>Showing</value>
+  </data>
+  <data name="ShowMore" xml:space="preserve">
+    <value>Show more</value>
   </data>
   <data name="SuccessfullyAddBillMeat" xml:space="preserve">
     <value>Add product to bill successfully</value>
@@ -351,11 +387,17 @@
   <data name="Unpaid" xml:space="preserve">
     <value>Unpaid</value>
   </data>
+  <data name="ViewHistory" xml:space="preserve">
+    <value>View history</value>
+  </data>
   <data name="ViewNearestTransaction" xml:space="preserve">
     <value>View nearest transaction</value>
   </data>
   <data name="Weight" xml:space="preserve">
     <value>Weight</value>
+  </data>
+  <data name="withPrice" xml:space="preserve">
+    <value>with price</value>
   </data>
   <data name="Yesterday Entry Price" xml:space="preserve">
     <value>Yesterday Entry Price</value>

@@ -20,3 +20,18 @@ window.triggerBtn = (id) => {
 window.hideModal = (id) => {
     $(`#${id}`).modal('toggle');
 }
+
+window.addIndicator = () => {
+    $("body").append(
+        `<div class="spinner-container d-flex justify-content-center align-items-center h-100 w-100 top-0 start-0 position-fixed bg-secondary bg-opacity-75 text-info" style="z-index: 9999999999999" id="spinner-container">
+            <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>`
+    )
+}
+
+window.removeIndicator = () => {
+    var t = $("#spinner-container")
+    $("#spinner-container").remove()
+}

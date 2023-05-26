@@ -26,8 +26,8 @@
                         </InputSelect>
                     </div>
                     <div class="mb-2">
-                        <label>@LRes["Prozen Meat"]?</label>
-                        <input type="checkbox" value="@meat.Prozen" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())"/>
+                        <label>@LRes["Frozen Meat"]?</label>
+                        <input type="checkbox" value="@meat.Frozen" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())"/>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@
 @code {
     EditContext editContext;
 
-    MeatDTO meat = new() { Prozen = false, Type = (int)MeatType.Beef };
+    MeatDTO meat = new() { Frozen = false, Type = (int)MeatType.Beef };
 
     [Parameter]
     public EventCallback GetData { get; set; }
@@ -55,7 +55,7 @@
 
     void onChange(string value)
     {
-        meat.Prozen = Convert.ToBoolean(value);
+        meat.Frozen = Convert.ToBoolean(value);
     }
 
     async Task OnSubmit()
@@ -64,11 +64,13 @@
         {
             if (editContext.Validate())
             {
+                await HelperFunctions.AddIndicator(JsRuntime);
                 bool result = MeatRepository.AddMeat(meat);
 
+                await HelperFunctions.RemoveIndicator(JsRuntime);
                 if (result)
                 {
-                    meat = new() { Prozen = false };
+                    meat = new() { Frozen = false };
                     editContext = new(meat);
                     await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["AddProductSuccess"]);
                     await GetData.InvokeAsync();
@@ -79,13 +81,14 @@
         }
         catch (Exception ex)
         {
+            await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
         }
     }
 
     void OnCloseModal()
     {
-        meat = new() { Prozen = false, Type = (int)MeatType.Beef };
+        meat = new() { Frozen = false, Type = (int)MeatType.Beef };
         editContext = new(meat);
     }
 }

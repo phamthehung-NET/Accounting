@@ -70,7 +70,7 @@
 
     void GetPeopleData()
     {
-        People = PeopleRepo.GetAllPeople(Keyword, "", null, 1, 10000);
+        People = PeopleRepo.GetAllPeople(Keyword, "", PriceType == PriceType.Entry ? true : null, 1, 10000);
         StateHasChanged();
     }
 
@@ -90,15 +90,18 @@
             PersonId = id,
             Type = (int)PriceType
         };
-
+        
+        await HelperFunctions.AddIndicator(JsRuntime);
         if (BillRepo.AddBill(bill))
         {
+            await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillPerson"]);
             await HelperFunctions.HideModal(JsRuntime, "addBillPeopleModal");
             GetData.Invoke();
         }
         else
         {
+            await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["ThisPersonIsExisted"]);
         }
     }

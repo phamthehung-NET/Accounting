@@ -26,8 +26,8 @@
                         </InputSelect>
                     </div>
                     <div class="mb-2">
-                        <label>@LRes["Prozen Meat"]?</label>
-                        <input type="checkbox" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())" checked="@meat.Prozen"/>
+                        <label>@LRes["Frozen Meat"]?</label>
+                        <input type="checkbox" @onchange="(ChangeEventArgs e) => onChange(e.Value.ToString())" checked="@meat.Frozen"/>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@
 @code {
     EditContext editContext;
 
-    MeatDTO meat = new() { Prozen = false, Type = (int)MeatType.Beef };
+    MeatDTO meat = new() { Frozen = false, Type = (int)MeatType.Beef };
 
     [Parameter]
     public EventCallback GetData { get; set; }
@@ -67,7 +67,7 @@
 
     void onChange(string value)
     {
-        meat.Prozen = Convert.ToBoolean(value);
+        meat.Frozen = Convert.ToBoolean(value);
     }
 
     async Task OnSubmit()
@@ -76,8 +76,10 @@
         {
             if (editContext.Validate())
             {
+                await HelperFunctions.AddIndicator(JsRuntime);
                 bool result = MeatRepository.EditMeat(meat);
 
+                await HelperFunctions.RemoveIndicator(JsRuntime);
                 if (result)
                 {
                     await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["EditProductSuccess"]);
@@ -89,6 +91,7 @@
         }
         catch (Exception ex)
         {
+            await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
         }
     }

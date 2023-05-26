@@ -1,4 +1,4 @@
-﻿@page "/manage-entry"
+﻿@page "/manage-sale"
 @using BlazorDateRangePicker
 @using Microsoft.AspNetCore.WebUtilities;
 @using Microsoft.Extensions.Localization;
@@ -10,18 +10,11 @@
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-2">
-        <CommonLabel DisplayText="@LRes["EntryList"]" Color="primary"></CommonLabel>
+        <CommonLabel DisplayText="@LRes["SaleList"]" Color="primary"></CommonLabel>
         <div class="fw-bold">@ShowingDate</div>
     </div>
     <div class="d-flex justify-content-end mb-2">
-        <div class="col-md-2 col-lg-2 col-sm-12 me-1">
-            <select class="form-control" @onchange="HandleSelectPaid">
-                <option value="">@LRes["ChooseBillType"]</option>
-                <option value="true" selected="@IsPaid">@LRes["Paid"]</option>
-                <option value="false" selected="@(!IsPaid)">@LRes["Unpaid"]</option>
-            </select>
-        </div>
-        <div class="col-md-3 col-lg-3 col-sm-12 me-1">
+        <div class="col-md-3 col-lg-3 col-sm-12 me-2">
             <DateRangePicker class="form-control" @bind-StartDate="@(DateRange.StartDate)" @bind-EndDate="@(DateRange.EndDate)" placeholder="@LRes["ChooseDate"]" OnRangeSelect="OnRangeSelect" MinDate="DateTime.Now.AddYears(-10)" MaxDate="DateTime.Now"/>
         </div>
         <div class="d-flex col-md-4 col-lg-4 col-sm-12 justify-content-between">
@@ -56,16 +49,16 @@
                             <div>@(bill.Items.Count() + " " + LRes["item(s)"])</div>
                             @if (bill.Items.Any())
                             {
-                                @((MarkupString)HandleShowStatus(bill.IsPaid))
+                                @((MarkupString)HandleShowStatus(false))
                             }
                         </div>
                     </div>
                     <div class="card-body overflow-auto" style="height: 15rem">
                         <ul class="list-group list-group-flush">
-                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
+                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date)
                             {
                                 <li class="list-group-item">
-                                    <button class="btn border-0 bg-transparent text-primary w-100 py-0" data-bs-toggle="modal" data-bs-target="#addBillMeatModal" @onclick="() => HandleSelecteBill(bill)">
+                                    <button class="btn border-0 bg-transparent text-primary w-100 py-0" data-bs-toggle="modal" data-bs-target="#addBillMeatModal" @onclick="() => {SelectedBill = bill;}">
                                         <i class="fa-regular fa-circle-plus"></i>
                                         <span>@LRes["Add"]</span>
                                     </button>
@@ -77,10 +70,7 @@
                                     <div>@(item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType != null ? item.MeatType.Value : null))</div>
                                     <div>@(item.Weight + " Kg")</div>
                                     <div>@item.Price</div>
-                                    @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
-                                    {
-                                        <div role="button" @onclick="() => HandleDeleteItemFromBill(item.Id.Value, bill.Id)" class="text-danger"><i class="fa-regular fa-xmark"></i></div>
-                                    }
+                                    <div role="button" @onclick="async () => await HandleDeleteItemFromBill(item.Id.Value, bill.Id)" class="text-danger"><i class="fa-regular fa-xmark"></i></div>
                                 </li>
                             }
                         </ul>
@@ -92,24 +82,12 @@
                         <div>
                             @if ((bill.IsPaid == null || !bill.IsPaid.Value) && bill.Items.Any())
                             {
-                                <button class="btn btn-primary me-1" data-bs-toggle="modal" data-bs-target="#payingBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-brands fa-amazon-pay"></i> @LRes["Pay"]</button>
+                                <button class="btn btn-primary me-1" @onclick="async () => await HandlePayingBill(bill.Id)"><i class="fa-brands fa-amazon-pay"></i> @LRes["Pay"]</button>
                             }
-                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
+                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date)
                             {
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             }
-                            <div class="btn-group dropup">
-                                <button type="button" class="btn border-0 bg-transparent p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-regular fa-ellipsis-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
-                                    {
-                                        <li class="dropdown-item">@LRes["EditItemsPrice"]</li>
-                                    }
-                                    <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#historyModal" @onclick="() => HandleSelecteBill(bill)">@LRes["ViewHistory"]</li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -126,21 +104,15 @@
     }
     <CommonModalWrapper Id="addBillPeopleModal">
         <ModalContent>
-            <AddBillPerson GetData="async () => await GetData()" PriceType="PriceType.Entry"/>
+            <AddBillPerson GetData="async () => await GetData()" PriceType="PriceType.Sale"/>
         </ModalContent>
     </CommonModalWrapper>
     <CommonModalWrapper Id="addBillMeatModal">
         <ModalContent>
-            <AddBillMeat GetData="async () => await GetData()" PriceType="PriceType.Entry" BillId="SelectedBill.Id" />
-        </ModalContent>
-    </CommonModalWrapper>
-    <CommonModalWrapper Id="historyModal">
-        <ModalContent>
-            <HistoryModal BillId="SelectedBill.Id" HistoryType="HistoryType.Bill" />
+            <AddBillMeat GetData="async () => await GetData()" PriceType="PriceType.Sale" BillId="SelectedBill.Id" />
         </ModalContent>
     </CommonModalWrapper>
     <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteBillConfimation"]" ModalID="deleteBill" SubmitEvent="async () => await HandleDeleteBill()"/>
-    <CommonConfirmModal Title="@LRes["PayingTitle"]" Message="@LRes["PayingBillConfimation"]" ModalID="payingBill" SubmitEvent="async () => await HandlePayingBill()"/>
 </div>
 
 @code {
@@ -156,7 +128,6 @@
         {"keyword", ""},
         {"startDate", ""},
         {"endDate", ""},
-        {"isPaid", ""},
     };
 
     Uri Uri;
@@ -172,8 +143,6 @@
     };
 
     string ShowingDate = string.Empty;
-
-    bool? IsPaid;
 
     protected override void OnInitialized()
     {
@@ -198,14 +167,7 @@
             {
                 if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("keyword", out var keyword))
                 {
-                    if (string.IsNullOrEmpty(Query["keyword"]))
-                    {
-                        Keyword = Query["keyword"];
-                    }
-                    else
-                    {
-                        Keyword = keyword;
-                    }
+                    Keyword = !string.IsNullOrEmpty(Keyword) ? Keyword : keyword;
                 }
                 if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageSize", out var pageSize))
                 {
@@ -222,7 +184,7 @@
                 {
                     if (string.IsNullOrEmpty(Query["startDate"]))
                     {
-                        DateRange.StartDate = !string.IsNullOrEmpty(startDate) ? DateTimeOffset.Parse(startDate) : DateRange.StartDate;
+                        DateRange.StartDate = !string.IsNullOrEmpty(startDate) && DateRange.StartDate == null  ? DateTimeOffset.Parse(startDate) : DateRange.StartDate;
                     }
                     else
                     {
@@ -233,20 +195,16 @@
                 {
                     if (string.IsNullOrEmpty(Query["endDate"]))
                     {
-                        DateRange.EndDate = !string.IsNullOrEmpty(endDate) ? DateTimeOffset.Parse(endDate) : DateRange.EndDate;
+                        DateRange.EndDate = !string.IsNullOrEmpty(endDate) && DateRange.EndDate == null ? DateTimeOffset.Parse(endDate) : DateRange.EndDate;
                     }
                     else
                     {
                         DateRange.EndDate = DateTimeOffset.Parse(Query["endDate"]);
                     }
                 }
-                if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("isPaid", out var isPaid))
-                {
-                    IsPaid = !string.IsNullOrEmpty(isPaid) ? bool.Parse(isPaid) : IsPaid;
-                }
             } 
 
-            Bills = BillRepo.GetAll(Keyword, DateRange.StartDate != null ? DateRange.StartDate.Value.DateTime : null, DateRange.EndDate != null ? DateRange.EndDate.Value.DateTime : null, Pagination.PageIndex, Pagination.PageSize, PriceType.Entry, IsPaid);
+            Bills = BillRepo.GetAll(Keyword, DateRange.StartDate != null ? DateRange.StartDate.Value.DateTime : null, DateRange.EndDate != null ? DateRange.EndDate.Value.DateTime : null, Pagination.PageIndex, Pagination.PageSize, PriceType.Sale, null);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
@@ -288,7 +246,6 @@
         Query["keyword"] = Keyword;
         Query["startDate"] = DateRange.StartDate != null ? DateRange.StartDate.Value.ToString("dd-MM-yyyy") : "";
         Query["endDate"] = DateRange.EndDate != null ? DateRange.EndDate.Value.ToString("dd-MM-yyyy") : "";
-        Query["isPaid"] = IsPaid.ToString();
 
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
 
@@ -308,24 +265,14 @@
         }
     }
 
-    async Task HandlePayingBill()
+    async Task HandlePayingBill(int billId)
     {
-        if (SelectedBill.Id > 0)
+        await HelperFunctions.AddIndicator(JsRuntime);
+        if (BillRepo.PayingBill(billId, 0))
         {
-            await HelperFunctions.AddIndicator(JsRuntime);
-            if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice))
-            {
-                Bills.Items.FirstOrDefault(x => x.Id == SelectedBill.Id).IsPaid = true;
-                SelectedBill = new();
-                await HelperFunctions.RemoveIndicator(JsRuntime);
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
-            }
-            else
-            {
-                await HelperFunctions.RemoveIndicator(JsRuntime);
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["PaidFailed"]);
-            }
+
         }
+        await HelperFunctions.RemoveIndicator(JsRuntime);
     }
 
     async Task HandleShowMore()
@@ -336,7 +283,7 @@
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
         await GetData();
     }
-
+    
     void HandleSelecteBill(BillDTO bill)
     {
         SelectedBill = bill;
@@ -357,19 +304,6 @@
                 return;
             }
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
-        }
-    }
-
-    void HandleSelectPaid(ChangeEventArgs e)
-    {
-        var value = e.Value.ToString();
-        if (string.IsNullOrEmpty(value))
-        {
-            IsPaid = null;
-        }
-        else
-        {
-            IsPaid = bool.Parse(value);
         }
     }
 }

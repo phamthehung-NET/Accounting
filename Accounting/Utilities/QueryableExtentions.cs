@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Accounting.Common
+namespace Accounting.Utilities
 {
     public static class QueryableExtentions
     {

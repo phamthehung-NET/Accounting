@@ -1,5 +1,4 @@
-﻿using Accounting.Common;
-using Accounting.Model;
+﻿using Accounting.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Data
@@ -21,5 +20,7 @@ namespace Accounting.Data
         public DbSet<Bill> Bills { get; set; }
         
         public DbSet<RecycleBin> RecycleBins { get; set; }
+
+        public DbSet<History> Histories { get; set; }
     }
 }

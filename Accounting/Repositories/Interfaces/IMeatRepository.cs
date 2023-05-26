@@ -1,11 +1,11 @@
-﻿using Accounting.Common;
+﻿using Accounting.Utilities;
 using Accounting.Model.DTO;
 
 namespace Accounting.Repositories.Interfaces
 {
     public interface IMeatRepository
     {
-        public Pagination<MeatDTO> GetAllMeats(string keyword, int? type, bool? prozen, int pageIndex, int pageSize, string order);
+        public Pagination<MeatDTO> GetAllMeats(string keyword, int? type, bool? frozen, int pageIndex, int pageSize, string order);
 
         public bool AddMeat(MeatDTO meat);
 

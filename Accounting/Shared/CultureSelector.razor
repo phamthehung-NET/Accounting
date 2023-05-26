@@ -1,10 +1,10 @@
 ﻿@using System.Globalization
 @inject NavigationManager Nav
 
-<select @bind="Culture" style="width: 3rem" class="form-control px-2">
+<select @bind="Culture" style="width: 15rem" class="form-control px-2">
     @foreach (var culture in supportedCultures)
     {
-        <option value="@culture">@culture.TwoLetterISOLanguageName</option>
+        <option value="@culture">@culture.NativeName</option>
     }
 </select>
 

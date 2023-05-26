@@ -18,6 +18,8 @@
 
         public bool? IsPaid { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public decimal TotalPrice 
         { 
             get
