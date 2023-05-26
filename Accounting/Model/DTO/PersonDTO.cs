@@ -1,4 +1,6 @@
-﻿namespace Accounting.Model.DTO
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Accounting.Model.DTO
 {
     public class PersonDTO
     {
@@ -14,6 +16,14 @@
 
         public bool? IsDeleted { get; set; }
 
-        public DateTime? NearestTransaction { get; set; }
+        [AllowNull]
+        public NearestTransaction NearestTransaction { get; set; }
+    }
+
+    public class NearestTransaction
+    {
+        public int Id { get; set; }
+
+        public DateTime? ActivateDate { get; set; }
     }
 }

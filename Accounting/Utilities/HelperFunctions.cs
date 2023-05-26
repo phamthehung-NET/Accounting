@@ -16,9 +16,9 @@ namespace Accounting.Utilities
         {
             return type switch
             {
-                (int)MeatType.Buffalo => (string)LRes["Buffalo"],
-                (int)MeatType.Beef => (string)LRes["Beef"],
-                (int)MeatType.Calves => (string)LRes["Calves"],
+                (int)MeatType.Buffalo => LRes["Buffalo"],
+                (int)MeatType.Beef => LRes["Beef"],
+                (int)MeatType.Calves => LRes["Calves"],
                 _ => string.Empty,
             };
         }

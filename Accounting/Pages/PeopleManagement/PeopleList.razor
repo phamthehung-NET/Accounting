@@ -27,12 +27,11 @@
                 <td>@Context.PhoneNumber</td>
                 <td>@Context.Address</td>
                 <td>@HandleDisplayType(Context.Source)</td>
-                <td>@(Context.NearestTransaction != null ? Context.NearestTransaction : LRes["No data"])</td>
+                <td>@(Context.NearestTransaction != null ? (Context.NearestTransaction.ActivateDate.Value.ToString("dd/MM/yyyy") + " (" + HelperFunctions.GetLunarDate(Context.NearestTransaction.ActivateDate.Value) +")") : LRes["No data"])</td>
                 <td>
-                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
-                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPersonModal" @onclick="() => EditPerson(Context.Id)"><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@("#deletePerson" + Context.Id)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
-                    <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeletePersonConfirmation"]" ModalID="@("deletePerson" + Context.Id)" SubmitEvent="async () => await DeletePerson(Context.Id)"/>
+                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)" @onclick="() => {SelectedPersonDTO = Context;}"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPersonModal" @onclick="() => OnSelectPerson(Context)"><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePerson" @onclick="() => OnSelectPerson(Context)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                 </td>
             </tr>
         </TBody>
@@ -47,6 +46,12 @@
             <EditPerson GetData="GetData" Person="SelectedPerson"/>
         </ModalContent>
     </CommonModalWrapper>
+    <CommonModalWrapper Id="nearestTransactionModal">
+        <ModalContent>
+            <NearestTransaction BillId="SelectedPersonDTO != null && SelectedPersonDTO.NearestTransaction != null ? SelectedPersonDTO.NearestTransaction.Id : 0" />
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeletePersonConfirmation"]" ModalID="deletePerson" SubmitEvent="async () => await DeletePerson(SelectedPerson.Id)"/>
 </div>
 
 @code {
@@ -74,6 +79,8 @@
 
     Person SelectedPerson;
 
+    PersonDTO SelectedPersonDTO;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -89,7 +96,7 @@
         Headers.Add(new Header() { Name = "PhoneNumber", DisplayName = LRes["PhoneNumber"], Ordering = true });
         Headers.Add(new Header() { Name = "Address", DisplayName = LRes["Address"], Ordering = true });
         Headers.Add(new Header() { Name = "Source", DisplayName = LRes["Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "NearestTransaction", DisplayName = LRes["NearestTransaction"], Ordering = true });
+        Headers.Add(new Header() { Name = "NearestTransaction", DisplayName = LRes["NearestTransaction"]});
         Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
     }
 
@@ -170,23 +177,26 @@
         await GetData();
     }
 
-    void EditPerson(int id)
+    void OnSelectPerson(PersonDTO person)
     {
-        SelectedPerson = PeopleRepo.GetPersonDetail(id);
+        SelectedPerson = PeopleRepo.GetPersonDetail(person.Id);
     }
 
     async Task DeletePerson(int id)
     {
-        await HelperFunctions.AddIndicator(JsRuntime);
-        var result = PeopleRepo.DeletePerson(id);
-        await HelperFunctions.RemoveIndicator(JsRuntime);
-        if (result)
+        if(id > 0)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
-            await GetData();
-            return;
+            await HelperFunctions.AddIndicator(JsRuntime);
+            var result = PeopleRepo.DeletePerson(id);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            if (result)
+            {
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
+                await GetData();
+                return;
+            }
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
         }
-        await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
     }
 
     string HandleDisplayType(bool? type)

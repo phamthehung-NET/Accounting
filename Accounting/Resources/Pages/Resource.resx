@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Action" xml:space="preserve">
+    <value>Hành động</value>
+  </data>
+  <data name="ActionDate" xml:space="preserve">
+    <value>Ngày</value>
+  </data>
   <data name="Actions" xml:space="preserve">
     <value>Hành động</value>
   </data>
@@ -125,6 +131,9 @@
   </data>
   <data name="AddBillMeatFailed" xml:space="preserve">
     <value>Thêm mặt hàng vào hóa đơn thất bại</value>
+  </data>
+  <data name="AddItem" xml:space="preserve">
+    <value>Thêm sản phẩm</value>
   </data>
   <data name="AddNewPerson" xml:space="preserve">
     <value>Tạo người mua/bán mới</value>
@@ -186,6 +195,12 @@
   <data name="CommonErrMsg" xml:space="preserve">
     <value>Có lỗi xảy ra, vui lòng liên hệ nhà phát triển để biết thêm thông tin chi tiết</value>
   </data>
+  <data name="Content" xml:space="preserve">
+    <value>Nội dung</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Tạo</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>ngày</value>
   </data>
@@ -209,6 +224,9 @@
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Sửa</value>
+  </data>
+  <data name="EditItemPrice" xml:space="preserve">
+    <value>Sửa giá các sản phẩm</value>
   </data>
   <data name="EditItemsPrice" xml:space="preserve">
     <value>Sửa giá các sản phẩm</value>
@@ -282,17 +300,26 @@
   <data name="Meat Type" xml:space="preserve">
     <value>Loại thịt</value>
   </data>
+  <data name="ModifiedHistory" xml:space="preserve">
+    <value>Lịch sử sửa đổi</value>
+  </data>
   <data name="Move to recycle bin success" xml:space="preserve">
     <value>Đã chuyển vào thùng rác</value>
   </data>
   <data name="Move to reycle bin failed" xml:space="preserve">
     <value>Chuyển vào thùng rác thất bại</value>
   </data>
+  <data name="MoveToRecycleBin" xml:space="preserve">
+    <value>Chuyển vào thùng rác</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Tên</value>
   </data>
   <data name="NearestTransaction" xml:space="preserve">
     <value>Giao dịch gần nhất</value>
+  </data>
+  <data name="NearestTransactionDetail" xml:space="preserve">
+    <value>Thông tin giao dịch gần nhất</value>
   </data>
   <data name="No data" xml:space="preserve">
     <value>Không có dữ liệu</value>
@@ -344,6 +371,12 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Xóa</value>
+  </data>
+  <data name="RemoveItem" xml:space="preserve">
+    <value>Xóa sản phẩm</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Khôi phục</value>
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Danh sách bán hàng</value>

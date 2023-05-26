@@ -6,24 +6,28 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["ChooseMeat"]" Color="warning"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["ModifiedHistory"]" Color="warning"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
         </div>
         <div class="modal-body">
-            @if (Histories != null && Histories.Items.Any())
+            @if (Histories != null && Histories.Items != null && Histories.Items.Any())
             {
                 <CommonDataTable Context="Context"
                         Headers="Headers"
                         TData="History"
                         PaginationData="Histories"
                         DisplayPaging="false">
-                    <TBody>
-                        <tr>
-                            <td>@Context.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                            <td>@Context.Action</td>
-                            <td>@Context.Content</td>
-                        </tr>
-                    </TBody>
+                    <TableBody>
+                        @for(var i = 0;i < Histories.Items.Count;i++)
+                        {  
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>@Histories.Items[i].CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                <td>@HandleShowAction(Histories.Items[i].Action)</td>
+                                <td>@Histories.Items[i].Content</td>
+                            </tr>
+                        }
+                    </TableBody>
                 </CommonDataTable>
             }
         </div>
@@ -47,8 +51,8 @@
 
     protected override void OnInitialized()
     {
-        //Headers.Add(new Header() { Name = "No.", DisplayName = LRes["No."] });
-        Headers.Add(new Header() { Name = "Date", DisplayName = LRes["Date"] });
+        Headers.Add(new Header() { Name = "No.", DisplayName = LRes["No."] });
+        Headers.Add(new Header() { Name = "Date", DisplayName = LRes["ActionDate"] });
         Headers.Add(new Header() { Name = "Action", DisplayName = LRes["Action"] });
         Headers.Add(new Header() { Name = "Content", DisplayName = LRes["Content"] });
     }
@@ -71,5 +75,20 @@
     {
         BillId = 0;
         Histories = new();
+    }
+
+    string HandleShowAction(int action)
+    {
+        return (HistoryAction)action switch
+        {
+            HistoryAction.Create => LRes["Create"],
+            HistoryAction.AddItem => LRes["AddItem"],
+            HistoryAction.RemoveItem => LRes["RemoveItem"],
+            HistoryAction.Remove => LRes["Remove"],
+            HistoryAction.EditItemPrice => LRes["EditItemPrice"],
+            HistoryAction.Pay => LRes["Pay"],
+            HistoryAction.Restore => LRes["Restore"],
+            _ => string.Empty,
+        };
     }
 }

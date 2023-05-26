@@ -1,10 +1,10 @@
-﻿using Accounting.Utilities;
-using Accounting.Data;
+﻿using Accounting.Data;
 using Accounting.Model;
 using Accounting.Model.DTO;
-using Accounting.Repositories.Interfaces;
-using Microsoft.Extensions.Localization;
 using Accounting.Pages;
+using Accounting.Repositories.Interfaces;
+using Accounting.Utilities;
+using Microsoft.Extensions.Localization;
 
 namespace Accounting.Repositories.Implementations
 {
@@ -38,7 +38,7 @@ namespace Accounting.Repositories.Implementations
                 context.Add(bill);
                 context.SaveChanges();
 
-                if(bill.Id > 0)
+                if (bill.Id > 0)
                 {
                     History history = new()
                     {
@@ -136,15 +136,15 @@ namespace Accounting.Repositories.Implementations
 
         public bool PayingBill(int id, decimal totalPrice)
         {
-           var bill = context.Bills.FirstOrDefault(x => x.Id == id);
-            if(bill != null)
+            var bill = context.Bills.FirstOrDefault(x => x.Id == id);
+            if (bill != null)
             {
                 bill.IsPaid = true;
                 History history = new()
                 {
                     ObjectId = id,
                     Action = (int)HistoryAction.Pay,
-                    Content = $"{Lres["Pay"]} {Lres["billwithprice"]}: {totalPrice:n0}.000 VND",
+                    Content = $"{Lres["Paid"]} {Lres["billwithprice"]}: {totalPrice:n0}.000 VND",
                     CreatedDate = DateTime.Now,
                     Type = (int)HistoryType.Bill,
                 };
@@ -184,13 +184,13 @@ namespace Accounting.Repositories.Implementations
                 context.Add(meatBill);
                 context.SaveChanges();
 
-                if(meatBill.Id > 0)
+                if (meatBill.Id > 0)
                 {
                     History history = new()
                     {
                         ObjectId = bill.Id,
                         Action = (int)HistoryAction.AddItem,
-                        Content = $"{Lres["Add"]} {weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatPrice.Price}" ,
+                        Content = $"{Lres["Add"]} {weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatPrice.Price}",
                         CreatedDate = currentDate,
                         Type = (int)HistoryType.Bill,
                     };
@@ -206,7 +206,7 @@ namespace Accounting.Repositories.Implementations
         public bool RemoveMeatFromBill(int meatpriceId)
         {
             var meatprice = context.MeatBillPrices.FirstOrDefault(x => x.Id == meatpriceId);
-            if(meatprice != null)
+            if (meatprice != null)
             {
                 var meat = context.Meats.FirstOrDefault(x => x.Id == meatprice.MeatId);
                 History history = new()
@@ -221,11 +221,50 @@ namespace Accounting.Repositories.Implementations
                 context.Remove(meatprice);
                 context.Add(history);
                 context.SaveChanges();
-                
+
                 return true;
             }
 
             return false;
         }
+
+        public BillDTO GetBillDetail(int id)
+        {
+            return (from b in context.Bills
+                    join p in context.People on b.PersonId equals p.Id
+                    join mbp in context.MeatBillPrices on b.Id equals mbp.BillId into meatBillPrices
+                    from mbp in meatBillPrices.DefaultIfEmpty()
+                    join m in context.Meats on mbp.MeatId equals m.Id into meats
+                    from m in meats.DefaultIfEmpty()
+                    where b.Id == id
+                    select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
+            .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.IsPaid })
+            .Select(x => new BillDTO
+            {
+                Id = x.Key.Id,
+                PersonId = x.Key.PersonId,
+                Type = x.Key.Type,
+                ActiveDate = x.Key.ActiveDate,
+                CreatedDate = x.Key.CreatedDate,
+                ModifiedDate = x.Key.ModifiedDate,
+                IsPaid = x.Key.IsPaid,
+                PersonName = x.Key.Name,
+                Items = x.Select(y => new MeatBillPriceDTO
+                {
+                    Id = y.meatBillId,
+                    BillId = y.Id,
+                    Price = y.Price,
+                    MeatName = y.meatName,
+                    MeatType = y.meatType,
+                    PriceType = y.PriceType,
+                    Weight = y.Weight,
+                    MeatId = y.MeatId,
+                    ActiveDate = y.ActiveDate,
+                    CreatedDate = y.CreatedDate,
+                    ModifiedDate = y.ModifiedDate,
+                }).Where(y => y.Id != null),
+            }).FirstOrDefault();
+        }
+
     }
 }

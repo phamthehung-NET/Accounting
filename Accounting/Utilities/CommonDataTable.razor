@@ -44,16 +44,23 @@
         }
     </thead>
     <tbody>
-        @if(PaginationData != null && PaginationData.Items.Any())
+        @if(TableBody != null)
         {
-            @foreach (var item in PaginationData.Items)
-            {
-                @TBody(item)
-            }
+            @TableBody
         }
         else
         {
-            <tr>@LRes["No data"]</tr>
+            @if (PaginationData != null && PaginationData.Items.Any())
+            {
+                @foreach (var item in PaginationData.Items)
+                {
+                    @TBody(item)
+                }
+            }
+            else
+            {
+                <tr>@LRes["No data"]</tr>
+            }
         }
     </tbody>
 </table>
@@ -99,6 +106,9 @@
 
     [Parameter]
     public bool DisplayPaging { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment TableBody { get; set; }
 
     void OnHeaderClick(string fieldName)
     {

@@ -1,5 +1,5 @@
-﻿using Accounting.Utilities;
-using Accounting.Model.DTO;
+﻿using Accounting.Model.DTO;
+using Accounting.Utilities;
 
 namespace Accounting.Repositories.Interfaces
 {
@@ -18,5 +18,7 @@ namespace Accounting.Repositories.Interfaces
         bool AddMeatToBill(int id, decimal weight, int billId, PriceType priceType);
 
         bool RemoveMeatFromBill(int meatpriceId);
+
+        BillDTO GetBillDetail(int id);
     }
 }

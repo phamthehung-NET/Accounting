@@ -1,0 +1,78 @@
+﻿@using Microsoft.Extensions.Localization;
+@inject IBillRepository BillRepo
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["NearestTransactionDetail"]" Color="warning"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="card col-md-12 col-sm-12 col-lg-12 col-xl-12 mb-4 p-0">
+                @if(Bill != null)
+                {
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="fw-bold">@Bill.PersonName</div>
+                        <div class="d-flex">
+                            <div>@(Bill.Items.Count() + " " + LRes["item(s)"])</div>
+                            @if (Bill.Items.Any())
+                            {
+                                @((MarkupString)HandleShowStatus(Bill.IsPaid))
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body overflow-auto" style="height: 15rem">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Bill.Items)
+                            {
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div>@(item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType != null ? item.MeatType.Value : null))</div>
+                                    <div>@(item.Weight + " Kg")</div>
+                                    <div>@item.Price</div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            @(Bill.TotalPrice == 0 ? string.Empty : Bill.TotalPrice.ToString("n0") + ".000 VND")
+                        </div>
+                        <div>
+                            @(Bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + HelperFunctions.GetLunarDate(Bill.ActiveDate.Value) + ")")
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int BillId { get; set; }
+
+    BillDTO Bill;
+
+    protected override void OnParametersSet()
+    {
+        if(BillId > 0)
+        {
+            Bill = BillRepo.GetBillDetail(BillId);
+        }
+    }
+
+    string HandleShowStatus(bool? status)
+    {
+        if (status != null && (bool)status)
+        {
+            return $"<div class='ms-2 text-success'>{LRes["Paid"]}</div>";
+        }
+        return $"<div class='ms-2 text-warning'>{LRes["Unpaid"]}</div>";
+    }
+}

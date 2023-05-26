@@ -123,7 +123,7 @@
 
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
         Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Prozen Meat"] + "?", Ordering = true });
+        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
         Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "TodayEntryPrice", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "YesterdaySalePrice", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });

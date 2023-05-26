@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="ActionDate" xml:space="preserve">
+    <value>Action date</value>
+  </data>
   <data name="Actions" xml:space="preserve">
     <value>Actions</value>
   </data>
@@ -125,6 +131,9 @@
   </data>
   <data name="AddBillMeatFailed" xml:space="preserve">
     <value>Add product to bill failed</value>
+  </data>
+  <data name="AddItem" xml:space="preserve">
+    <value>Add item</value>
   </data>
   <data name="AddNewPerson" xml:space="preserve">
     <value>Add new person</value>
@@ -183,6 +192,12 @@
   <data name="CommonErrMsg" xml:space="preserve">
     <value>Something went wrong, please contact to developer for more detail</value>
   </data>
+  <data name="Content" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>date</value>
   </data>
@@ -206,6 +221,9 @@
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
+  </data>
+  <data name="EditItemPrice" xml:space="preserve">
+    <value>Edit items price</value>
   </data>
   <data name="EditItemsPrice" xml:space="preserve">
     <value>Edit items price</value>
@@ -279,17 +297,26 @@
   <data name="Meat Type" xml:space="preserve">
     <value>Meat Type</value>
   </data>
+  <data name="ModifiedHistory" xml:space="preserve">
+    <value>Modified histories</value>
+  </data>
   <data name="Move to recycle bin success" xml:space="preserve">
     <value>Move to recycle bin successfully</value>
   </data>
   <data name="Move to reycle bin failed" xml:space="preserve">
     <value>Move to reycle bin failed</value>
   </data>
+  <data name="MoveToRecycleBin" xml:space="preserve">
+    <value>Move to recycle bin</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
   <data name="NearestTransaction" xml:space="preserve">
     <value>Nearest transaction</value>
+  </data>
+  <data name="NearestTransactionDetail" xml:space="preserve">
+    <value>Nearest transaction detail</value>
   </data>
   <data name="No data" xml:space="preserve">
     <value>No data</value>
@@ -341,6 +368,12 @@
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Remove</value>
+  </data>
+  <data name="RemoveItem" xml:space="preserve">
+    <value>Remove item</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Restore</value>
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Sale list</value>
