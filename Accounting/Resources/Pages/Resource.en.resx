@@ -318,6 +318,9 @@
   <data name="NearestTransactionDetail" xml:space="preserve">
     <value>Nearest transaction detail</value>
   </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
   <data name="No data" xml:space="preserve">
     <value>No data</value>
   </data>
@@ -431,6 +434,9 @@
   </data>
   <data name="withPrice" xml:space="preserve">
     <value>with price</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
   </data>
   <data name="Yesterday Entry Price" xml:space="preserve">
     <value>Yesterday Entry Price</value>

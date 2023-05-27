@@ -10,7 +10,7 @@
             <CommonLabel DisplayText="@LRes["ChooseMeat"]" Color="warning"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body overflow-auto" style="height: 73vh">
             <div class="mb-2">
                 <label>@LRes["Weight"]</label>
                 <input class="form-control @(!string.IsNullOrEmpty(ErrorMsg) ? "is-invalid" : "")" type="number" value="@(Weight == 0 ? null : Weight)" placeholder="@LRes["EnterWeight"]" min="0" @onchange="OnWeightChange"/>
@@ -107,12 +107,14 @@
                 GetData.Invoke();
                 Weight = 0;
                 BillId = 0;
+                Keyword = string.Empty;
             }
             else
             {
                 await HelperFunctions.RemoveIndicator(JsRuntime);
                 await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddBillMeatFailed"]);
                 Weight = 0;
+                Keyword = string.Empty;
             }
         }
         else
@@ -130,5 +132,6 @@
     {
         Weight = 0;
         ErrorMsg = string.Empty;
+        Keyword = string.Empty;
     }
 }

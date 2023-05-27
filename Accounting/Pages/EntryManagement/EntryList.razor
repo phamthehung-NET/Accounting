@@ -25,7 +25,7 @@
             <DateRangePicker class="form-control" @bind-StartDate="@(DateRange.StartDate)" @bind-EndDate="@(DateRange.EndDate)" placeholder="@LRes["ChooseDate"]" OnRangeSelect="OnRangeSelect" MinDate="DateTime.Now.AddYears(-10)" MaxDate="DateTime.Now" ApplyLabel="@LRes["Done"]" CancelLabel="@LRes["Close"]" ShowOnlyOneCalendar="true"/>
         </div>
         <div class="d-flex col-md-4 col-lg-4 col-sm-12 justify-content-between">
-            <div class="col-md-10 pe-1">
+            <div class="col-md-10 col-lg-10 col-sm-12 pe-1">
                 <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@Keyword" @onchange="(ChangeEventArgs e) => {Keyword = e.Value.ToString();}" />
             </div>
             <div class="col-md-2 col-lg-2 col-sm-12">
@@ -89,7 +89,7 @@
                         <div>
                             @(bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND")
                         </div>
-                        <div>
+                        <div class="text-end">
                             @if ((bill.IsPaid == null || !bill.IsPaid.Value) && bill.Items.Any())
                             {
                                 <button class="btn btn-primary me-1" data-bs-toggle="modal" data-bs-target="#payingBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-brands fa-amazon-pay"></i> @LRes["Pay"]</button>

@@ -70,7 +70,7 @@
                 await HelperFunctions.RemoveIndicator(JsRuntime);
                 if (result)
                 {
-                    meat = new() { Frozen = false };
+                    meat = new() { Frozen = false, Type = (int)MeatType.Beef };
                     editContext = new(meat);
                     await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["AddProductSuccess"]);
                     await GetData.InvokeAsync();

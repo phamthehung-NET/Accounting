@@ -20,14 +20,12 @@
     <SurveyPrompt Title="How is Blazor working for you?" />
     <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#priceModal" hidden id="hiddenBtnPriceModal"></button>
     <div class="modal fade" id="priceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-        <PriceList Meats="Meats"/>
+        <PriceList />
     </div>
 </div>
 
 @code{
     Uri Uri;
-
-    Pagination<MeatDTO> Meats;
 
     protected override void OnInitialized()
     {
@@ -44,7 +42,6 @@
                 var lastUpdatePriceDate = userManager.FindByNameAsync(user.Identity.Name).Result.UpdatedPriceDate;
                 if (lastUpdatePriceDate.Date < DateTime.Today)
                 {
-                    Meats = MeatRepository.GetAllMeats(string.Empty, null, null, 1, 10, "id_desc");
                     await HelperFunctions.TriggerBtn(JsRuntime, "hiddenBtnPriceModal");
                     StateHasChanged();
                 }

@@ -10,7 +10,7 @@
             <CommonLabel DisplayText="@LRes["ChoosePerson"]" Color="warning"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body overflow-auto" style="height: 73vh">
             <div class="mb-2">
                 <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => {Keyword = e.Value.ToString(); GetPeopleData();})"/>
             </div>
@@ -98,6 +98,7 @@
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillPerson"]);
             await HelperFunctions.HideModal(JsRuntime, "addBillPeopleModal");
             GetData.Invoke();
+            Keyword = string.Empty;
         }
         else
         {

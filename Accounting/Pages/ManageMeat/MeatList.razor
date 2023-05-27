@@ -82,7 +82,7 @@
     </CommonModalWrapper>
     <CommonModalWrapper Id="priceModal">
         <ModalContent>
-            <PriceList Meats="Meats" GetData="GetData"/>
+            <PriceList GetParentData="GetData"/>
         </ModalContent>
     </CommonModalWrapper>
     <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteProductConfirmation"]" ModalID="deleteMeat" SubmitEvent="async () => await DeleteMeat(SelectedMeat != null ? SelectedMeat.Id : 0)"/>

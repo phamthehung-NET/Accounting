@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using Microsoft.Extensions.Localization;
 @inject IPriceRepository PriceRepository
+@inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
 
@@ -10,12 +11,12 @@
             <CommonLabel DisplayText="@LRes["ManagePriceTitle"]" Color="primary"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body overflow-auto" style="height: 73vh">
             @if (Meats != null)
             {
                 <CommonDataTable Context="Context" 
                     Headers="Headers" 
-                    TData="MeatDTO" 
+                    TData="MeatDTO"
                     PaginationData="Meats" 
                     Sorting="@Sorting" 
                     SortData="(sortingString) => SortData(sortingString)">
@@ -34,8 +35,6 @@
                             </td>
                         </tr>
                     </TBody>
-                    <Pagination>
-                    </Pagination>
                 </CommonDataTable>
             }
         </div>
@@ -48,10 +47,9 @@
 
 @code {
     [Parameter]
-    public Pagination<MeatDTO> Meats { get; set; }
+    public EventCallback GetParentData { get; set; }
 
-    [Parameter]
-    public EventCallback GetData { get; set; }
+    Pagination<MeatDTO> Meats;
 
     PaginationObject Pagination = new();
 
@@ -67,11 +65,25 @@
     {
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
         Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["PProduct Type"], Ordering = true });
+        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
         Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
         Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetData();
+        }
+    }
+
+    void GetData()
+    {
+        Meats = MeatRepository.GetAllMeats(string.Empty, null, null, 1, 10000, Sorting);
+        StateHasChanged();
     }
 
     void OnInputChange(int meatId, int price, string inputType)
@@ -100,7 +112,8 @@
     {
         InputEntryList.Clear();
         InputSaleList.Clear();
-        await GetData.InvokeAsync();
+        await GetParentData.InvokeAsync();
+        GetData();
     }
 
     async Task OnSubmit()
@@ -115,7 +128,8 @@
                 InputEntryList.Clear();
                 InputSaleList.Clear();
                 await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["EditPriceSuccess"]);
-                await GetData.InvokeAsync();
+                await GetParentData.InvokeAsync();
+                GetData();
                 return;
             }
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["EditPriceFailed"]);
@@ -130,5 +144,6 @@
     {
         Sorting = sortingString;
         StateHasChanged();
+        GetData();
     }
 }

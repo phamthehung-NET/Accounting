@@ -2,7 +2,7 @@
 @inject IStringLocalizer<Resource> LRes
 @typeparam TData
 
-<table class="table table-bordered table-striped text-center table-responsive">
+<table class="table table-bordered table-striped text-center table-responsive @TableClass" style="@TalbleStyle">
     <thead>
         @if(THead != null)
         {
@@ -109,6 +109,12 @@
 
     [Parameter]
     public RenderFragment TableBody { get; set; }
+
+    [Parameter]
+    public string TableClass { get; set; }
+
+    [Parameter]
+    public string TalbleStyle { get; set; }
 
     void OnHeaderClick(string fieldName)
     {
