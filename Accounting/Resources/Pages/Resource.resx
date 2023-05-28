@@ -336,6 +336,9 @@
   <data name="Paid" xml:space="preserve">
     <value>Đã thanh toán</value>
   </data>
+  <data name="PaidFailed" xml:space="preserve">
+    <value>Thanh toán hóa đơn thất bại</value>
+  </data>
   <data name="Pay" xml:space="preserve">
     <value>Thanh toán</value>
   </data>
@@ -404,6 +407,9 @@
   </data>
   <data name="SuccessfullyAddBillPerson" xml:space="preserve">
     <value>Tạo hóa đơn thành công</value>
+  </data>
+  <data name="SucessfullyPaid" xml:space="preserve">
+    <value>Thanh toán hóa đơn thành công</value>
   </data>
   <data name="ThisPersonIsExisted" xml:space="preserve">
     <value>Hóa đơn cho người này đã tồn tại, vui lòng kiểm tra lại</value>

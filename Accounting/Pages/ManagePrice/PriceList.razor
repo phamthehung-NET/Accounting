@@ -24,7 +24,7 @@
                         <tr>
                             <td>@Context.Name</td>
                             <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
-                            <td>@(Context.Frozen.Value ? "✔️" : "❌")</td>
+                            <td>@(Context.Frozen.Value ? LRes["Frozen Meat"] : LRes["Normal Meat"])</td>
                             <td>@(Context.YesterdayEntryPrice == null ? LRes["No data"] : Context.YesterdayEntryPrice)</td>
                             <td>
                                 <input type="number" min=0 value="@(Context.TodayEntryPrice == null ? (InputEntryList.TryGetValue(Context.Id, out int? value) ? value : null) : Convert.ToInt32(Context.TodayEntryPrice.Value.ToString("n0")))" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id, int.Parse(e.Value.ToString()), "entry"))"/>

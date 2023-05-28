@@ -156,9 +156,19 @@ namespace Accounting.Repositories.Implementations
             return false;
         }
 
-        public bool UpdateBillItems(BillDTO bill)
+        public bool UpdateBillItems(BillDTO res)
         {
-            throw new NotImplementedException();
+            foreach (var item in res.Items)
+            {
+                var itemDb = context.MeatBillPrices.FirstOrDefault(x => x.BillId == res.Id && x.Id == item.Id);
+                if (itemDb != null && item.Price != null && item.Price.Value > 0 && item.Price != itemDb.Price)
+                {
+                    itemDb.Price = item.Price;
+                    itemDb.Weight = item.Weight.Value;
+                }
+            }
+            context.SaveChanges();
+            return true;
         }
 
         public bool AddMeatToBill(int id, decimal weight, int billId, PriceType priceType)
@@ -266,5 +276,25 @@ namespace Accounting.Repositories.Implementations
             }).FirstOrDefault();
         }
 
+        public Pagination<MeatBillPriceDTO> GetAllMeatOfBill(int billId)
+        {
+            return (from mbp in context.MeatBillPrices
+                    join m in context.Meats on mbp.MeatId equals m.Id
+                    where mbp.BillId == billId
+                    select new MeatBillPriceDTO
+                    {
+                        BillId = mbp.BillId,
+                        ActiveDate = mbp.ActiveDate,
+                        CreatedDate = mbp.CreatedDate,
+                        Id = mbp.Id,
+                        MeatId = mbp.MeatId,
+                        ModifiedDate = mbp.ModifiedDate,
+                        Price = mbp.Price,
+                        PriceType = mbp.PriceType,
+                        Weight = mbp.Weight,
+                        MeatName = m.Name,
+                        MeatType = m.Type,
+                    }).Paginate(1, 10000);
+        }
     }
 }

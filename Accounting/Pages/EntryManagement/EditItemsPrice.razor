@@ -1,0 +1,121 @@
+﻿@using System.Globalization
+@using Microsoft.Extensions.Localization;
+@inject IBillRepository BillRepo
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+
+<div class="modal-dialog modal-xl">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["EditItemPrice"]" Color="primary"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
+        </div>
+        <div class="modal-body overflow-auto" style="height: 73vh">
+            @if (Prices != null)
+            {
+                    <CommonDataTable Context="Context" 
+                    Headers="Headers" 
+                    TData="MeatBillPriceDTO"
+                    PaginationData="Prices">
+                        <TBody>
+                            <tr>
+                                <td>@Context.MeatName</td>
+                                <td>@HelperFunctions.RenderMeatType(LRes, Context.MeatType.Value)</td>
+                                <td>
+                                    <input type="number" min=0 value="@(Context.Weight.Value == 0 ? null : Context.Weight.Value)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id.Value, e.Value.ToString(), "weight"))" />
+                                </td>
+                                <td>
+                                    <input type="number" min=0 value="@(Context.Price == null ? null : Convert.ToInt32(Context.Price.Value.ToString("n0")))" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id.Value, e.Value.ToString(), "price"))" />
+                                </td>
+                            </tr>
+                        </TBody>
+                    </CommonDataTable>
+            }
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">@LRes["Close"]</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="OnSubmit">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback GetParentData { get; set; }
+
+    [Parameter]
+    public int BillId { get; set; }
+
+    Pagination<MeatBillPriceDTO> Prices;
+
+    List<Header> Headers = new();
+
+    protected override void OnInitialized()
+    {
+        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"] });
+        Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"] });
+        Headers.Add(new Header() { Name = "Weight", DisplayName = LRes["Weight"] });
+        Headers.Add(new Header() { Name = "Price", DisplayName = LRes["Price"] });
+    }
+
+    protected override void OnParametersSet()
+    {
+        if(BillId > 0)
+        {
+            GetData();
+        }
+    }
+
+    void GetData()
+    {
+        Prices = BillRepo.GetAllMeatOfBill(BillId);
+        StateHasChanged();
+    }
+
+    void OnInputChange(int priceId, string value, string inputType)
+    {
+        var item = Prices.Items.FirstOrDefault(x => x.Id == priceId);
+        if(inputType.Equals("weight"))
+        {
+            item.Weight = decimal.Parse(!string.IsNullOrEmpty(value) ? value.Replace('.', ',') : "0");
+        }
+        else
+        {
+            item.Price = int.Parse(value);
+        }
+    }
+
+    async Task OnCloseModal()
+    {
+        await GetParentData.InvokeAsync();
+    }
+
+    async Task OnSubmit()
+    {
+        try
+        {
+            if(BillId > 0)
+            {
+                BillDTO bill = new()
+                {
+                    Id = BillId,
+                    Items = Prices.Items.AsEnumerable(),
+                };
+                await HelperFunctions.AddIndicator(JsRuntime);
+                var result = BillRepo.UpdateBillItems(bill);
+                await HelperFunctions.RemoveIndicator(JsRuntime);
+                if (result)
+                {
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["UpdateItemsPriceSuccessfully"]);
+                    await GetParentData.InvokeAsync();
+                    return;
+                }
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["UpdateItemsPriceFailed"]);
+            }
+        }
+        catch (Exception ex)
+        {
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+}

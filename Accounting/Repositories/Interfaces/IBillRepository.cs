@@ -20,5 +20,7 @@ namespace Accounting.Repositories.Interfaces
         bool RemoveMeatFromBill(int meatpriceId);
 
         BillDTO GetBillDetail(int id);
+
+        Pagination<MeatBillPriceDTO> GetAllMeatOfBill(int billId);
     }
 }

@@ -333,6 +333,9 @@
   <data name="Paid" xml:space="preserve">
     <value>Paid</value>
   </data>
+  <data name="PaidFailed" xml:space="preserve">
+    <value>Paying bill failed</value>
+  </data>
   <data name="Pay" xml:space="preserve">
     <value>Pay</value>
   </data>
@@ -401,6 +404,9 @@
   </data>
   <data name="SuccessfullyAddBillPerson" xml:space="preserve">
     <value>Add bill successfully</value>
+  </data>
+  <data name="SucessfullyPaid" xml:space="preserve">
+    <value>Bill is paid successfully</value>
   </data>
   <data name="ThisPersonIsExisted" xml:space="preserve">
     <value>Bill for this person is already existed, please check again</value>
