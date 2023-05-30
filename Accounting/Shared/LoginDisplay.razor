@@ -1,12 +1,14 @@
-﻿<AuthorizeView>
+﻿@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<Resource> LRes
+<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage" class="nav-link ms-0">Hello, @context.User.Identity?.Name</a>
+        <a class="nav-link text-black ms-0">@LRes["Hello"], @context.User.Identity?.Name</a>
         <form method="post" action="Identity/Account/Logout">
-            <button type="submit" class="btn nav-link">Log out</button>
+            <button type="submit" class="btn nav-link text-black">@LRes["Log out"]</button>
         </form>
     </Authorized>
     <NotAuthorized>
         @*<a href="Identity/Account/Register">Register</a>*@
-        <a href="Identity/Account/Login" class="nav-link ms-0">Log in</a>
+        <a href="Identity/Account/Login" class="nav-link text-black ms-0">@LRes["Log in"]</a>
     </NotAuthorized>
 </AuthorizeView>

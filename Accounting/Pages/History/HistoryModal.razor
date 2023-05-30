@@ -2,11 +2,12 @@
 @inject IJSRuntime JsRuntime
 @inject IHistoryRepository HistoryRepo
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
-<div class="modal-dialog modal-lg">
+<div class="modal-dialog modal-xl">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["ModifiedHistory"]" Color="warning"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["ModifiedHistory"]" Color="@Constants.PrimaryColor"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
         </div>
         <div class="modal-body">
@@ -57,18 +58,34 @@
         Headers.Add(new Header() { Name = "Content", DisplayName = LRes["Content"] });
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if(BillId > 0)
         {
-            GetData();
+            await GetData();
         }
     }
 
-    void GetData()
+    async Task GetData()
     {
-        Histories = HistoryRepo.GetAllHistoryByObject(BillId, HistoryType);
-        StateHasChanged();
+        try
+        {
+            Histories = HistoryRepo.GetAllHistoryByObject(BillId, HistoryType);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "History Modal > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     void OnDismiss()

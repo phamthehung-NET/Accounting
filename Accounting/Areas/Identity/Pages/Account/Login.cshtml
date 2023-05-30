@@ -1,35 +1,38 @@
 ﻿@page
+@using Accounting.Pages;
+@using Microsoft.Extensions.Localization;
 @model LoginModel
+@inject IStringLocalizer<Resource> LRes
 
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = LRes["Log in"];
 }
 
 <h1 class="text-center">@ViewData["Title"]</h1>
-<div class="row">
+<div class="row mt-md-5 mt-lg-5 mt-xl-5">
     <div class="col-md-6 mx-auto">
        <div class="card">
            <div class="card-body">
                 <form id="account" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="Username" />
-                        <label asp-for="Input.UserName" class="form-label">UserName</label>
+                        <input asp-for="Input.UserName" class="form-control rounded-pill" autocomplete="username" aria-required="true" placeholder="@LRes["Username"]" />
+                        <label asp-for="Input.UserName" class="form-label">@LRes["Username"]</label>
                         <span asp-validation-for="Input.UserName" class="text-danger"></span>
                     </div>
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                        <label asp-for="Input.Password" class="form-label">Password</label>
+                        <input asp-for="Input.Password" class="form-control rounded-pill" autocomplete="current-password" aria-required="true" placeholder="@LRes["Password"]" />
+                        <label asp-for="Input.Password" class="form-label">@LRes["Password"]</label>
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
-                    <div class="checkbox mb-3">
+                    @*<div class="checkbox mb-3">
                         <label asp-for="Input.RememberMe" class="form-label">
                             <input class="form-check-input" asp-for="Input.RememberMe" />
                             @Html.DisplayNameFor(m => m.Input.RememberMe)
                         </label>
-                    </div>
+                    </div>*@
                     <div>
-                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary rounded-pill">@LRes["Log in"]</button>
                     </div>
                     @*<div>
                         <p>

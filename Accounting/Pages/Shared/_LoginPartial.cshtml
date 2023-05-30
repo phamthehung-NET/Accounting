@@ -1,28 +1,31 @@
 ﻿@using Accounting.Model;
+@using Accounting.Pages;
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Localization;
 
 @inject SignInManager<CustomUser> SignInManager
 @inject UserManager<CustomUser> UserManager
+@inject IStringLocalizer<Resource> LRes
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+        <a id="manage" class="nav-link text-dark" title="Manage">@LRes["Hello"] @UserManager.GetUserName(User)!</a>
     </li>
     <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
-            <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
+            <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">@LRes["Log out"]</button>
         </form>
     </li>
 }
 else
 {
-    <li class="nav-item">
+    @*<li class="nav-item">
         <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
+    </li>*@
     <li class="nav-item">
-        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">@LRes["Log in"]</a>
     </li>
 }
 </ul>

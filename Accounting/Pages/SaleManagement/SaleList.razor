@@ -6,11 +6,14 @@
 @inject IBillRepository BillRepo
 @inject NavigationManager NavigationManager 
 @inject IJSRuntime JsRuntime
+@inject ILogRepository LogRepo
 @attribute [Authorize]
+
+<PageTitle>@LRes["Manage sale"]</PageTitle>
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-2">
-        <CommonLabel DisplayText="@LRes["SaleList"]" Color="primary"></CommonLabel>
+        <CommonLabel DisplayText="@LRes["SaleList"]" Color="@Constants.PrimaryColor"></CommonLabel>
         <div class="fw-bold">@ShowingDate</div>
     </div>
     <div class="d-flex justify-content-end mb-2">
@@ -36,7 +39,7 @@
     <div class="row">
         @if(DateRange.StartDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 || DateRange.EndDate.Value.Date.CompareTo(DateTime.Now.Date) == 0)
         {
-            <div class="card col-md-3 col-sm-12 col-lg-3 col-xl-3 mb-4 p-0">
+            <div class="card col-md-4 col-sm-12 col-lg-4 col-xl-4 mb-4 p-0">
                 <div class="card-header">
                     @LRes["Add"]
                 </div>
@@ -52,7 +55,7 @@
         {
             foreach (var bill in Bills.Items)
             {
-                <div class="card col-md-3 col-sm-12 col-lg-3 col-xl-3 mb-4 p-0">
+                <div class="card col-md-4 col-sm-12 col-lg-4 col-xl-4 mb-4 p-0">
                     <div class="card-header d-flex justify-content-between">
                         <div class="fw-bold">@bill.PersonName</div>
                         <div class="d-flex">
@@ -102,7 +105,7 @@
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             }
                             <div class="btn-group dropup">
-                                <button type="button" class="btn border-0 bg-transparent p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button type="button" class="btn border-0 bg-transparent rounded-0 p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-regular fa-ellipsis-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
@@ -258,8 +261,17 @@
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Sale list > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
@@ -276,13 +288,30 @@
 
     async Task HandleDeleteItemFromBill(int id, int billId)
     {
-        await HelperFunctions.AddIndicator(JsRuntime);
-        if (BillRepo.RemoveMeatFromBill(id))
+        try
         {
-            var bill = Bills.Items.FirstOrDefault(x => x.Id == billId);
-            bill.Items = bill.Items.Where(x => x.Id != id).AsEnumerable();
+            await HelperFunctions.AddIndicator(JsRuntime);
+            if (BillRepo.RemoveMeatFromBill(id))
+            {
+                var bill = Bills.Items.FirstOrDefault(x => x.Id == billId);
+                bill.Items = bill.Items.Where(x => x.Id != id).AsEnumerable();
+            }
+            await HelperFunctions.RemoveIndicator(JsRuntime);
         }
-        await HelperFunctions.RemoveIndicator(JsRuntime);
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Sale list > HandleDeleteItemFromBill()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     void OnRangeSelect(BlazorDateRangePicker.DateRange range)
@@ -318,21 +347,38 @@
 
     async Task HandlePayingBill()
     {
-        if (SelectedBill.Id > 0)
+        try
         {
-            await HelperFunctions.AddIndicator(JsRuntime);
-            if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice))
+            if (SelectedBill.Id > 0)
             {
-                Bills.Items.FirstOrDefault(x => x.Id == SelectedBill.Id).IsPaid = true;
-                SelectedBill = new();
-                await HelperFunctions.RemoveIndicator(JsRuntime);
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
+                await HelperFunctions.AddIndicator(JsRuntime);
+                if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice))
+                {
+                    Bills.Items.FirstOrDefault(x => x.Id == SelectedBill.Id).IsPaid = true;
+                    SelectedBill = new();
+                    await HelperFunctions.RemoveIndicator(JsRuntime);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
+                }
+                else
+                {
+                    await HelperFunctions.RemoveIndicator(JsRuntime);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["PaidFailed"]);
+                }
             }
-            else
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
             {
-                await HelperFunctions.RemoveIndicator(JsRuntime);
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["PaidFailed"]);
-            }
+                CreatedDate = DateTime.Now,
+                Location = "Sale List > HandlePayingBill()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 
@@ -352,19 +398,36 @@
 
     async Task HandleDeleteBill()
     {
-        if (SelectedBill.Id > 0)
+        try
         {
-            await HelperFunctions.AddIndicator(JsRuntime);
-            var result = BillRepo.DeleteBill(SelectedBill.Id);
-            await HelperFunctions.RemoveIndicator(JsRuntime);
-            if (result)
+            if (SelectedBill.Id > 0)
             {
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
-                Bills.Items = Bills.Items.Where(x => x.Id != SelectedBill.Id).ToList();
-                SelectedBill = new();
-                return;
+                await HelperFunctions.AddIndicator(JsRuntime);
+                var result = BillRepo.DeleteBill(SelectedBill.Id);
+                await HelperFunctions.RemoveIndicator(JsRuntime);
+                if (result)
+                {
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
+                    Bills.Items = Bills.Items.Where(x => x.Id != SelectedBill.Id).ToList();
+                    SelectedBill = new();
+                    return;
+                }
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
             }
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Sale list > HandleDeleteBill()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 

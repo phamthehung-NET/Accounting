@@ -3,11 +3,12 @@
 @inject IBillRepository BillRepo
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["ChooseMeat"]" Color="warning"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["ChooseMeat"]" Color="@Constants.PrimaryColor"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
         </div>
         <div class="modal-body overflow-auto" style="height: 73vh">
@@ -17,7 +18,7 @@
                 <div class="text-danger">@ErrorMsg</div>
             </div>
             <div class="mb-2">
-                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => {Keyword = e.Value.ToString(); GetMeatData();})"/>
+                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@(async (ChangeEventArgs e) => {Keyword = e.Value.ToString(); await GetMeatData();})"/>
             </div>
                 @if (Meats != null && Meats.Items.Any())
                 {
@@ -70,18 +71,34 @@
         Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"]});
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
+        if(BillId > 0)
         {
-            GetMeatData();
+            await GetMeatData();
         }
     }
 
-    void GetMeatData()
+    async Task GetMeatData()
     {
-        Meats = MeatRepo.GetAllMeats(Keyword, null, null, 1, 10000, "");
-        StateHasChanged();
+        try
+        {
+            Meats = MeatRepo.GetAllMeats(Keyword, null, null, 1, 10000, "");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Entry/SaleList > Add bill meat modal > GetMeatData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     string HandleDisplayType(bool? type)

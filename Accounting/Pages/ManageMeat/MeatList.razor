@@ -7,13 +7,14 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 @attribute [Authorize]
 
 <PageTitle>@LRes["Product Management"]</PageTitle>
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between">
-        <CommonLabel DisplayText="@LRes["Product List"]" Color="primary"></CommonLabel>
+        <CommonLabel DisplayText="@LRes["Product List"]" Color="@Constants.PrimaryColor"></CommonLabel>
         <div class="d-flex mb-2">
             <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#priceModal"><i class="fa-duotone fa-circle-dollar"></i> @LRes["Manage Price"]</button>
             <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addMeatModal"><i class="fa-duotone fa-plus"></i> @LRes["Add"]</button>
@@ -208,8 +209,17 @@
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Meat list > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
@@ -222,18 +232,35 @@
 
     async Task DeleteMeat(int id)
     {
-        if(id > 0)
+        try
         {
-            await HelperFunctions.AddIndicator(JsRuntime);
-            var result = MeatRepository.DeleteMeat(id);
-            await HelperFunctions.RemoveIndicator(JsRuntime);
-            if (result)
+            if(id > 0)
             {
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
-                await GetData();
-                return;
+                await HelperFunctions.AddIndicator(JsRuntime);
+                var result = MeatRepository.DeleteMeat(id);
+                await HelperFunctions.RemoveIndicator(JsRuntime);
+                if (result)
+                {
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
+                    await GetData();
+                    return;
+                }
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
             }
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Meat list > DeleteMeat()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 

@@ -5,11 +5,14 @@
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @inject IPeopleRepository PeopleRepo
+@inject ILogRepository LogRepo
 @attribute [Authorize]
+
+<PageTitle>@LRes["Manage person"]</PageTitle>
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between">
-        <CommonLabel DisplayText="@LRes["PeopleList"]" Color="primary"></CommonLabel>
+        <CommonLabel DisplayText="@LRes["PeopleList"]" Color="@Constants.PrimaryColor"></CommonLabel>
         <button type="button" class="btn btn-outline-primary mb-2" data-bs-toggle="modal" data-bs-target="#addPersonModal"><i class="fa-duotone fa-plus"></i> @LRes["Add"]</button>
     </div>
     <CommonDataTable Context="Context" 
@@ -26,7 +29,7 @@
                 <td>@Context.Name</td>
                 <td>@Context.PhoneNumber</td>
                 <td>@Context.Address</td>
-                <td>@HandleDisplayType(Context.Source)</td>
+                <td>@HelperFunctions.HandleDisplayPersonType(LRes, Context.Source)</td>
                 <td>@(Context.NearestTransaction != null ? (Context.NearestTransaction.ActivateDate.Value.ToString("dd/MM/yyyy") + " (" + HelperFunctions.GetLunarDate(Context.NearestTransaction.ActivateDate.Value) +")") : LRes["No data"])</td>
                 <td>
                     <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)" @onclick="() => {SelectedPersonDTO = Context;}"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
@@ -151,8 +154,17 @@
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "People list > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
@@ -184,27 +196,35 @@
 
     async Task DeletePerson(int id)
     {
-        if(id > 0)
+        try
         {
-            await HelperFunctions.AddIndicator(JsRuntime);
-            var result = PeopleRepo.DeletePerson(id);
-            await HelperFunctions.RemoveIndicator(JsRuntime);
-            if (result)
+            if(id > 0)
             {
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
-                await GetData();
-                return;
+                await HelperFunctions.AddIndicator(JsRuntime);
+                var result = PeopleRepo.DeletePerson(id);
+                await HelperFunctions.RemoveIndicator(JsRuntime);
+                if (result)
+                {
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
+                    await GetData();
+                    return;
+                }
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
             }
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
         }
-    }
-
-    string HandleDisplayType(bool? type)
-    {
-        if (type != null && (bool)type)
+        catch (Exception ex)
         {
-            return LRes["Seller"];
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "People list > DetelePerson()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
-        return LRes["Buyer"];
     }
 }

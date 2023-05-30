@@ -119,7 +119,7 @@ namespace Accounting.Repositories.Implementations
 
         private bool IsMeatExits(MeatDTO meat)
         {
-            var db = context.Meats.FirstOrDefault(x => x.Name.Equals(meat.Name) && x.Type == meat.Type && x.Frozen == meat.Frozen);
+            var db = context.Meats.FirstOrDefault(x => x.Name.Equals(meat.Name) && x.Type == meat.Type && x.Frozen == meat.Frozen && x.IsDeleted == false);
             if (db != null)
             {
                 if (meat.Id > 0 && db.Id == meat.Id)

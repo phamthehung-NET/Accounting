@@ -1,0 +1,170 @@
+﻿@using Microsoft.Extensions.Localization;
+@inject IRecycleBinRepository RecycleBinRepo
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["ItemDetail"]" Color="@Constants.PrimaryColor"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            @if(Bill != null)
+            {
+                <div class="card col-md-12 col-sm-12 col-lg-12 col-xl-12 mb-4 p-0">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="fw-bold">@Bill.PersonName</div>
+                        <div class="d-flex">
+                            <div>@(Bill.Items.Count() + " " + LRes["item(s)"])</div>
+                            @if (Bill.Items.Any())
+                            {
+                                @((MarkupString)HandleShowStatus(Bill.IsPaid))
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body overflow-auto" style="height: 15rem">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Bill.Items)
+                            {
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div>@(item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType != null ? item.MeatType.Value : null))</div>
+                                    <div>@(item.Weight + " Kg")</div>
+                                    <div>@item.Price</div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            @(Bill.TotalPrice == 0 ? string.Empty : Bill.TotalPrice.ToString("n0") + ".000 VND")
+                        </div>
+                        <div>
+                            @(Bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + HelperFunctions.GetLunarDate(Bill.ActiveDate.Value) + ")")
+                        </div>
+                    </div>
+                </div>
+            }
+            @if(Person != null)
+            {
+                <div class="card col-md-12 col-sm-12 col-lg-12 col-xl-12 mb-4 p-0">
+                    <div class="card-header d-flex justify-content-between"></div>
+                    <div class="card-body overflow-auto" style="height: 15rem">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div class="fw-bold">@LRes["Name"]:</div>
+                                <div>@Person.Name</div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div class="fw-bold">@LRes["Type"]:</div>
+                                <div>@HelperFunctions.HandleDisplayPersonType(LRes, Person.Source)</div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div class="fw-bold">@LRes["PhoneNumber"]:</div>
+                                <div>@Person.PhoneNumber</div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div class="fw-bold">@LRes["Address"]:</div>
+                                <div>@Person.Address</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                    </div>
+                </div>
+            }
+            @if(Meat != null)
+            {
+                <div class="card col-md-12 col-sm-12 col-lg-12 col-xl-12 mb-4 p-0">
+                    <div class="card-header d-flex justify-content-between"></div>
+                    <div class="card-body overflow-auto" style="height: 15rem">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div class="fw-bold">@LRes["Name"]:</div>
+                                <div>@Meat.Name</div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div class="fw-bold">@LRes["Type"]:</div>
+                                <div>@HelperFunctions.RenderMeatType(LRes, Meat.Type)</div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div class="fw-bold">@LRes["PhoneNumber"]:</div>
+                                <div>@(Meat.Frozen.Value ? LRes["Frozen Meat"] : LRes["Normal Meat"])</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public RecycleBinDTO Item { get; set; }
+
+    MeatDTO Meat;
+
+    BillDTO Bill;
+
+    Person Person;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            if(Item != null)
+            {
+                Person = null;
+                Bill = null;
+                Meat = null;
+                object detail = RecycleBinRepo.GetObjectDetail(Item.ObjectId, (RecycleBinObjectType)Item.Type);
+
+                switch ((RecycleBinObjectType)Item.Type)
+                {
+                    case RecycleBinObjectType.Person:
+                        Person = detail != null ? (Person)detail : null;
+                        break;
+                    case RecycleBinObjectType.Bill:
+                        Bill = detail != null ? (BillDTO)detail : null;
+                        break;
+                    case RecycleBinObjectType.Meat:
+                        Meat = detail != null ? (MeatDTO)detail : null;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Recycle bin > Item detail modal > OnParametersSet()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+
+    string HandleShowStatus(bool? status)
+    {
+        if (status != null && (bool)status)
+        {
+            return $"<div class='ms-2 text-success'>{LRes["Paid"]}</div>";
+        }
+        return $"<div class='ms-2 text-warning'>{LRes["Unpaid"]}</div>";
+    }
+}

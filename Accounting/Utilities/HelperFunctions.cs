@@ -25,20 +25,20 @@ namespace Accounting.Utilities
 
         public async static Task ShowNotification(IJSRuntime jsRuntime, ToastType toastType, string content)
         {
-            var bootstrapColor = "info";
+            var bootstrapColor = Constants.InfoColor;
             switch (toastType)
             {
                 case ToastType.Error:
-                    bootstrapColor = "danger";
+                    bootstrapColor = Constants.ErrorColor;
                     break;
                 case ToastType.Notification:
-                    bootstrapColor = "info";
+                    bootstrapColor = Constants.InfoColor;
                     break;
                 case ToastType.Success:
-                    bootstrapColor = "success";
+                    bootstrapColor = Constants.SuccessColor;
                     break;
                 case ToastType.Warning:
-                    bootstrapColor = "warning";
+                    bootstrapColor = Constants.WarningColor;
                     break;
                 default:
                     break;
@@ -72,6 +72,20 @@ namespace Accounting.Utilities
         public static async Task RemoveIndicator(IJSRuntime jSRuntime)
         {
             await jSRuntime.InvokeVoidAsync("removeIndicator");
+        }
+
+        public static string HandleDisplayPersonType(IStringLocalizer<Resource> LRes, bool? type)
+        {
+            if (type != null && (bool)type)
+            {
+                return LRes["Seller"];
+            }
+            return LRes["Buyer"];
+        }
+
+        public static async Task ToggleSideBar(IJSRuntime jSRuntime)
+        {
+            await jSRuntime.InvokeVoidAsync("toggleSideBar");
         }
     }
 }

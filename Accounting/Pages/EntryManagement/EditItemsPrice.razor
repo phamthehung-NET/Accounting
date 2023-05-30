@@ -3,11 +3,12 @@
 @inject IBillRepository BillRepo
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["EditItemPrice"]" Color="primary"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["EditItemsPrice"]" Color="@Constants.PrimaryColor"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
         </div>
         <div class="modal-body overflow-auto" style="height: 73vh">
@@ -22,10 +23,10 @@
                                 <td>@Context.MeatName</td>
                                 <td>@HelperFunctions.RenderMeatType(LRes, Context.MeatType.Value)</td>
                                 <td>
-                                    <input type="number" min=0 value="@(Context.Weight.Value == 0 ? null : Context.Weight.Value)" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id.Value, e.Value.ToString(), "weight"))" />
+                                    <input type="number" min=0 value="@(Context.Weight.Value == 0 ? null : Context.Weight.Value.ToString().Replace(',', '.'))" placeholder="@LRes["No data"]" class="form-control" onchange="@(async (ChangeEventArgs e) => await OnInputChange(Context.Id.Value, e.Value.ToString(), "weight"))" />
                                 </td>
                                 <td>
-                                    <input type="number" min=0 value="@(Context.Price == null ? null : Convert.ToInt32(Context.Price.Value.ToString("n0")))" placeholder="@LRes["No data"]" class="form-control" onchange="@((ChangeEventArgs e) => OnInputChange(Context.Id.Value, e.Value.ToString(), "price"))" />
+                                    <input type="number" min=0 value="@(Context.Price == null ? null : Convert.ToInt32(Context.Price.Value.ToString("n0")))" placeholder="@LRes["No data"]" class="form-control" onchange="@(async (ChangeEventArgs e) => await OnInputChange(Context.Id.Value, e.Value.ToString(), "price"))" />
                                 </td>
                             </tr>
                         </TBody>
@@ -58,30 +59,62 @@
         Headers.Add(new Header() { Name = "Price", DisplayName = LRes["Price"] });
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if(BillId > 0)
         {
-            GetData();
+            await GetData();
         }
     }
 
-    void GetData()
+    async Task GetData()
     {
-        Prices = BillRepo.GetAllMeatOfBill(BillId);
-        StateHasChanged();
+        try
+        {
+            Prices = BillRepo.GetAllMeatOfBill(BillId);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Entry/SaleList > Edit item price modal > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
-    void OnInputChange(int priceId, string value, string inputType)
+    async Task OnInputChange(int priceId, string value, string inputType)
     {
-        var item = Prices.Items.FirstOrDefault(x => x.Id == priceId);
-        if(inputType.Equals("weight"))
+        try
         {
-            item.Weight = decimal.Parse(!string.IsNullOrEmpty(value) ? value.Replace('.', ',') : "0");
+            var item = Prices.Items.FirstOrDefault(x => x.Id == priceId);
+            if(inputType.Equals("weight"))
+            {
+                item.Weight = decimal.Parse(!string.IsNullOrEmpty(value) ? value.Replace('.', ',') : "0");
+            }
+            else
+            {
+                item.Price = int.Parse(value);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            item.Price = int.Parse(value);
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Entry/SaleList > Edit item price modal > OnInputChange()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 
@@ -115,6 +148,16 @@
         }
         catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Entry/SaleList > Edit item price modal > OnSubmit()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }

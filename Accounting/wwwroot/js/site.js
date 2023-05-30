@@ -35,3 +35,19 @@ window.removeIndicator = () => {
     var t = $("#spinner-container")
     $("#spinner-container").remove()
 }
+
+window.toggleSideBar = () => {
+    const $this = $('#btn-nav-toggler');
+    const sidebar = $(`.sidebar`);
+    const isExpanded = $this.attr('aria-expanded');
+    if (isExpanded.toLowerCase() === "true") {
+        sidebar.attr('hidden', true);
+        $this.attr('aria-expanded', false);
+        $this.children('i').removeClass('fa-regular fa-xmark').addClass('fa-regular fa-bars');
+    } else {
+        sidebar.removeAttr('hidden');
+        $this.attr('aria-expanded', true);
+        $this.children('i').removeClass('fa-regular fa-bars').addClass('fa-regular fa-xmark');
+    }
+    $this.blur();
+}

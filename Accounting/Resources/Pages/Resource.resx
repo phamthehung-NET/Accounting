@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About" xml:space="preserve">
+    <value>Thông tin hệ thống</value>
+  </data>
+  <data name="Accounting" xml:space="preserve">
+    <value>Kế toán</value>
+  </data>
   <data name="Action" xml:space="preserve">
     <value>Hành động</value>
   </data>
@@ -156,8 +162,14 @@
   <data name="Address" xml:space="preserve">
     <value>Địa chỉ</value>
   </data>
+  <data name="at" xml:space="preserve">
+    <value>tại</value>
+  </data>
   <data name="Beef" xml:space="preserve">
     <value>Bò</value>
+  </data>
+  <data name="Bill" xml:space="preserve">
+    <value>Hóa đơn</value>
   </data>
   <data name="BillIsCreated" xml:space="preserve">
     <value>Hóa được tạo mới</value>
@@ -176,6 +188,9 @@
   </data>
   <data name="Calves" xml:space="preserve">
     <value>Bê</value>
+  </data>
+  <data name="changeTo" xml:space="preserve">
+    <value>thành</value>
   </data>
   <data name="ChooseBillType" xml:space="preserve">
     <value>Chọn loại hóa đơn</value>
@@ -201,6 +216,12 @@
   <data name="Create" xml:space="preserve">
     <value>Tạo</value>
   </data>
+  <data name="CreatedDate" xml:space="preserve">
+    <value>Ngày tạo</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Bảng điều khiển</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>ngày</value>
   </data>
@@ -219,6 +240,9 @@
   <data name="DeleteTitle" xml:space="preserve">
     <value>Xác nhận xóa</value>
   </data>
+  <data name="Detail" xml:space="preserve">
+    <value>Chi tiết</value>
+  </data>
   <data name="Done" xml:space="preserve">
     <value>Xong</value>
   </data>
@@ -226,7 +250,7 @@
     <value>Sửa</value>
   </data>
   <data name="EditItemPrice" xml:space="preserve">
-    <value>Sửa giá các sản phẩm</value>
+    <value>Sửa giá sản phẩm</value>
   </data>
   <data name="EditItemsPrice" xml:space="preserve">
     <value>Sửa giá các sản phẩm</value>
@@ -252,6 +276,9 @@
   <data name="EnterWeight" xml:space="preserve">
     <value>Nhập cân nặng</value>
   </data>
+  <data name="EntryBill" xml:space="preserve">
+    <value>Hóa đơn nhập</value>
+  </data>
   <data name="EntryList" xml:space="preserve">
     <value>Danh sách nhập hàng</value>
   </data>
@@ -267,14 +294,38 @@
   <data name="Frozen Meat" xml:space="preserve">
     <value>Đông lạnh</value>
   </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Xin chào</value>
+  </data>
   <data name="here" xml:space="preserve">
     <value>đây</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Trang chủ</value>
   </data>
   <data name="in" xml:space="preserve">
     <value>trong</value>
   </data>
   <data name="item(s)" xml:space="preserve">
     <value>sản phẩm</value>
+  </data>
+  <data name="ItemDetail" xml:space="preserve">
+    <value>Chi tiết vật phẩm</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Vị trí</value>
+  </data>
+  <data name="Log" xml:space="preserve">
+    <value>Nhật ký hoạt động</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Đăng nhập</value>
+  </data>
+  <data name="Log list" xml:space="preserve">
+    <value>Danh sách các nhật ký hoạt động</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Đăng xuất</value>
   </data>
   <data name="LunarDate" xml:space="preserve">
     <value>Âm lịch</value>
@@ -297,8 +348,14 @@
   <data name="ManagePriceTitle" xml:space="preserve">
     <value>Quản lý giá các mặt hàng</value>
   </data>
+  <data name="Meat" xml:space="preserve">
+    <value>Thịt</value>
+  </data>
   <data name="Meat Type" xml:space="preserve">
     <value>Loại thịt</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Thông điệp</value>
   </data>
   <data name="ModifiedHistory" xml:space="preserve">
     <value>Lịch sử sửa đổi</value>
@@ -315,6 +372,9 @@
   <data name="Name" xml:space="preserve">
     <value>Tên</value>
   </data>
+  <data name="named" xml:space="preserve">
+    <value>có tên</value>
+  </data>
   <data name="NearestTransaction" xml:space="preserve">
     <value>Giao dịch gần nhất</value>
   </data>
@@ -329,6 +389,9 @@
   </data>
   <data name="Normal Meat" xml:space="preserve">
     <value>Thịt tươi</value>
+  </data>
+  <data name="of" xml:space="preserve">
+    <value>của</value>
   </data>
   <data name="or click" xml:space="preserve">
     <value>hoặc nhấp vào</value>
@@ -351,6 +414,9 @@
   <data name="PeopleList" xml:space="preserve">
     <value>Danh sách người mua/bán</value>
   </data>
+  <data name="Person" xml:space="preserve">
+    <value>Người</value>
+  </data>
   <data name="PhoneNumber" xml:space="preserve">
     <value>Điện thoại</value>
   </data>
@@ -366,11 +432,17 @@
   <data name="Product Type" xml:space="preserve">
     <value>Loại hàng</value>
   </data>
+  <data name="ProductCommonError" xml:space="preserve">
+    <value>Có một số lỗi xảy ra, ứng dụng này sẽ không thể hoạt động cho đến khi tải lại trang</value>
+  </data>
   <data name="ProductName" xml:space="preserve">
     <value>Tên mặt hàng</value>
   </data>
   <data name="Recycle bin" xml:space="preserve">
     <value>Thùng rác</value>
+  </data>
+  <data name="RecycleBinList" xml:space="preserve">
+    <value>Danh sách các mục trong thùng rác</value>
   </data>
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Chuyển hướng đến trang đăng nhập trong</value>
@@ -383,6 +455,21 @@
   </data>
   <data name="Restore" xml:space="preserve">
     <value>Khôi phục</value>
+  </data>
+  <data name="RestoreConfirmation" xml:space="preserve">
+    <value>Bạn có chắc muốn khôi phục lại vật phẩm này không?</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>Danh sách hiện tại đã chứa vật phẩm mới có các thuộc tính tương tự, không thể khôi phục</value>
+  </data>
+  <data name="RestoreSuccessfully" xml:space="preserve">
+    <value>Khôi phục vật phẩm thành công</value>
+  </data>
+  <data name="RestoreTitle" xml:space="preserve">
+    <value>Khôi phục vật phẩm</value>
+  </data>
+  <data name="SaleBill" xml:space="preserve">
+    <value>Hóa đơn bán</value>
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Danh sách bán hàng</value>
@@ -420,6 +507,9 @@
   <data name="to" xml:space="preserve">
     <value>đến</value>
   </data>
+  <data name="to Accounting Application" xml:space="preserve">
+    <value>đến với ứng dụng kế toán</value>
+  </data>
   <data name="Today Entry Price" xml:space="preserve">
     <value>Giá Nhập Hôm Nay</value>
   </data>
@@ -432,6 +522,15 @@
   <data name="Unpaid" xml:space="preserve">
     <value>Chưa thanh toán</value>
   </data>
+  <data name="Update" xml:space="preserve">
+    <value>Cập nhật</value>
+  </data>
+  <data name="UpdateItemsPriceFailed" xml:space="preserve">
+    <value>Sửa giá các sản phẩm thất bại</value>
+  </data>
+  <data name="UpdateItemsPriceSuccessfully" xml:space="preserve">
+    <value>Sửa giá các sản phẩm thành công</value>
+  </data>
   <data name="ViewHistory" xml:space="preserve">
     <value>Xem lịch sử</value>
   </data>
@@ -440,6 +539,12 @@
   </data>
   <data name="Weight" xml:space="preserve">
     <value>Cân nặng</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Chào mừng</value>
+  </data>
+  <data name="Welcome Page" xml:space="preserve">
+    <value>Trang chào mừng</value>
   </data>
   <data name="withPrice" xml:space="preserve">
     <value>với giá</value>

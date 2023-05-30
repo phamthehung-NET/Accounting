@@ -2,12 +2,13 @@
 @inject IPeopleRepository PeopleRepo
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
 <EditForm EditContext="editContext" OnSubmit="async () => await OnSubmit()">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <CommonLabel DisplayText="@LRes["AddNewPerson"]" Color="primary"></CommonLabel>
+                <CommonLabel DisplayText="@LRes["AddNewPerson"]" Color="@Constants.PrimaryColor"></CommonLabel>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
             </div>
             <div class="modal-body">
@@ -79,7 +80,16 @@
         }
         catch (Exception ex)
         {
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Manage people > Add peerson Modal > OnSubmit()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 

@@ -2,10 +2,11 @@
 {
     public class Constants
     {
-        public const string ToastError = "danger";
-        public const string ToastSuccess = "success";
-        public const string ToastInfo = "info";
-        public const string ToastWarning = "warning";
+        public const string ErrorColor = "danger";
+        public const string SuccessColor = "success";
+        public const string InfoColor = "info";
+        public const string WarningColor = "warning";
+        public const string PrimaryColor = "primary";
     }
 
     public enum MeatType

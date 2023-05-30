@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Accounting" xml:space="preserve">
+    <value>Accounting</value>
+  </data>
   <data name="Action" xml:space="preserve">
     <value>Action</value>
   </data>
@@ -156,8 +159,14 @@
   <data name="Address" xml:space="preserve">
     <value>Address</value>
   </data>
+  <data name="at" xml:space="preserve">
+    <value>at</value>
+  </data>
   <data name="Beef" xml:space="preserve">
     <value>Beef</value>
+  </data>
+  <data name="Bill" xml:space="preserve">
+    <value>Bill</value>
   </data>
   <data name="BillIsCreated" xml:space="preserve">
     <value>Bill is created</value>
@@ -173,6 +182,9 @@
   </data>
   <data name="Calves" xml:space="preserve">
     <value>Calves</value>
+  </data>
+  <data name="changeTo" xml:space="preserve">
+    <value>change to</value>
   </data>
   <data name="ChooseBillType" xml:space="preserve">
     <value>Choose bill type</value>
@@ -198,6 +210,12 @@
   <data name="Create" xml:space="preserve">
     <value>Create</value>
   </data>
+  <data name="CreatedDate" xml:space="preserve">
+    <value>Created date</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
   <data name="date" xml:space="preserve">
     <value>date</value>
   </data>
@@ -215,6 +233,9 @@
   </data>
   <data name="DeleteTitle" xml:space="preserve">
     <value>Confirm delete</value>
+  </data>
+  <data name="Detail" xml:space="preserve">
+    <value>Detail</value>
   </data>
   <data name="Done" xml:space="preserve">
     <value>Done</value>
@@ -249,6 +270,9 @@
   <data name="EnterWeight" xml:space="preserve">
     <value>Enter weight</value>
   </data>
+  <data name="EntryBill" xml:space="preserve">
+    <value>Entry bill</value>
+  </data>
   <data name="EntryList" xml:space="preserve">
     <value>Entry list</value>
   </data>
@@ -267,11 +291,26 @@
   <data name="here" xml:space="preserve">
     <value>here</value>
   </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
   <data name="in" xml:space="preserve">
     <value>in</value>
   </data>
   <data name="item(s)" xml:space="preserve">
     <value>item(s)</value>
+  </data>
+  <data name="ItemDetail" xml:space="preserve">
+    <value>Item detail</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="Log" xml:space="preserve">
+    <value>Activity log</value>
+  </data>
+  <data name="Log list" xml:space="preserve">
+    <value>Log list</value>
   </data>
   <data name="LunarDate" xml:space="preserve">
     <value>Lunar date</value>
@@ -294,8 +333,14 @@
   <data name="ManagePriceTitle" xml:space="preserve">
     <value>Manage products price</value>
   </data>
+  <data name="Meat" xml:space="preserve">
+    <value>Meat</value>
+  </data>
   <data name="Meat Type" xml:space="preserve">
     <value>Meat Type</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
   </data>
   <data name="ModifiedHistory" xml:space="preserve">
     <value>Modified histories</value>
@@ -312,6 +357,9 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="named" xml:space="preserve">
+    <value>named</value>
+  </data>
   <data name="NearestTransaction" xml:space="preserve">
     <value>Nearest transaction</value>
   </data>
@@ -326,6 +374,9 @@
   </data>
   <data name="Normal Meat" xml:space="preserve">
     <value>Fresh</value>
+  </data>
+  <data name="of" xml:space="preserve">
+    <value>of</value>
   </data>
   <data name="or click" xml:space="preserve">
     <value>or click</value>
@@ -348,6 +399,9 @@
   <data name="PeopleList" xml:space="preserve">
     <value>People list</value>
   </data>
+  <data name="Person" xml:space="preserve">
+    <value>Person</value>
+  </data>
   <data name="PhoneNumber" xml:space="preserve">
     <value>Phone number</value>
   </data>
@@ -363,11 +417,17 @@
   <data name="Product Type" xml:space="preserve">
     <value>Product Type</value>
   </data>
+  <data name="ProductCommonError" xml:space="preserve">
+    <value>An error has occurred. This application may no longer respond until reloaded.</value>
+  </data>
   <data name="ProductName" xml:space="preserve">
     <value>Product name</value>
   </data>
   <data name="Recycle bin" xml:space="preserve">
     <value>Recycle bin</value>
+  </data>
+  <data name="RecycleBinList" xml:space="preserve">
+    <value>List items in recycle bin</value>
   </data>
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Redirecting to login in</value>
@@ -380,6 +440,18 @@
   </data>
   <data name="Restore" xml:space="preserve">
     <value>Restore</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>Current list is already exist a new item has the same properties, cannot restore</value>
+  </data>
+  <data name="RestoreSuccessfully" xml:space="preserve">
+    <value>Restore item successfully</value>
+  </data>
+  <data name="RestoreTitle" xml:space="preserve">
+    <value>Restore item</value>
+  </data>
+  <data name="SaleBill" xml:space="preserve">
+    <value>Sale bill</value>
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Sale list</value>
@@ -417,6 +489,9 @@
   <data name="to" xml:space="preserve">
     <value>to</value>
   </data>
+  <data name="to Accounting Application" xml:space="preserve">
+    <value>to Accounting Application</value>
+  </data>
   <data name="Today Entry Price" xml:space="preserve">
     <value>Today Entry Price</value>
   </data>
@@ -429,6 +504,15 @@
   <data name="Unpaid" xml:space="preserve">
     <value>Unpaid</value>
   </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="UpdateItemsPriceFailed" xml:space="preserve">
+    <value>Update items price failed</value>
+  </data>
+  <data name="UpdateItemsPriceSuccessfully" xml:space="preserve">
+    <value>Update items price successfully</value>
+  </data>
   <data name="ViewHistory" xml:space="preserve">
     <value>View history</value>
   </data>
@@ -437,6 +521,12 @@
   </data>
   <data name="Weight" xml:space="preserve">
     <value>Weight</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="Welcome Page" xml:space="preserve">
+    <value>Welcome Page</value>
   </data>
   <data name="withPrice" xml:space="preserve">
     <value>with price</value>

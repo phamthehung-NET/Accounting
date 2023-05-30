@@ -4,20 +4,21 @@
 
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.AspNetCore.WebUtilities;
+@using Microsoft.Extensions.Localization;
 @inject IHttpContextAccessor HttpContext
 @inject NavigationManager NavigationManager
 @inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
 @inject UserManager<CustomUser> userManager
+@inject IStringLocalizer<Resource> LRes
 
-<PageTitle>Index</PageTitle>
+<PageTitle>@LRes["Home"]</PageTitle>
 
 <div class="text-center">
-    <h1>Hello, world!</h1>
+    <h1>@LRes["Welcome"]</h1>
 
-    Welcome to your new app.
+    @LRes["Welcome"] @LRes["to Accounting Application"]
 
-    <SurveyPrompt Title="How is Blazor working for you?" />
     <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#priceModal" hidden id="hiddenBtnPriceModal"></button>
     <div class="modal fade" id="priceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <PriceList />
@@ -45,10 +46,6 @@
                     await HelperFunctions.TriggerBtn(JsRuntime, "hiddenBtnPriceModal");
                     StateHasChanged();
                 }
-            }
-            else if (!user.Identity.IsAuthenticated && Uri.AbsolutePath.Equals("/unauthorized"))
-            {
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Warning, "Unauthorized");
             }
         }
     }

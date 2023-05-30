@@ -3,16 +3,17 @@
 @inject IBillRepository BillRepo
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["ChoosePerson"]" Color="warning"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["ChoosePerson"]" Color="@Constants.PrimaryColor"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body overflow-auto" style="height: 73vh">
             <div class="mb-2">
-                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => {Keyword = e.Value.ToString(); GetPeopleData();})"/>
+                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@(async (ChangeEventArgs e) => {Keyword = e.Value.ToString(); await GetPeopleData();})"/>
             </div>
                 @if (People != null && People.Items.Any())
                 {
@@ -60,18 +61,31 @@
         Headers.Add(new Header() { Name = "Source", DisplayName = LRes["Type"] });
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
-        {
-            GetPeopleData();
-        }
+        await GetPeopleData();
     }
 
-    void GetPeopleData()
+    async Task GetPeopleData()
     {
-        People = PeopleRepo.GetAllPeople(Keyword, "", PriceType == PriceType.Entry ? true : null, 1, 10000);
-        StateHasChanged();
+        try
+        {
+            People = PeopleRepo.GetAllPeople(Keyword, "", PriceType == PriceType.Entry ? true : null, 1, 10000);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Entry/SaleList > Add bill person modal > GetPeopleData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     string HandleDisplayType(bool? type)

@@ -2,11 +2,12 @@
 @inject IBillRepository BillRepo
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["NearestTransactionDetail"]" Color="warning"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["NearestTransactionDetail"]" Color="@Constants.PrimaryColor"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -59,11 +60,27 @@
 
     BillDTO Bill;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        if(BillId > 0)
+        try
         {
-            Bill = BillRepo.GetBillDetail(BillId);
+            if(BillId > 0)
+            {
+                Bill = BillRepo.GetBillDetail(BillId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Manage People > Nearest Transaction Modal > OnParameterSet()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 

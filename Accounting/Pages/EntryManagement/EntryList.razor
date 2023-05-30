@@ -6,11 +6,14 @@
 @inject IBillRepository BillRepo
 @inject NavigationManager NavigationManager 
 @inject IJSRuntime JsRuntime
+@inject ILogRepository LogRepo
 @attribute [Authorize]
+
+<PageTitle>@LRes["Manage entries"]</PageTitle>
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-2">
-        <CommonLabel DisplayText="@LRes["EntryList"]" Color="primary"></CommonLabel>
+        <CommonLabel DisplayText="@LRes["EntryList"]" Color="@Constants.PrimaryColor"></CommonLabel>
         <div class="fw-bold">@ShowingDate</div>
     </div>
     <div class="d-flex justify-content-end mb-2">
@@ -34,9 +37,9 @@
         </div>
     </div>
     <div class="row">
-        @if (DateRange.StartDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 || DateRange.EndDate.Value.Date.CompareTo(DateTime.Now.Date) == 0)
+        @if(DateRange.StartDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 || DateRange.EndDate.Value.Date.CompareTo(DateTime.Now.Date) == 0)
         {
-            <div class="card col-md-3 col-sm-12 col-lg-3 col-xl-3 mb-4 p-0">
+            <div class="card col-md-4 col-sm-12 col-lg-4 col-xl-4 mb-4 p-0">
                 <div class="card-header">
                     @LRes["Add"]
                 </div>
@@ -48,11 +51,11 @@
                 </div>
             </div>
         }
-        @if(Bills != null && Bills.Items.Any())
+        @if (Bills != null && Bills.Items.Any())
         {
-            foreach(var bill in Bills.Items)
+            foreach (var bill in Bills.Items)
             {
-                <div class="card col-md-3 col-sm-12 col-lg-3 col-xl-3 mb-4 p-0">
+                <div class="card col-md-4 col-sm-12 col-lg-4 col-xl-4 mb-4 p-0">
                     <div class="card-header d-flex justify-content-between">
                         <div class="fw-bold">@bill.PersonName</div>
                         <div class="d-flex">
@@ -65,7 +68,7 @@
                     </div>
                     <div class="card-body overflow-auto" style="height: 15rem">
                         <ul class="list-group list-group-flush">
-                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
+                            @if (bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
                             {
                                 <li class="list-group-item">
                                     <button class="btn border-0 bg-transparent text-primary w-100 py-0" data-bs-toggle="modal" data-bs-target="#addBillMeatModal" @onclick="() => HandleSelecteBill(bill)">
@@ -74,13 +77,13 @@
                                     </button>
                                 </li>
                             }
-                            @foreach(var item in bill.Items)
+                            @foreach (var item in bill.Items)
                             {
                                 <li class="list-group-item d-flex justify-content-between">
                                     <div>@(item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType != null ? item.MeatType.Value : null))</div>
                                     <div>@(item.Weight + " Kg")</div>
                                     <div>@item.Price</div>
-                                    @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
+                                    @if (bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
                                     {
                                         <div role="button" @onclick="() => HandleDeleteItemFromBill(item.Id.Value, bill.Id)" class="text-danger"><i class="fa-regular fa-xmark"></i></div>
                                     }
@@ -97,18 +100,18 @@
                             {
                                 <button class="btn btn-primary me-1" data-bs-toggle="modal" data-bs-target="#payingBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-brands fa-amazon-pay"></i> @LRes["Pay"]</button>
                             }
-                            @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
+                            @if (bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
                             {
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             }
                             <div class="btn-group dropup">
-                                <button type="button" class="btn border-0 bg-transparent p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button type="button" class="btn border-0 bg-transparent rounded-0 p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-regular fa-ellipsis-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    @if(bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
+                                    @if (bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
                                     {
-                                        <li class="dropdown-item">@LRes["EditItemsPrice"]</li>
+                                        <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPriceModal" @onclick="() => HandleSelecteBill(bill)">@LRes["EditItemsPrice"]</li>
                                     }
                                     <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#historyModal" @onclick="() => HandleSelecteBill(bill)">@LRes["ViewHistory"]</li>
                                 </ul>
@@ -119,7 +122,7 @@
             }
         }
     </div>
-    @if(Bills != null && Pagination.PageSize < Bills.TotalItems)
+    @if (Bills != null && Pagination.PageSize < Bills.TotalItems)
     {
         <div class="text-center mb-5">
             <div>
@@ -140,6 +143,11 @@
     <CommonModalWrapper Id="historyModal">
         <ModalContent>
             <HistoryModal BillId="SelectedBill.Id" HistoryType="HistoryType.Bill" />
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonModalWrapper Id="editPriceModal">
+        <ModalContent>
+            <EditItemsPrice BillId="SelectedBill.Id" GetParentData="async () => await GetData()" />
         </ModalContent>
     </CommonModalWrapper>
     <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteBillConfimation"]" ModalID="deleteBill" SubmitEvent="async () => await HandleDeleteBill()"/>
@@ -247,14 +255,23 @@
                 {
                     IsPaid = !string.IsNullOrEmpty(isPaid) ? bool.Parse(isPaid) : IsPaid;
                 }
-            } 
+            }
 
             Bills = BillRepo.GetAll(Keyword, DateRange.StartDate != null ? DateRange.StartDate.Value.DateTime : null, DateRange.EndDate != null ? DateRange.EndDate.Value.DateTime : null, Pagination.PageIndex, Pagination.PageSize, PriceType.Entry, IsPaid);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "EntryList > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
@@ -262,7 +279,7 @@
 
     string HandleShowStatus(bool? status)
     {
-        if(status != null && (bool)status)
+        if (status != null && (bool)status)
         {
             return $"<div class='ms-2 text-success'>{LRes["Paid"]}</div>";
         }
@@ -271,13 +288,30 @@
 
     async Task HandleDeleteItemFromBill(int id, int billId)
     {
-        await HelperFunctions.AddIndicator(JsRuntime);
-        if(BillRepo.RemoveMeatFromBill(id))
+        try
         {
-            var bill = Bills.Items.FirstOrDefault(x => x.Id == billId);
-            bill.Items = bill.Items.Where(x => x.Id != id).AsEnumerable();
+            await HelperFunctions.AddIndicator(JsRuntime);
+            if (BillRepo.RemoveMeatFromBill(id))
+            {
+                var bill = Bills.Items.FirstOrDefault(x => x.Id == billId);
+                bill.Items = bill.Items.Where(x => x.Id != id).AsEnumerable();
+            }
+            await HelperFunctions.RemoveIndicator(JsRuntime);
         }
-        await HelperFunctions.RemoveIndicator(JsRuntime);
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "EntryList > HandleDeleteItemFromBill()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     void OnRangeSelect(BlazorDateRangePicker.DateRange range)
@@ -301,7 +335,7 @@
 
     string HandleShowDate()
     {
-        if(DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
+        if (DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
         {
             return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
         }
@@ -313,21 +347,38 @@
 
     async Task HandlePayingBill()
     {
-        if (SelectedBill.Id > 0)
+        try
         {
-            await HelperFunctions.AddIndicator(JsRuntime);
-            if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice))
+            if (SelectedBill.Id > 0)
             {
-                Bills.Items.FirstOrDefault(x => x.Id == SelectedBill.Id).IsPaid = true;
-                SelectedBill = new();
-                await HelperFunctions.RemoveIndicator(JsRuntime);
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
+                await HelperFunctions.AddIndicator(JsRuntime);
+                if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice))
+                {
+                    Bills.Items.FirstOrDefault(x => x.Id == SelectedBill.Id).IsPaid = true;
+                    SelectedBill = new();
+                    await HelperFunctions.RemoveIndicator(JsRuntime);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
+                }
+                else
+                {
+                    await HelperFunctions.RemoveIndicator(JsRuntime);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["PaidFailed"]);
+                }
             }
-            else
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
             {
-                await HelperFunctions.RemoveIndicator(JsRuntime);
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["PaidFailed"]);
-            }
+                CreatedDate = DateTime.Now,
+                Location = "EntryList > HandlePayingBill()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 
@@ -347,19 +398,36 @@
 
     async Task HandleDeleteBill()
     {
-        if(SelectedBill.Id > 0)
+        try
         {
-            await HelperFunctions.AddIndicator(JsRuntime);
-            var result = BillRepo.DeleteBill(SelectedBill.Id);
-            await HelperFunctions.RemoveIndicator(JsRuntime);
-            if (result)
+            if (SelectedBill.Id > 0)
             {
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
-                Bills.Items = Bills.Items.Where(x => x.Id != SelectedBill.Id).ToList();
-                SelectedBill = new();
-                return;
+                await HelperFunctions.AddIndicator(JsRuntime);
+                var result = BillRepo.DeleteBill(SelectedBill.Id);
+                await HelperFunctions.RemoveIndicator(JsRuntime);
+                if (result)
+                {
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["Move to recycle bin success"]);
+                    Bills.Items = Bills.Items.Where(x => x.Id != SelectedBill.Id).ToList();
+                    SelectedBill = new();
+                    return;
+                }
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
             }
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["Move to reycle bin failed"]);
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "EntryList > HandleDeleteBill()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 

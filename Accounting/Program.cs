@@ -42,6 +42,8 @@ builder.Services.AddScoped<IPriceRepository, PriceRepository>();
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddScoped<IBillRepository, BillRepository>();
 builder.Services.AddScoped<IHistoryRepository, HistoryRepository>();
+builder.Services.AddScoped<IRecycleBinRepository, RecycleBinRepository>();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
 
 builder.Services.AddHttpContextAccessor();
 

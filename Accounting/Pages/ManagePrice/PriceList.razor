@@ -4,11 +4,12 @@
 @inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["ManagePriceTitle"]" Color="primary"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["ManagePriceTitle"]" Color="@Constants.PrimaryColor"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
         </div>
         <div class="modal-body overflow-auto" style="height: 73vh">
@@ -19,7 +20,7 @@
                     TData="MeatDTO"
                     PaginationData="Meats" 
                     Sorting="@Sorting" 
-                    SortData="(sortingString) => SortData(sortingString)">
+                    SortData="async (sortingString) => await SortData(sortingString)">
                     <TBody>
                         <tr>
                             <td>@Context.Name</td>
@@ -72,18 +73,34 @@
         Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            GetData();
+            await GetData();
         }
     }
 
-    void GetData()
+    async Task GetData()
     {
-        Meats = MeatRepository.GetAllMeats(string.Empty, null, null, 1, 10000, Sorting);
-        StateHasChanged();
+        try
+        {
+            Meats = MeatRepository.GetAllMeats(string.Empty, null, null, 1, 10000, Sorting);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Price List > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     void OnInputChange(int meatId, int price, string inputType)
@@ -113,7 +130,7 @@
         InputEntryList.Clear();
         InputSaleList.Clear();
         await GetParentData.InvokeAsync();
-        GetData();
+        await GetData();
     }
 
     async Task OnSubmit()
@@ -129,21 +146,30 @@
                 InputSaleList.Clear();
                 await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["EditPriceSuccess"]);
                 await GetParentData.InvokeAsync();
-                GetData();
+                await GetData();
                 return;
             }
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["EditPriceFailed"]);
         }
         catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Price list > OnSubmit()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 
-    void SortData(string sortingString)
+    async Task SortData(string sortingString)
     {
         Sorting = sortingString;
         StateHasChanged();
-        GetData();
+        await GetData();
     }
 }

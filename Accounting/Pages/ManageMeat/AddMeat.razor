@@ -2,12 +2,13 @@
 @inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 
 <EditForm EditContext="editContext" OnSubmit="async () => await OnSubmit()">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <CommonLabel DisplayText="@LRes["AddNewProduct"]" Color="primary"></CommonLabel>
+                <CommonLabel DisplayText="@LRes["AddNewProduct"]" Color="@Constants.PrimaryColor"></CommonLabel>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnCloseModal"></button>
             </div>
             <div class="modal-body">
@@ -81,8 +82,17 @@
         }
         catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Manage Meat > Add Meat Modal > OnSubmit()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
             await HelperFunctions.RemoveIndicator(JsRuntime);
-            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, ex.Message);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
 

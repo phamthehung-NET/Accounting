@@ -1,7 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.Extensions.Localization;
+@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
 
-<PageTitle>Accounting</PageTitle>
+<PageTitle>@LRes["Accounting"]</PageTitle>
 <div class="page position-relative">
     <div class="toast-container mx-auto position-absolute top-0 end-0 start-0 mt-4" style="z-index: 999999999999"></div>
     <AuthorizeView>
@@ -12,9 +15,14 @@
 
     <main>
         <div class="top-row px-4 auth">
+            <AuthorizeView>
+                <button title="Navigation menu" class="navbar-toggler me-auto" id="btn-nav-toggler" aria-expanded="true" @onclick="async () => await ToggleSideBar()">
+                    <i class="fa-regular fa-xmark"></i>
+                </button>
+            </AuthorizeView>
             <CultureSelector/>
             <LoginDisplay />
-            <a class="nav-link ms-0">About</a>
+            <a class="nav-link text-black ms-0">@LRes["About"]</a>
         </div>
 
         <article class="content px-4">
@@ -22,3 +30,11 @@
         </article>
     </main>
 </div>
+
+@code{
+
+    async Task ToggleSideBar()
+    {
+        await HelperFunctions.ToggleSideBar(JsRuntime);
+    }
+}

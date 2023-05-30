@@ -1,0 +1,289 @@
+﻿@page "/recycle-bin"
+@using Microsoft.AspNetCore.WebUtilities;
+@using System.Globalization
+@using Microsoft.Extensions.Localization;
+@using Accounting.Repositories.Interfaces;
+@inject IRecycleBinRepository RecycleBinRepo
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
+@attribute [Authorize]
+
+<PageTitle>@LRes["Recycle bin"]</PageTitle>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between">
+        <CommonLabel DisplayText="@LRes["RecycleBinList"]" Color="@Constants.PrimaryColor"></CommonLabel>
+    </div>
+    <div class="d-flex justify-content-end mb-2">
+        <div class="col-md-1 me-2">
+            <select class="form-select" onchange="@((ChangeEventArgs e) => onParamsChange(e, "Type"))">
+                <option value="">@LRes["Type"]</option>
+                <option value="@((int)RecycleBinObjectType.Meat)" selected="@(Type == RecycleBinObjectType.Meat)">@LRes["Meat"]</option>
+                <option value="@((int)RecycleBinObjectType.Bill)" selected="@(Type == RecycleBinObjectType.Bill)">@LRes["Bill"]</option>
+                <option value="@((int)RecycleBinObjectType.Person)" selected="@(Type == RecycleBinObjectType.Person)">@LRes["Person"]</option>
+            </select>
+        </div>
+        <div class="d-flex col-md-4 justify-content-between">
+            <div class="col-md-10 pe-1">
+                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@((ChangeEventArgs e) => onParamsChange(e, "Keyword"))"/>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" @onclick="async () => await onParamSubmit()"><i class="fa-regular fa-filter"></i> @LRes["Filter"]</button>
+            </div>
+        </div>
+    </div>
+    <CommonDataTable Context="Context" 
+        Headers="Headers" 
+        TData="RecycleBinDTO" 
+        PaginationData="RecycleBin" 
+        Sorting="@Sorting" 
+        SortData="async (sortingString) => await SortData(sortingString)"
+        GetData="async (pagination) => await GetPaginateData(pagination)"
+        PaginationObject="Pagination"
+        DisplayPaging="true">
+        <TBody>
+            <tr>
+                <td>@Context.ObjectName</td>
+                <td>@HandleShowObjectType(Context.Type)</td>
+                <td>@Context.CreatedDate</td>
+                <td>
+                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#detailObjectModal" @onclick="() => SelectObject(Context) "><i class="fa-regular fa-circle-info"></i> @LRes["Detail"]</button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#restoreObjectModal" @onclick="() => SelectObject(Context)"><i class="fa-duotone fa-trash-can-undo"></i> @LRes["Restore"]</button>
+                </td>
+            </tr>
+        </TBody>
+    </CommonDataTable>
+    <CommonModalWrapper Id="detailObjectModal">
+        <ModalContent>
+            <ItemDetail Item="SelectedObject"/>
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonConfirmModal Title="@LRes["RestoreTitle"]" Message="@LRes["RestoreConfirmation"]" ModalID="restoreObjectModal" SubmitEvent="async () => await RestoreObject()"/>
+</div>
+
+@code {
+
+    Pagination<RecycleBinDTO> RecycleBin;
+
+    string Keyword = "";
+
+    PaginationObject Pagination = new();
+
+    RecycleBinObjectType? Type = null;
+
+    RecycleBinDTO SelectedObject;
+
+    Uri Uri;
+
+    List<RecycleBinDTO> BaseList;
+
+    Dictionary<string, string> Query = new()
+    {
+        {"pageIndex", ""},
+        {"pageSize", ""},
+        {"keyword", ""},
+        {"type", ""},
+    };
+
+    List<Header> Headers = new();
+
+    string Sorting = "id_desc";
+
+    protected override void OnInitialized()
+    {
+        Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+
+        Headers.Add(new Header() { Name = "ObjectName", DisplayName = LRes["Name"] });
+        Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Type"], Ordering = true });
+        Headers.Add(new Header() { Name = "CreatedDate", DisplayName = LRes["CreatedDate"], Ordering = true });
+        Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetData();
+        }
+    }
+
+    async Task GetData()
+    {
+        try
+        {
+            await HelperFunctions.AddIndicator(JsRuntime);
+            if (Uri != null)
+            {
+                if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("keyword", out var keyword))
+                {
+                    if (string.IsNullOrEmpty(Query["keyword"]))
+                    {
+                        Keyword = Query["keyword"];
+                    }
+                    else
+                    {
+                        Keyword = keyword;
+                    }
+
+                }
+                if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageSize", out var pageSize))
+                {
+                    if (string.IsNullOrEmpty(Query["pageSize"]))
+                    {
+                        Pagination.PageSize = !string.IsNullOrEmpty(pageSize) ? int.Parse(pageSize) : Pagination.PageSize;
+                    }
+                    else
+                    {
+                        Pagination.PageSize = int.Parse(Query["pageSize"]);
+                    }
+                }
+                if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("pageIndex", out var pageIndex))
+                {
+                    if (string.IsNullOrEmpty(Query["pageIndex"]))
+                    {
+                        Pagination.PageIndex = !string.IsNullOrEmpty(pageIndex) ? int.Parse(pageIndex) : Pagination.PageIndex;
+                    }
+                    else
+                    {
+                        Pagination.PageIndex = int.Parse(Query["pageIndex"]);
+                    }
+                }
+                if (QueryHelpers.ParseQuery(Uri.Query).TryGetValue("type", out var type))
+                {
+                    if (string.IsNullOrEmpty(Query["type"]))
+                    {
+                        Type = !string.IsNullOrEmpty(type) ? (RecycleBinObjectType)int.Parse(type) : null;
+                    }
+                    else
+                    {
+                        Type = (RecycleBinObjectType)int.Parse(Query["type"]);
+                    }
+                }
+            }
+
+            RecycleBin = RecycleBinRepo.GetAll("", Type, Sorting, Pagination.PageIndex, Pagination.PageSize);
+            BaseList = RecycleBin.Items;
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Recycle bin list > GetData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+
+    void SelectObject(RecycleBinDTO item)
+    {
+        SelectedObject = item;
+    }
+
+    void onParamsChange(ChangeEventArgs e, string paramType)
+    {
+        Pagination.PageIndex = 1;
+        switch (paramType)
+        {
+            case "Type":
+                Type = !string.IsNullOrEmpty(e.Value.ToString()) ? (RecycleBinObjectType)int.Parse(e.Value.ToString()) : null;
+                break;
+            case "Keyword":
+                Keyword = e.Value.ToString();
+                if (string.IsNullOrEmpty(Keyword))
+                {
+                    RecycleBin.Items = BaseList;
+                }
+                else
+                {
+                    RecycleBin.Items = BaseList.Where(x => x.ObjectName.ToLower().Contains(Keyword.ToLower())).ToList();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    async Task onParamSubmit()
+    {
+        Query["keyword"] = Keyword;
+        Query["type"] = Type == null ? "" : ((int)Type).ToString();
+
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
+
+        await GetData();
+    }
+
+    async Task GetPaginateData(PaginationObject pagination)
+    {
+        Pagination.PageIndex = pagination.PageIndex;
+        Pagination.PageSize = pagination.PageSize;
+
+        Query["pageIndex"] = pagination.PageIndex.ToString();
+        Query["pageSize"] = pagination.PageSize.ToString();
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
+
+        await GetData();
+    }
+
+    async Task SortData(string sortingString)
+    {
+        Sorting = sortingString;
+        StateHasChanged();
+        await GetData();
+    }
+
+    string HandleShowObjectType(int type)
+    {
+        return (RecycleBinObjectType)type switch
+        {
+            RecycleBinObjectType.Meat => LRes["Meat"],
+            RecycleBinObjectType.Bill => LRes["Bill"],
+            RecycleBinObjectType.Person => LRes["Person"],
+            _ => string.Empty
+        };
+    }
+
+    async Task RestoreObject()
+    {
+        try
+        {
+            if(SelectedObject != null)
+            {
+                await HelperFunctions.AddIndicator(JsRuntime);
+                var result = RecycleBinRepo.Restore(SelectedObject.ObjectId, (RecycleBinObjectType)SelectedObject.Type);
+                await HelperFunctions.RemoveIndicator(JsRuntime);
+                if (result)
+                {
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["RestoreSuccessfully"]);
+                    await GetData();
+                    return;
+                }
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["RestoreFailed"]);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Recycle bin list > RestoreObject()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+}

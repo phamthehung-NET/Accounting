@@ -22,5 +22,7 @@ namespace Accounting.Data
         public DbSet<RecycleBin> RecycleBins { get; set; }
 
         public DbSet<History> Histories { get; set; }
+
+        public DbSet<Log> Logs { get; set; }
     }
 }

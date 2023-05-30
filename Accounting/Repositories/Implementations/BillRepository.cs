@@ -161,10 +161,34 @@ namespace Accounting.Repositories.Implementations
             foreach (var item in res.Items)
             {
                 var itemDb = context.MeatBillPrices.FirstOrDefault(x => x.BillId == res.Id && x.Id == item.Id);
-                if (itemDb != null && item.Price != null && item.Price.Value > 0 && item.Price != itemDb.Price)
+                var meat = context.Meats.FirstOrDefault(x => x.Id == item.MeatId);
+                History history = new()
                 {
-                    itemDb.Price = item.Price;
-                    itemDb.Weight = item.Weight.Value;
+                    Action = (int)HistoryAction.EditItemPrice,
+                    Content = $"{Lres["Update"]} {itemDb.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {itemDb.Price.Value.ToString("n0")} {Lres["changeTo"]} {item.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {item.Price}",
+                    CreatedDate = DateTime.Now,
+                    ObjectId = itemDb.BillId.Value,
+                    Type = (int)HistoryType.Bill,
+                };
+
+                if (itemDb != null && item.Price != null && item.Price.Value > 0 && item.Weight != null && item.Weight > 0)
+                {
+                    if(item.Price != itemDb.Price || item.Weight != itemDb.Weight)
+                    {
+                        if(item.Price != itemDb.Price)
+                        {
+                            itemDb.Price = item.Price;
+                        }
+                        if(item.Weight.Value != itemDb.Weight)
+                        {
+                            itemDb.Weight = item.Weight.Value;
+                        }
+                        context.Add(history);
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
             context.SaveChanges();
@@ -200,7 +224,7 @@ namespace Accounting.Repositories.Implementations
                     {
                         ObjectId = bill.Id,
                         Action = (int)HistoryAction.AddItem,
-                        Content = $"{Lres["Add"]} {weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatPrice.Price}",
+                        Content = $"{Lres["Add"]} {weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatPrice.Price.Value.ToString("n0")}",
                         CreatedDate = currentDate,
                         Type = (int)HistoryType.Bill,
                     };
@@ -223,7 +247,7 @@ namespace Accounting.Repositories.Implementations
                 {
                     ObjectId = meatprice.BillId.Value,
                     Action = (int)HistoryAction.RemoveItem,
-                    Content = $"{Lres["Remove"]} {meatprice.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatprice.Price}",
+                    Content = $"{Lres["Remove"]} {meatprice.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatprice.Price.Value.ToString("n0")}",
                     CreatedDate = DateTime.Now,
                     Type = (int)HistoryType.Bill,
                 };
