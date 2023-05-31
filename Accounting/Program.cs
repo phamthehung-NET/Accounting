@@ -32,7 +32,7 @@ builder.Services.AddIdentity<CustomUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.ExpireTimeSpan = TimeSpan.FromHours(23);
+    options.ExpireTimeSpan = TimeSpan.FromHours(12);
 });
 
 builder.Services.AddLocalization(opt => opt.ResourcesPath = "Resources");
@@ -44,6 +44,7 @@ builder.Services.AddScoped<IBillRepository, BillRepository>();
 builder.Services.AddScoped<IHistoryRepository, HistoryRepository>();
 builder.Services.AddScoped<IRecycleBinRepository, RecycleBinRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 builder.Services.AddHttpContextAccessor();
 

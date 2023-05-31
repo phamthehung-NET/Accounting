@@ -1,7 +1,7 @@
-﻿using Accounting.Utilities;
-using Accounting.Data;
+﻿using Accounting.Data;
 using Accounting.Model;
 using Accounting.Repositories.Interfaces;
+using Accounting.Utilities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Accounting.Repositories.Implementations
