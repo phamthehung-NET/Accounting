@@ -183,6 +183,9 @@
   <data name="Calves" xml:space="preserve">
     <value>Calves</value>
   </data>
+  <data name="cannot contains alphabet digit(s)" xml:space="preserve">
+    <value>cannot contains alphabet digit(s)</value>
+  </data>
   <data name="changeTo" xml:space="preserve">
     <value>change to</value>
   </data>
@@ -297,6 +300,9 @@
   <data name="in" xml:space="preserve">
     <value>in</value>
   </data>
+  <data name="is required" xml:space="preserve">
+    <value>is required</value>
+  </data>
   <data name="item(s)" xml:space="preserve">
     <value>item(s)</value>
   </data>
@@ -354,6 +360,9 @@
   <data name="MoveToRecycleBin" xml:space="preserve">
     <value>Move to recycle bin</value>
   </data>
+  <data name="must have 10 digits" xml:space="preserve">
+    <value>must have 10 digits</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
@@ -386,6 +395,9 @@
   </data>
   <data name="PaidFailed" xml:space="preserve">
     <value>Paying bill failed</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
   </data>
   <data name="Pay" xml:space="preserve">
     <value>Pay</value>
@@ -512,6 +524,9 @@
   </data>
   <data name="UpdateItemsPriceSuccessfully" xml:space="preserve">
     <value>Update items price successfully</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
   </data>
   <data name="ViewHistory" xml:space="preserve">
     <value>View history</value>

@@ -4,7 +4,7 @@
 @inject IStringLocalizer<Resource> LRes
 @inject ILogRepository LogRepo
 
-<EditForm EditContext="editContext" OnSubmit="async () => await OnSubmit()">
+<EditForm EditContext="editContext" OnValidSubmit="async () => await OnSubmit()">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -13,18 +13,22 @@
             </div>
             <div class="modal-body">
                 <DataAnnotationsValidator/>
+                <ValidationSummary/>
                 <div class="col-md-9">
                     <div class="mb-2">
                         <label>@LRes["Name"]</label>
                         <InputText @bind-Value="person.Name" class="form-control"/>
+                        <ValidationMessage For="() => person.Name"/>
                     </div>
                     <div class="mb-2">
                         <label>@LRes["PhoneNumber"]</label>
                         <InputText @bind-Value="person.PhoneNumber" class="form-control"/>
+                        <ValidationMessage For="() => person.PhoneNumber"/>
                     </div>
                     <div class="mb-2">
                         <label>@LRes["Address"]</label>
                         <InputText @bind-Value="person.Address" class="form-control"/>
+                        <ValidationMessage For="() => person.Address"/>
                     </div>
                     <div class="mb-2">
                         <label>@LRes["Type"]:</label>
@@ -37,7 +41,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnCloseModal">@LRes["Close"]</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+                <button type="submit" class="btn btn-primary">@LRes["Done"]</button>
             </div>
         </div>
     </div>
@@ -47,7 +51,7 @@
 @code {
     EditContext editContext;
 
-    Person person = new() { Source = false };
+    ValidatedPerson person = new() { Source = false };
 
     [Parameter]
     public EventCallback GetData { get; set; }
@@ -61,22 +65,28 @@
     {
         try
         {
-            if (editContext.Validate())
+            await HelperFunctions.AddIndicator(JsRuntime);
+            Person personAdd = new()
             {
-                await HelperFunctions.AddIndicator(JsRuntime);
-                bool result = PeopleRepo.AddPerson(person);
-                await HelperFunctions.RemoveIndicator(JsRuntime);
+                Address = person.Address,
+                Name = person.Name,
+                PhoneNumber = person.PhoneNumber,
+                Source = person.Source,
+            };
 
-                if (result)
-                {
-                    person = new() { Source = false };
-                    editContext = new(person);
-                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["AddPersonSuccess"]);
-                    await GetData.InvokeAsync();
-                    return;
-                }
-                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddPersonFailed"]);
+            bool result = PeopleRepo.AddPerson(personAdd);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+
+            if (result)
+            {
+                person = new() { Source = false };
+                editContext = new(person);
+                await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["AddPersonSuccess"]);
+                await HelperFunctions.HideModal(JsRuntime, "addPersonModal");
+                await GetData.InvokeAsync();
+                return;
             }
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["AddPersonFailed"]);
         }
         catch (Exception ex)
         {

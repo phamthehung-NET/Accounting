@@ -189,6 +189,9 @@
   <data name="Calves" xml:space="preserve">
     <value>Bê</value>
   </data>
+  <data name="cannot contains alphabet digit(s)" xml:space="preserve">
+    <value>chỉ có thể bao gồm các chữ số</value>
+  </data>
   <data name="changeTo" xml:space="preserve">
     <value>thành</value>
   </data>
@@ -306,6 +309,9 @@
   <data name="in" xml:space="preserve">
     <value>trong</value>
   </data>
+  <data name="is required" xml:space="preserve">
+    <value>không được để trống</value>
+  </data>
   <data name="item(s)" xml:space="preserve">
     <value>sản phẩm</value>
   </data>
@@ -369,6 +375,9 @@
   <data name="MoveToRecycleBin" xml:space="preserve">
     <value>Chuyển vào thùng rác</value>
   </data>
+  <data name="must have 10 digits" xml:space="preserve">
+    <value>phải gồm 10 ký tự</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Tên</value>
   </data>
@@ -401,6 +410,9 @@
   </data>
   <data name="PaidFailed" xml:space="preserve">
     <value>Thanh toán hóa đơn thất bại</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Mật khẩu</value>
   </data>
   <data name="Pay" xml:space="preserve">
     <value>Thanh toán</value>
@@ -530,6 +542,9 @@
   </data>
   <data name="UpdateItemsPriceSuccessfully" xml:space="preserve">
     <value>Sửa giá các sản phẩm thành công</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Tên người dùng</value>
   </data>
   <data name="ViewHistory" xml:space="preserve">
     <value>Xem lịch sử</value>
