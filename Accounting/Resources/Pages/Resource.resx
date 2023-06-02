@@ -198,6 +198,9 @@
   <data name="ChooseBillType" xml:space="preserve">
     <value>Chọn loại hóa đơn</value>
   </data>
+  <data name="ChooseDate" xml:space="preserve">
+    <value>Chọn ngày</value>
+  </data>
   <data name="ChooseMeat" xml:space="preserve">
     <value>Chọn mặt hàng</value>
   </data>
@@ -528,6 +531,9 @@
   <data name="Today Sale Price" xml:space="preserve">
     <value>Giá Bán Hôm Nay</value>
   </data>
+  <data name="Total" xml:space="preserve">
+    <value>Tổng</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Kiểu</value>
   </data>
@@ -551,6 +557,12 @@
   </data>
   <data name="ViewNearestTransaction" xml:space="preserve">
     <value>Xem thông tin giao dịch gần nhất</value>
+  </data>
+  <data name="Wasted" xml:space="preserve">
+    <value>Khấu hao</value>
+  </data>
+  <data name="WastedMeatWeight" xml:space="preserve">
+    <value>Khấu hao trọng lượng</value>
   </data>
   <data name="Weight" xml:space="preserve">
     <value>Cân nặng</value>

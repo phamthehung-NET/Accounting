@@ -11,21 +11,66 @@
             get
             {
                 var list = new List<MeatBillPriceDTO>();
-                SaleMeats.ForEach(sale =>
+                var entries = EntryMeats.GroupBy(x => x.MeatId).Select(x => new
                 {
-                    var entry = EntryMeats.FirstOrDefault(x => x.MeatId == sale.MeatId);
+                    MeatId = x.Key.Value,
+                    Data = x.Select(y => new MeatBillPriceDTO
+                    {
+                        Id = y.Id,
+                        BillId = y.BillId,
+                        CreatedDate = y.CreatedDate,
+                        ModifiedDate = y.ModifiedDate,
+                        Price = y.Price,
+                        Weight = y.Weight,
+                        PriceType = y.PriceType,
+                        ActiveDate = y.ActiveDate,
+                        MeatId = y.MeatId,
+                        MeatName = y.MeatName,
+                        MeatType = y.MeatType,
+                    })
+                }).ToList();
+                SaleMeats.GroupBy(x => x.MeatId).Select(x => new
+                {
+                    MeatId = x.Key.Value,
+                    Data = x.Select(y => new MeatBillPriceDTO
+                    {
+                        Id = y.Id,
+                        BillId = y.BillId,
+                        CreatedDate = y.CreatedDate,
+                        ModifiedDate = y.ModifiedDate,
+                        Price = y.Price,
+                        Weight = y.Weight,
+                        PriceType = y.PriceType,
+                        ActiveDate = y.ActiveDate,
+                        MeatId = y.MeatId,
+                        MeatName = y.MeatName,
+                        MeatType = y.MeatType,
+                    })
+                }).ToList().ForEach(sale =>
+                {
+                    var entry = entries.FirstOrDefault(x => x.MeatId == sale.MeatId);
                     if (entry != null)
                     {
                         MeatBillPriceDTO meat = new()
                         {
                             MeatId = sale.MeatId,
-                            MeatName = sale.MeatName,
-                            MeatType = sale.MeatType,
-                            ActiveDate = sale.ActiveDate,
-                            CreatedDate = sale.CreatedDate,
-                            Weight = entry.Weight - sale.Weight,
-                            ModifiedDate = sale.ModifiedDate,
+                            MeatName = sale.Data.First().MeatName,
+                            MeatType = sale.Data.First().MeatType,
+                            ActiveDate = sale.Data.First().ActiveDate,
+                            CreatedDate = sale.Data.First().CreatedDate,
+                            ModifiedDate = sale.Data.First().ModifiedDate,
                         };
+                        decimal totalEntry = 0;
+                        decimal totalSale = 0;
+                        foreach (var item in sale.Data)
+                        {
+                            totalSale += item.Weight.Value;
+                        }
+                        foreach (var item in entry.Data)
+                        {
+                            totalEntry += item.Weight.Value;
+                        }
+                        meat.Weight = totalEntry - totalSale;
                         list.Add(meat);
                     }
                 });
