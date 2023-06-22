@@ -312,6 +312,9 @@
   <data name="ItemDetail" xml:space="preserve">
     <value>Item detail</value>
   </data>
+  <data name="Lastest 10 days wasted weight" xml:space="preserve">
+    <value>Lastest 10 days wasted weight</value>
+  </data>
   <data name="Location" xml:space="preserve">
     <value>Location</value>
   </data>

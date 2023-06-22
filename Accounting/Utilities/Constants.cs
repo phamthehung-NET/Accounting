@@ -1,4 +1,7 @@
-﻿namespace Accounting.Utilities
+﻿using ChartJs.Blazor.Util;
+using System.Drawing;
+
+namespace Accounting.Utilities
 {
     public class Constants
     {
@@ -7,6 +10,10 @@
         public const string InfoColor = "info";
         public const string WarningColor = "warning";
         public const string PrimaryColor = "primary";
+
+        public const string GoodChartColor = "rgba(13, 157, 255, 0.8)";
+        public const string WarningChartColor = "rgba(255, 237, 13, 0.8)";
+        public const string NotGoodChartColor = "rgba(255, 12, 12, 0.8)";
     }
 
     public enum MeatType

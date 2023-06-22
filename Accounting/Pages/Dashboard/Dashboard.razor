@@ -1,11 +1,14 @@
 ﻿@page "/dashboard"
 @using BlazorDateRangePicker
-@using ChartJs.Blazor.ChartJS.BarChart;
-@using ChartJs.Blazor.ChartJS.Common.Properties;
-@using ChartJs.Blazor.Charts
+@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart;
+@using ChartJs.Blazor.Common;
+@using ChartJs.Blazor.Common.Enums;
+@using ChartJs.Blazor.Util;
 @using Microsoft.AspNetCore.WebUtilities;
 @using System.Globalization
 @using Microsoft.Extensions.Localization;
+@using System.Drawing;
 @inject IDashboardRepository DasboardRepo
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
@@ -20,7 +23,7 @@
             <div class="fw-bold">@LRes["WastedMeatWeight"]</div>
             <div>@($"{WastedDate.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(WastedDate)})")</div>
         </div>
-        <div class="card-body overflow-auto" style="height: 15rem">
+        <div class="card-body">
             <div class="mb-2">
                 <DateRangePicker class="form-control" placeholder="@LRes["ChooseDate"]" OnRangeSelect="async (dateRange) => await OnRangeSelect(dateRange) " MinDate="DateTime.Now.AddYears(-10)" MaxDate="DateTime.Now" ApplyLabel="@LRes["Done"]" CancelLabel="@LRes["Close"]" ShowOnlyOneCalendar="true" SingleDatePicker="true"/>
             </div>
@@ -34,7 +37,7 @@
                             <th>@LRes["Wasted"]</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="overflow-auto" style="height: 10rem">
                         @foreach (var item in Data.Result)
                         {
                             <tr>
@@ -50,8 +53,10 @@
                     </tbody>
                 </table>
             }
-            @*<ChartJsBarChart Config="config"/>*@
         </div>
+    </div>
+    <div class="card col-12">
+        <Chart Config="config"/>
     </div>
 </div>
 
@@ -61,6 +66,8 @@
     DateTime WastedDate = DateTime.Now;
 
     BarConfig config;
+
+    List<string> label = new() { "1", "2", "3", "4", "5", "6" };
 
     protected override void OnInitialized()
     {
@@ -74,6 +81,10 @@
                     Display = true,
                     Text = LRes["Lastest 10 days wasted weight"].ToString(),
                 },
+                Legend = new()
+                {
+                    Display = false
+                },
             },
         };
     }
@@ -83,6 +94,7 @@
         if (firstRender)
         {
             await GetWastedData();
+            GetChartData();
         }
     }
 
@@ -105,5 +117,41 @@
     {
         WastedDate = range.Start.DateTime;
         await GetWastedData();
+    }
+
+    void GetChartData()
+    {
+        var data = DasboardRepo.GetChartData();
+        
+        List<string> colors = new();
+        List<decimal> showingData = new();
+
+        data.ForEach(item =>
+        {
+            if(item.WastedWeight > 0 && item.WastedWeight <= 3)
+            {
+                colors.Add(Constants.GoodChartColor);
+                showingData.Add(item.WastedWeight);
+                config.Data.Labels.Add(HelperFunctions.GetLunarDate(item.ActivateDate));
+            }
+            else if(item.WastedWeight > 3 && item.WastedWeight <= 5)
+            {
+                colors.Add(Constants.WarningChartColor);
+                showingData.Add(item.WastedWeight);
+                config.Data.Labels.Add(HelperFunctions.GetLunarDate(item.ActivateDate));
+            }
+            else if(item.WastedWeight > 5)
+            {
+                colors.Add(Constants.NotGoodChartColor);
+                showingData.Add(item.WastedWeight);
+                config.Data.Labels.Add(HelperFunctions.GetLunarDate(item.ActivateDate));
+            }
+        });
+
+        BarDataset<decimal> dataset = new BarDataset<decimal>(showingData)
+        {
+            BackgroundColor = colors.ToArray(),
+        };
+        config.Data.Datasets.Add(dataset);
     }
 }

@@ -91,5 +91,7 @@
                 return total;
             }
         }
+
+        public DateTime ActivateDate { get; set ; } = DateTime.Now;
     }
 }
