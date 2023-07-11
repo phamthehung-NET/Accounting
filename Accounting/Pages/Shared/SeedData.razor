@@ -1,0 +1,71 @@
+﻿@page "/seed-data"
+@inject IMeatRepository meatRepo
+@inject IPriceRepository priceRepo
+@inject IPeopleRepository peopleRepo
+@inject IBillRepository billRepo
+@inject IJSRuntime JsRuntime
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var inputSaleList = new Dictionary<int, int?>();
+        var inputEntryList = new Dictionary<int, int?>();
+        Random random = new();
+
+        await HelperFunctions.AddIndicator(JsRuntime);
+        var meats = meatRepo.GetAllMeats("", null, null, 1, 1000, string.Empty).Items.ToList();
+        meats.ForEach(x =>
+        {
+            var value = random.Next(190, 210);
+            inputEntryList.Add(x.Id, value);
+            inputSaleList.Add(x.Id, value + 5);
+        });
+
+        var sourcePeople = peopleRepo.GetAllPeople("", "", true, 1, 1000).Items.Select(x => x.Id);
+        var people = peopleRepo.GetAllPeople("", "", false, 1, 1000).Items.Select(x => x.Id);
+
+        for(int i = -10; i <= 0; i++)
+        {
+            DateTime date = DateTime.Now.AddDays(i);
+            if(i == 0)
+            {
+                date = DateTime.Now;
+            }
+            var result = await priceRepo.UpdateItemPrice(inputEntryList, inputSaleList, date);
+
+            foreach(var item in sourcePeople)
+            {
+                BillDTO bill = new()
+                {
+                    PersonId = item,
+                    Type = (int)PriceType.Entry
+                };
+                await billRepo.AddBill(bill, date);
+            };
+
+            var entryBills = billRepo.GetAll("", date, date, 1, 1000, PriceType.Entry, null).Items.Select(x => x.Id);
+
+            foreach(var item in entryBills)
+            {
+                foreach(var meat in meats)
+                {
+                    decimal weight = 0;
+                    if (meat.Frozen != null && meat.Frozen.Value)
+                    {
+                        weight = (decimal)(random.Next(10, 21) - 0.5);
+                    }
+                    else
+                    {
+                        weight = (decimal)(random.Next(20, 35) - 0.5);
+                    }
+                    await billRepo.AddMeatToBill(meat.Id, weight, item, PriceType.Entry);
+                }
+            }
+        }
+
+
+        await HelperFunctions.RemoveIndicator(JsRuntime);
+    }
+
+}

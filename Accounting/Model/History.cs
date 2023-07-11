@@ -13,6 +13,8 @@ namespace Accounting.Model
 
         public DateTime CreatedDate { get; set; }
 
+        public string LunarCreatedDate { get; set; }
+
         public int Action { get; set; }
 
         public string Content { get; set; }

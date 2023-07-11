@@ -5,6 +5,7 @@
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
 @inject ILogRepository LogRepo
+@inject ISettingRepository SettingRepo
 
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
@@ -62,15 +63,19 @@
 
     Dictionary<int, int?> InputSaleList = new();
 
+    bool IsLeapYear;
+
     protected override void OnInitialized()
     {
+        IsLeapYear = bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting));
+
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
         Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
         Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now.AddDays(-1))}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(DateTime.Now)}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now.AddDays(-1))}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now)}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now.AddDays(-1))}</div>", Ordering = true });
+        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now)}</div>", Ordering = true });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -138,7 +143,7 @@
         try
         {
             await HelperFunctions.AddIndicator(JsRuntime);
-            var result = PriceRepository.UpdateItemPrice(InputEntryList, InputSaleList);
+            var result = await PriceRepository.UpdateItemPrice(InputEntryList, InputSaleList, null);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             if (result)
             {

@@ -15,6 +15,7 @@ namespace Accounting.Repositories.Implementations
         private readonly IMeatRepository meatRepository;
         private readonly IPeopleRepository peopleRepository;
         private readonly IBillRepository billRepository;
+        private readonly bool IsLeapYear;
 
         public RecycleBinRepository(AccountingDbContext _context, IStringLocalizer<Resource> _Lres, IMeatRepository _meatRepository, IPeopleRepository _peopleRepository, IBillRepository _billRepository)
         {
@@ -23,6 +24,7 @@ namespace Accounting.Repositories.Implementations
             billRepository = _billRepository;
             meatRepository = _meatRepository;
             peopleRepository = _peopleRepository;
+            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
         }
 
         public Pagination<RecycleBinDTO> GetAll(string keyword, RecycleBinObjectType? type, string order, int pageIndex, int pageSize)
@@ -42,6 +44,8 @@ namespace Accounting.Repositories.Implementations
                                   Id = r.Id,
                                   CreatedDate = r.CreatedDate,
                                   ModifiedDate = r.ModifiedDate,
+                                  LunarCreatedDate = r.LunarCreatedDate,
+                                  LunarModifiedDate = r.LunarModifiedDate,
                                   ObjectId = r.ObjectId.Value,
                                   Type = r.Type,
                                   ObjectName = r.Type == (int)RecycleBinObjectType.Meat ? 
@@ -59,6 +63,8 @@ namespace Accounting.Repositories.Implementations
 
         public bool Restore(int objectId, RecycleBinObjectType objectType)
         {
+            var currentDate = DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
             RecycleBin recycleBin = context.RecycleBins.FirstOrDefault(x => x.ObjectId == objectId && x.Type == (int)objectType);
             switch (objectType)
             {
@@ -97,7 +103,8 @@ namespace Accounting.Repositories.Implementations
                         ObjectId = bill.Id,
                         Action = (int)HistoryAction.Restore,
                         Content = $"{Lres["Restore"]} {Lres["Bill"]}",
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = currentDate,
+                        LunarCreatedDate = currentLunarDate,
                         Type = (int)HistoryType.Bill,
                     };
 

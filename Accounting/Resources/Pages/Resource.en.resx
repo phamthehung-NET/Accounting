@@ -162,6 +162,9 @@
   <data name="at" xml:space="preserve">
     <value>at</value>
   </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
   <data name="Beef" xml:space="preserve">
     <value>Beef</value>
   </data>
@@ -225,6 +228,9 @@
   <data name="date" xml:space="preserve">
     <value>date</value>
   </data>
+  <data name="DateTimeSettings" xml:space="preserve">
+    <value>Date and time</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
@@ -257,6 +263,12 @@
   </data>
   <data name="EditPerson" xml:space="preserve">
     <value>Edit person</value>
+  </data>
+  <data name="EditPersonFailed" xml:space="preserve">
+    <value>Edit person failed</value>
+  </data>
+  <data name="EditPersonSuccess" xml:space="preserve">
+    <value>Edit person success</value>
   </data>
   <data name="EditPriceFailed" xml:space="preserve">
     <value>Edit price failed</value>
@@ -305,6 +317,9 @@
   </data>
   <data name="is required" xml:space="preserve">
     <value>is required</value>
+  </data>
+  <data name="IsLeapYear" xml:space="preserve">
+    <value>Lunar Leap Year (for current year)</value>
   </data>
   <data name="item(s)" xml:space="preserve">
     <value>item(s)</value>
@@ -450,6 +465,9 @@
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Redirecting to login in</value>
   </data>
+  <data name="ReleasedInfo" xml:space="preserve">
+    <value>System was developed by Pham The Hung - Junior .Net</value>
+  </data>
   <data name="Remove" xml:space="preserve">
     <value>Remove</value>
   </data>
@@ -497,6 +515,9 @@
   </data>
   <data name="SucessfullyPaid" xml:space="preserve">
     <value>Bill is paid successfully</value>
+  </data>
+  <data name="SystemSettings" xml:space="preserve">
+    <value>System settings</value>
   </data>
   <data name="ThisPersonIsExisted" xml:space="preserve">
     <value>Bill for this person is already existed, please check again</value>

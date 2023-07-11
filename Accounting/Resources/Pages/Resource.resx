@@ -165,6 +165,9 @@
   <data name="at" xml:space="preserve">
     <value>tại</value>
   </data>
+  <data name="Back" xml:space="preserve">
+    <value>Trở lại</value>
+  </data>
   <data name="Beef" xml:space="preserve">
     <value>Bò</value>
   </data>
@@ -231,6 +234,9 @@
   <data name="date" xml:space="preserve">
     <value>ngày</value>
   </data>
+  <data name="DateTimeSettings" xml:space="preserve">
+    <value>Thời gian</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Xóa</value>
   </data>
@@ -263,6 +269,12 @@
   </data>
   <data name="EditPerson" xml:space="preserve">
     <value>Sửa thông tin người mua/bán</value>
+  </data>
+  <data name="EditPersonFailed" xml:space="preserve">
+    <value>Cập nhật thông tin thất bại</value>
+  </data>
+  <data name="EditPersonSuccess" xml:space="preserve">
+    <value>Cập nhật thông tin thành công</value>
   </data>
   <data name="EditPriceFailed" xml:space="preserve">
     <value>Cập nhật giá thất bại</value>
@@ -315,8 +327,11 @@
   <data name="is required" xml:space="preserve">
     <value>không được để trống</value>
   </data>
+  <data name="IsLeapYear" xml:space="preserve">
+    <value>Năm Âm lịch nhuận (cho năm hiện tại)</value>
+  </data>
   <data name="item(s)" xml:space="preserve">
-    <value>sản phẩm</value>
+    <value>vật phẩm</value>
   </data>
   <data name="ItemDetail" xml:space="preserve">
     <value>Chi tiết vật phẩm</value>
@@ -465,6 +480,9 @@
   <data name="Redirecting to login in" xml:space="preserve">
     <value>Chuyển hướng đến trang đăng nhập trong</value>
   </data>
+  <data name="ReleasedInfo" xml:space="preserve">
+    <value>Hệ thống được phát triển bởi Phạm Thế Hùng - Junior .Net</value>
+  </data>
   <data name="Remove" xml:space="preserve">
     <value>Xóa</value>
   </data>
@@ -515,6 +533,9 @@
   </data>
   <data name="SucessfullyPaid" xml:space="preserve">
     <value>Thanh toán hóa đơn thành công</value>
+  </data>
+  <data name="SystemSettings" xml:space="preserve">
+    <value>Cài đặt hệ thống</value>
   </data>
   <data name="ThisPersonIsExisted" xml:space="preserve">
     <value>Hóa đơn cho người này đã tồn tại, vui lòng kiểm tra lại</value>

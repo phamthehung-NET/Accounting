@@ -15,8 +15,14 @@ namespace Accounting.Model
 
         public DateTime? ActiveDate { get; set; }
 
+        public string LunarActiveDate { get; set; }
+
         public DateTime? CreatedDate { get; set; }
 
+        public string LunarCreatedDate { get; set; }
+
         public DateTime? ModifiedDate { get; set; }
+        
+        public string LunarModifiedDate { get; set; }
     }
 }

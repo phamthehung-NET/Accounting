@@ -8,6 +8,7 @@
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
 @inject ILogRepository LogRepo
+@inject ISettingRepository SettingRepo
 @attribute [Authorize]
 
 <PageTitle>@LRes["Recycle bin"]</PageTitle>
@@ -47,7 +48,7 @@
             <tr>
                 <td>@Context.ObjectName</td>
                 <td>@HandleShowObjectType(Context.Type)</td>
-                <td>@Context.CreatedDate</td>
+                <td>@Context.CreatedDate.Value.ToString("dd/MM/yyyy") (@(string.IsNullOrEmpty(Context.LunarCreatedDate) ? HelperFunctions.GetLunarDate(bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting)), Context.CreatedDate.Value) : Context.LunarCreatedDate) @LRes["LunarDate"])</td>
                 <td>
                     <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#detailObjectModal" @onclick="() => SelectObject(Context) "><i class="fa-regular fa-circle-info"></i> @LRes["Detail"]</button>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#restoreObjectModal" @onclick="() => SelectObject(Context)"><i class="fa-duotone fa-trash-can-undo"></i> @LRes["Restore"]</button>

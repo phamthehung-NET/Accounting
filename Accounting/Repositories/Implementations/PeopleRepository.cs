@@ -9,10 +9,12 @@ namespace Accounting.Repositories.Implementations
     public class PeopleRepository : IPeopleRepository
     {
         private readonly AccountingDbContext context;
+        private readonly bool IsLeapYear;
 
         public PeopleRepository(AccountingDbContext _context)
         {
             context = _context;
+            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
         }
 
         public bool AddPerson(Person res)
@@ -25,6 +27,8 @@ namespace Accounting.Repositories.Implementations
 
         public bool DeletePerson(int id)
         {
+            var currentDate = DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
             var person = context.People.FirstOrDefault(x => x.Id == id);
             if (person != null)
             {
@@ -33,7 +37,8 @@ namespace Accounting.Repositories.Implementations
                 {
                     ObjectId = id,
                     Type = (int)RecycleBinObjectType.Person,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = currentDate,
+                    LunarCreatedDate = currentLunarDate,
                 };
                 context.Add(recycle);
                 context.SaveChanges();
@@ -56,7 +61,8 @@ namespace Accounting.Repositories.Implementations
                               p.PhoneNumber,
                               p.Source,
                               NearestTransaction = bill.ActiveDate,
-                              NearestTransactionId = bill.Id
+                              NearestTransactionId = bill.Id,
+                              LunarNearestTransaction = bill.LunarActiveDate,
                           }).GroupBy(x => new { x.Id, x.Name, x.Source, x.Address, x.IsDeleted, x.PhoneNumber })
                          .Select(x => new PersonDTO
                          {
@@ -70,6 +76,7 @@ namespace Accounting.Repositories.Implementations
                              {
                                  Id = y.NearestTransactionId,
                                  ActivateDate = y.NearestTransaction,
+                                 LunarActiveDate = y.LunarNearestTransaction                                 
                              }).Where(x => x.ActivateDate != null).OrderByDescending(x => x.ActivateDate).FirstOrDefault(),
                          });
 

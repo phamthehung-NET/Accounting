@@ -6,6 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject IPeopleRepository PeopleRepo
 @inject ILogRepository LogRepo
+@inject ISettingRepository SettingRepo
 @attribute [Authorize]
 
 <PageTitle>@LRes["Manage person"]</PageTitle>
@@ -30,7 +31,7 @@
                 <td>@Context.PhoneNumber</td>
                 <td>@Context.Address</td>
                 <td>@HelperFunctions.HandleDisplayPersonType(LRes, Context.Source)</td>
-                <td>@(Context.NearestTransaction != null ? (Context.NearestTransaction.ActivateDate.Value.ToString("dd/MM/yyyy") + " (" + HelperFunctions.GetLunarDate(Context.NearestTransaction.ActivateDate.Value) +")") : LRes["No data"])</td>
+                <td>@(Context.NearestTransaction != null ? (Context.NearestTransaction.ActivateDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(Context.NearestTransaction.LunarActiveDate) ? HelperFunctions.GetLunarDate(bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting)), Context.NearestTransaction.ActivateDate.Value) : Context.NearestTransaction.LunarActiveDate) +")") : LRes["No data"])</td>
                 <td>
                     <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)" @onclick="() => {SelectedPersonDTO = Context;}"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
                     <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPersonModal" @onclick="() => OnSelectPerson(Context)"><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>

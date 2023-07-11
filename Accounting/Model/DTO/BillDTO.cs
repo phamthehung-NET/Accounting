@@ -16,6 +16,12 @@
 
         public DateTime? ModifiedDate { get; set; }
 
+        public string LunarActiveDate { get; set; }
+
+        public string LunarCreatedDate { get; set; }
+
+        public string LunarModifiedDate { get; set; }
+
         public bool? IsPaid { get; set; }
 
         public bool IsDeleted { get; set; }

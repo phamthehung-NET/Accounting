@@ -1,14 +1,36 @@
 ﻿@using Microsoft.Extensions.Localization;
+@inject NavigationManager NavigationManager
 @inject IStringLocalizer<Resource> LRes
+
 <AuthorizeView>
     <Authorized>
-        <a class="nav-link text-black ms-0">@LRes["Hello"], @context.User.Identity?.Name</a>
-        <form method="post" action="Identity/Account/Logout">
-            <button type="submit" class="btn nav-link text-black">@LRes["Log out"]</button>
-        </form>
+        <a class="nav-link text-black ms-0 dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">@LRes["Hello"], @context.User.Identity?.Name</a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
+            <li><button class="dropdown-item" onclick="@(() => NavigateTo("/system-setting"))"><i class="fa-duotone fa-gears"></i> @LRes["SystemSettings"]</button></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form class="dropdown-item" method="post" action="Identity/Account/Logout">
+                    <button type="submit" class="btn nav-link text-black"><i class="fa-duotone fa-arrow-right-from-bracket"></i> @LRes["Log out"]</button>
+                </form>
+            </li>
+        </ul>
     </Authorized>
     <NotAuthorized>
         @*<a href="Identity/Account/Register">Register</a>*@
         <a href="Identity/Account/Login" class="nav-link text-black ms-0">@LRes["Log in"]</a>
     </NotAuthorized>
 </AuthorizeView>
+
+@code{
+    Uri Uri;
+
+    protected override void OnInitialized()
+    {
+        Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+    }
+
+    void NavigateTo(string url)
+    {
+        NavigationManager.NavigateTo(url);
+    }
+}

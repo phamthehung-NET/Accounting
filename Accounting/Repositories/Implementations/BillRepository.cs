@@ -12,31 +12,37 @@ namespace Accounting.Repositories.Implementations
     {
         private readonly AccountingDbContext context;
         private readonly IStringLocalizer<Resource> Lres;
+        private readonly bool IsLeapYear;
 
         public BillRepository(AccountingDbContext _context, IStringLocalizer<Resource> _Lres)
         {
             context = _context;
             Lres = _Lres;
+            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
         }
 
-        public bool AddBill(BillDTO res)
+        public async Task<bool> AddBill(BillDTO res, DateTime? currentDate)
         {
-            var currentDate = DateTime.Now;
-            var billDb = context.Bills.FirstOrDefault(x => x.PersonId == res.PersonId && x.ActiveDate.Value.Date == currentDate.Date && x.Type == res.Type && x.IsDeleted == false);
+            currentDate ??= DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate.Value);
+            var billDb = context.Bills.FirstOrDefault(x => x.PersonId == res.PersonId && x.ActiveDate.Value.Date == currentDate.Value.Date && x.Type == res.Type && x.IsDeleted == false);
             if (billDb == null)
             {
                 Bill bill = new()
                 {
                     PersonId = res.PersonId,
                     Type = res.Type,
-                    ActiveDate = currentDate,
-                    CreatedDate = currentDate,
-                    ModifiedDate = currentDate,
+                    ActiveDate = currentDate.Value,
+                    CreatedDate = currentDate.Value,
+                    ModifiedDate = currentDate.Value,
+                    LunarActiveDate = currentLunarDate,
+                    LunarCreatedDate = currentLunarDate,
+                    LunarModifiedDate = currentLunarDate,
                     IsPaid = false,
                 };
 
-                context.Add(bill);
-                context.SaveChanges();
+                await context.AddAsync(bill);
+                await context.SaveChangesAsync();
 
                 if (bill.Id > 0)
                 {
@@ -45,11 +51,12 @@ namespace Accounting.Repositories.Implementations
                         ObjectId = bill.Id,
                         Action = (int)HistoryAction.Create,
                         Content = Lres["BillIsCreated"],
-                        CreatedDate = currentDate,
+                        CreatedDate = currentDate.Value,
+                        LunarCreatedDate = currentLunarDate,
                         Type = (int)HistoryType.Bill,
                     };
-                    context.Add(history);
-                    context.SaveChanges();
+                    await context.AddAsync(history);
+                    await context.SaveChangesAsync();
                 }
 
                 return bill.Id > 0;
@@ -59,6 +66,8 @@ namespace Accounting.Repositories.Implementations
 
         public bool DeleteBill(int id)
         {
+            var currentDate = DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
             var bill = context.Bills.FirstOrDefault(x => x.Id == id);
             if (bill != null)
             {
@@ -68,7 +77,8 @@ namespace Accounting.Repositories.Implementations
                     ObjectId = id,
                     Action = (int)HistoryAction.Remove,
                     Content = $"{Lres["BillIsRemoved"]}",
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = currentDate,
+                    LunarCreatedDate = currentLunarDate,
                     Type = (int)HistoryType.Bill,
                 };
 
@@ -76,7 +86,8 @@ namespace Accounting.Repositories.Implementations
                 {
                     ObjectId = id,
                     Type = (int)RecycleBinObjectType.Bill,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = currentDate,
+                    LunarCreatedDate = currentLunarDate,
                 };
                 context.Add(history);
                 context.Add(recycle);
@@ -103,8 +114,8 @@ namespace Accounting.Repositories.Implementations
                                             : startDate == null || endDate == null || (b.ActiveDate.Value.Date.CompareTo(startDate.Value.Date) >= 0 && b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date) <= 0))
                             && (isPaid == null || b.IsPaid == isPaid)
                             && b.Type == (int)priceType && !b.IsDeleted
-                         select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
-                        .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.IsPaid })
+                         select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarCreatedDate, b.LunarActiveDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
+                        .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
                         .Select(x => new BillDTO
                         {
                             Id = x.Key.Id,
@@ -113,6 +124,9 @@ namespace Accounting.Repositories.Implementations
                             ActiveDate = x.Key.ActiveDate,
                             CreatedDate = x.Key.CreatedDate,
                             ModifiedDate = x.Key.ModifiedDate,
+                            LunarActiveDate = x.Key.LunarActiveDate,
+                            LunarCreatedDate = x.Key.LunarCreatedDate,
+                            LunarModifiedDate = x.Key.LunarModifiedDate,
                             IsPaid = x.Key.IsPaid,
                             PersonName = x.Key.Name,
                             Items = x.Select(y => new MeatBillPriceDTO
@@ -128,6 +142,9 @@ namespace Accounting.Repositories.Implementations
                                 ActiveDate = y.ActiveDate,
                                 CreatedDate = y.CreatedDate,
                                 ModifiedDate = y.ModifiedDate,
+                                LunarActiveDate = y.LunarActiveDate,
+                                LunarCreatedDate = y.LunarCreatedDate,
+                                LunarModifiedDate = y.LunarModifiedDate,
                             }).Where(y => y.Id != null),
                         });
 
@@ -136,6 +153,8 @@ namespace Accounting.Repositories.Implementations
 
         public bool PayingBill(int id, decimal totalPrice)
         {
+            var currentDate = DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
             var bill = context.Bills.FirstOrDefault(x => x.Id == id);
             if (bill != null)
             {
@@ -145,7 +164,8 @@ namespace Accounting.Repositories.Implementations
                     ObjectId = id,
                     Action = (int)HistoryAction.Pay,
                     Content = $"{Lres["Paid"]} {Lres["billwithprice"]}: {totalPrice:n0}.000 VND",
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = currentDate,
+                    LunarCreatedDate = currentLunarDate,
                     Type = (int)HistoryType.Bill,
                 };
                 context.Add(history);
@@ -158,6 +178,9 @@ namespace Accounting.Repositories.Implementations
 
         public bool UpdateBillItems(BillDTO res)
         {
+            var currentDate = DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
+
             foreach (var item in res.Items)
             {
                 var itemDb = context.MeatBillPrices.FirstOrDefault(x => x.BillId == res.Id && x.Id == item.Id);
@@ -166,7 +189,8 @@ namespace Accounting.Repositories.Implementations
                 {
                     Action = (int)HistoryAction.EditItemPrice,
                     Content = $"{Lres["Update"]} {itemDb.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {itemDb.Price.Value.ToString("n0")} {Lres["changeTo"]} {item.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {item.Price}",
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = currentDate,
+                    LunarCreatedDate = currentLunarDate,
                     ObjectId = itemDb.BillId.Value,
                     Type = (int)HistoryType.Bill,
                 };
@@ -195,9 +219,10 @@ namespace Accounting.Repositories.Implementations
             return true;
         }
 
-        public bool AddMeatToBill(int id, decimal weight, int billId, PriceType priceType)
+        public async Task<bool> AddMeatToBill(int id, decimal weight, int billId, PriceType priceType)
         {
             var currentDate = DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
             var bill = context.Bills.FirstOrDefault(x => x.Id == billId);
             var meat = context.Meats.FirstOrDefault(x => x.Id == id);
             var meatPrice = context.MeatPrices.FirstOrDefault(x => x.ActiveDate.Value.Date.CompareTo(currentDate.Date) == 0 && x.MeatId == id && x.PriceType == (int)priceType);
@@ -211,12 +236,15 @@ namespace Accounting.Repositories.Implementations
                     Weight = weight,
                     CreatedDate = currentDate,
                     ModifiedDate = currentDate,
+                    LunarActiveDate = HelperFunctions.GetLunarDate(IsLeapYear, bill.ActiveDate.Value),
+                    LunarCreatedDate = currentLunarDate,
+                    LunarModifiedDate = currentLunarDate,
                     PriceType = (int)priceType,
                     Price = meatPrice.Price
                 };
 
-                context.Add(meatBill);
-                context.SaveChanges();
+                await context.AddAsync(meatBill);
+                await context.SaveChangesAsync();
 
                 if (meatBill.Id > 0)
                 {
@@ -226,10 +254,11 @@ namespace Accounting.Repositories.Implementations
                         Action = (int)HistoryAction.AddItem,
                         Content = $"{Lres["Add"]} {weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatPrice.Price.Value.ToString("n0")}",
                         CreatedDate = currentDate,
+                        LunarCreatedDate = currentLunarDate,
                         Type = (int)HistoryType.Bill,
                     };
-                    context.Add(history);
-                    context.SaveChanges();
+                    await context.AddAsync(history);
+                    await context.SaveChangesAsync();
                 }
 
                 return meatBill.Id > 0;
@@ -239,6 +268,9 @@ namespace Accounting.Repositories.Implementations
 
         public bool RemoveMeatFromBill(int meatpriceId)
         {
+            var currentDate = DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
+
             var meatprice = context.MeatBillPrices.FirstOrDefault(x => x.Id == meatpriceId);
             if (meatprice != null)
             {
@@ -248,7 +280,8 @@ namespace Accounting.Repositories.Implementations
                     ObjectId = meatprice.BillId.Value,
                     Action = (int)HistoryAction.RemoveItem,
                     Content = $"{Lres["Remove"]} {meatprice.Weight} kg {meat.Name} {HelperFunctions.RenderMeatType(Lres, meat.Type)} {Lres["withPrice"]} {meatprice.Price.Value.ToString("n0")}",
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = currentDate,
+                    LunarCreatedDate = currentLunarDate,
                     Type = (int)HistoryType.Bill,
                 };
 
@@ -271,8 +304,8 @@ namespace Accounting.Repositories.Implementations
                     join m in context.Meats on mbp.MeatId equals m.Id into meats
                     from m in meats.DefaultIfEmpty()
                     where b.Id == id
-                    select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
-            .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.IsPaid })
+                    select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarActiveDate, b.LunarCreatedDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
+            .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
             .Select(x => new BillDTO
             {
                 Id = x.Key.Id,
@@ -281,6 +314,9 @@ namespace Accounting.Repositories.Implementations
                 ActiveDate = x.Key.ActiveDate,
                 CreatedDate = x.Key.CreatedDate,
                 ModifiedDate = x.Key.ModifiedDate,
+                LunarActiveDate = x.Key.LunarActiveDate,
+                LunarCreatedDate = x.Key.LunarCreatedDate,
+                LunarModifiedDate = x.Key.LunarModifiedDate,
                 IsPaid = x.Key.IsPaid,
                 PersonName = x.Key.Name,
                 Items = x.Select(y => new MeatBillPriceDTO
@@ -296,6 +332,9 @@ namespace Accounting.Repositories.Implementations
                     ActiveDate = y.ActiveDate,
                     CreatedDate = y.CreatedDate,
                     ModifiedDate = y.ModifiedDate,
+                    LunarActiveDate = y.LunarActiveDate,
+                    LunarCreatedDate = y.LunarCreatedDate,
+                    LunarModifiedDate = y.LunarModifiedDate
                 }).Where(y => y.Id != null),
             }).FirstOrDefault();
         }
@@ -313,6 +352,9 @@ namespace Accounting.Repositories.Implementations
                         Id = mbp.Id,
                         MeatId = mbp.MeatId,
                         ModifiedDate = mbp.ModifiedDate,
+                        LunarModifiedDate = mbp.LunarModifiedDate,
+                        LunarActiveDate = mbp.LunarActiveDate,
+                        LunarCreatedDate = mbp.LunarCreatedDate,
                         Price = mbp.Price,
                         PriceType = mbp.PriceType,
                         Weight = mbp.Weight,

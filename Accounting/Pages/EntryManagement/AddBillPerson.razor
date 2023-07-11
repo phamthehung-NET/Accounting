@@ -106,7 +106,7 @@
         };
         
         await HelperFunctions.AddIndicator(JsRuntime);
-        if (BillRepo.AddBill(bill))
+        if (await BillRepo.AddBill(bill, null))
         {
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SuccessfullyAddBillPerson"]);

@@ -3,6 +3,7 @@
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
 @inject ILogRepository LogRepo
+@inject ISettingRepository SettingRepo
 
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -41,7 +42,7 @@
                             @(Bill.TotalPrice == 0 ? string.Empty : Bill.TotalPrice.ToString("n0") + ".000 VND")
                         </div>
                         <div>
-                            @(Bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + HelperFunctions.GetLunarDate(Bill.ActiveDate.Value) + ")")
+                            @(Bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(Bill.LunarActiveDate) ? HelperFunctions.GetLunarDate(bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting)), Bill.ActiveDate.Value) : Bill.LunarActiveDate) + ")")
                         </div>
                     </div>
                 }

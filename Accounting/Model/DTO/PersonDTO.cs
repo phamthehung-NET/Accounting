@@ -25,5 +25,7 @@ namespace Accounting.Model.DTO
         public int Id { get; set; }
 
         public DateTime? ActivateDate { get; set; }
+
+        public string LunarActiveDate { get; set; }
     }
 }

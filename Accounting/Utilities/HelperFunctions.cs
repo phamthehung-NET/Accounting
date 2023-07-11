@@ -46,12 +46,18 @@ namespace Accounting.Utilities
             await jsRuntime.InvokeVoidAsync("showToast", bootstrapColor, content);
         }
 
-        public static string GetLunarDate(DateTime dateInput)
+        public static string GetLunarDate(bool isLeapYear, DateTime dateInput)
         {
             ChineseLunisolarCalendar lunarCalendar = new();
             var day = lunarCalendar.GetDayOfMonth(dateInput);
-            var month = lunarCalendar.GetMonth(dateInput) - 1;
-            return string.Join("/", new int[] { day, month });
+            var month = lunarCalendar.GetMonth(dateInput);
+            var year = lunarCalendar.GetYear(dateInput);
+            
+            if(isLeapYear)
+            {
+                month--;
+            }
+            return string.Join("/", new int[] { day, month, year });
         }
 
         public static async Task TriggerBtn(IJSRuntime jSRuntime, string btnId)

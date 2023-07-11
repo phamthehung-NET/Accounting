@@ -7,7 +7,7 @@ namespace Accounting.Repositories.Interfaces
     {
         Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize, PriceType priceType, bool? isPaid);
 
-        bool AddBill(BillDTO res);
+        Task<bool> AddBill(BillDTO res, DateTime? currentDate);
 
         bool UpdateBillItems(BillDTO res);
 
@@ -15,7 +15,7 @@ namespace Accounting.Repositories.Interfaces
 
         bool PayingBill(int id, decimal totalPrice);
 
-        bool AddMeatToBill(int id, decimal weight, int billId, PriceType priceType);
+        Task<bool> AddMeatToBill(int id, decimal weight, int billId, PriceType priceType);
 
         bool RemoveMeatFromBill(int meatpriceId);
 

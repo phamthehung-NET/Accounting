@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ISettingRepository SettingRepo
 @attribute [Authorize]
 
 <PageTitle>@LRes["Dashboard"]</PageTitle>
@@ -21,7 +22,7 @@
     <div class="card col-md-5 col-sm-12 col-lg-5 col-xl-5 mb-4 p-0">
         <div class="card-header d-flex justify-content-between">
             <div class="fw-bold">@LRes["WastedMeatWeight"]</div>
-            <div>@($"{WastedDate.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(WastedDate)})")</div>
+            <div>@($"{WastedDate.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(IsLeapYear, WastedDate)})")</div>
         </div>
         <div class="card-body">
             <div class="mb-2">
@@ -67,7 +68,7 @@
 
     BarConfig config;
 
-    List<string> label = new() { "1", "2", "3", "4", "5", "6" };
+    bool IsLeapYear;
 
     protected override void OnInitialized()
     {
@@ -93,6 +94,7 @@
     {
         if (firstRender)
         {
+            IsLeapYear = bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting));
             await GetWastedData();
             GetChartData();
         }
@@ -132,19 +134,19 @@
             {
                 colors.Add(Constants.GoodChartColor);
                 showingData.Add(item.WastedWeight);
-                config.Data.Labels.Add(HelperFunctions.GetLunarDate(item.ActivateDate));
+                config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
             }
             else if(item.WastedWeight > 3 && item.WastedWeight <= 5)
             {
                 colors.Add(Constants.WarningChartColor);
                 showingData.Add(item.WastedWeight);
-                config.Data.Labels.Add(HelperFunctions.GetLunarDate(item.ActivateDate));
+                config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
             }
             else if(item.WastedWeight > 5)
             {
                 colors.Add(Constants.NotGoodChartColor);
                 showingData.Add(item.WastedWeight);
-                config.Data.Labels.Add(HelperFunctions.GetLunarDate(item.ActivateDate));
+                config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
             }
         });
 

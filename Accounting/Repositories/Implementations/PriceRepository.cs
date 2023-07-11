@@ -11,30 +11,34 @@ namespace Accounting.Repositories.Implementations
         private readonly AccountingDbContext context;
         private readonly IHttpContextAccessor httpContext;
         private readonly UserManager<CustomUser> userManager;
+        private readonly bool IsLeapYear;
 
         public PriceRepository(AccountingDbContext _context, IHttpContextAccessor _httpContext, UserManager<CustomUser> _userManager)
         {
             context = _context;
             httpContext = _httpContext;
             userManager = _userManager;
+            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
         }
 
-        public bool UpdateItemPrice(Dictionary<int, int?> inputEntryPrice, Dictionary<int, int?> inputSalePrice)
+        public async Task<bool> UpdateItemPrice(Dictionary<int, int?> inputEntryPrice, Dictionary<int, int?> inputSalePrice, DateTime? date)
         {
+            date ??= DateTime.Now;
+            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, date.Value);
             var user = userManager.FindByNameAsync(httpContext.HttpContext.User.Identity.Name).Result;
             if (!inputEntryPrice.Any() && !inputSalePrice.Any())
             {
                 List<MeatPrice> addList = new();
-                var priceDb = context.MeatPrices.Where(x => x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0);
+                var priceDb = context.MeatPrices.Where(x => x.ActiveDate.Value.Date.CompareTo(date.Value.Date) == 0);
                 if (!priceDb.Any())
                 {
-                    var yesterdayPriceDb = context.MeatPrices.Where(x => x.ActiveDate.Value.Date.CompareTo(DateTime.Now.AddDays(-1).Date) == 0);
+                    var yesterdayPriceDb = context.MeatPrices.Where(x => x.ActiveDate.Value.Date.CompareTo(date.Value.AddDays(-1).Date) == 0);
                     foreach (var x in yesterdayPriceDb)
                     {
                         if (x.Price == null)
                         {
                             var lastestPrice = context.MeatPrices
-                                .Where(y => y.MeatId == x.MeatId && y.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) < 0 && y.PriceType == x.PriceType && y.Price != null);
+                                .Where(y => y.MeatId == x.MeatId && y.ActiveDate.Value.Date.CompareTo(date.Value.Date) < 0 && y.PriceType == x.PriceType && y.Price != null);
                             x.Price = lastestPrice.Any() ? lastestPrice.MaxBy(y => y.ActiveDate).Price : null;
                         }
                         else
@@ -42,8 +46,10 @@ namespace Accounting.Repositories.Implementations
                             MeatPrice meatPrice = new()
                             {
                                 MeatId = x.MeatId,
-                                ActiveDate = DateTime.Now,
-                                CreatedDate = DateTime.Now,
+                                ActiveDate = date.Value,
+                                CreatedDate = date.Value,
+                                LunarActiveDate = currentLunarDate,
+                                LunarCreatedDate = currentLunarDate,
                                 PriceType = x.PriceType,
                                 Price = x.Price != null ? x.Price : null,
                             };
@@ -56,21 +62,23 @@ namespace Accounting.Repositories.Implementations
             List<MeatPrice> priceList = new();
             foreach (var item in inputEntryPrice)
             {
-                var entryDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && x.PriceType == (int)PriceType.Entry);
+                var entryDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(date.Value.Date) == 0 && x.PriceType == (int)PriceType.Entry);
                 if (entryDb == null)
                 {
                     MeatPrice meatPrice = new()
                     {
                         MeatId = item.Key,
-                        ActiveDate = DateTime.Now,
-                        CreatedDate = DateTime.Now,
+                        ActiveDate = date.Value,
+                        CreatedDate = date.Value,
+                        LunarActiveDate = currentLunarDate,
+                        LunarCreatedDate = currentLunarDate,
                         PriceType = (int)PriceType.Entry,
                     };
 
                     if (item.Value == null)
                     {
                         var lastestPrice = context.MeatPrices
-                            .Where(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) < 0 && x.PriceType == (int)PriceType.Entry && x.Price != null)
+                            .Where(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(date.Value.Date) < 0 && x.PriceType == (int)PriceType.Entry && x.Price != null)
                             .MaxBy(x => x.ActiveDate);
 
                         meatPrice.Price = lastestPrice != null ? lastestPrice.Price : null;
@@ -89,21 +97,23 @@ namespace Accounting.Repositories.Implementations
 
             foreach (var item in inputSalePrice)
             {
-                var saleDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) == 0 && x.PriceType == (int)PriceType.Sale);
+                var saleDb = context.MeatPrices.FirstOrDefault(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(date.Value.Date) == 0 && x.PriceType == (int)PriceType.Sale);
                 if (saleDb == null)
                 {
                     MeatPrice meatPrice = new()
                     {
                         MeatId = item.Key,
-                        ActiveDate = DateTime.Now,
-                        CreatedDate = DateTime.Now,
+                        ActiveDate = date.Value,
+                        CreatedDate = date.Value,
+                        LunarActiveDate = currentLunarDate,
+                        LunarCreatedDate = currentLunarDate,
                         PriceType = (int)PriceType.Sale,
                     };
 
                     if (item.Value == null)
                     {
                         var lastestPrice = context.MeatPrices
-                            .Where(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(DateTime.Now.Date) < 0 && x.PriceType == (int)PriceType.Sale && x.Price != null)
+                            .Where(x => x.MeatId == item.Key && x.ActiveDate.Value.Date.CompareTo(date.Value.Date) < 0 && x.PriceType == (int)PriceType.Sale && x.Price != null)
                             .MaxBy(x => x.ActiveDate);
 
                         meatPrice.Price = lastestPrice != null ? lastestPrice.Price : null;
@@ -120,10 +130,10 @@ namespace Accounting.Repositories.Implementations
                 }
             }
 
-            context.MeatPrices.AddRange(priceList);
-            user.UpdatedPriceDate = DateTime.Now;
-            userManager.UpdateAsync(user);
-            context.SaveChanges();
+            await context.MeatPrices.AddRangeAsync(priceList);
+            user.UpdatedPriceDate = date.Value;
+            await userManager.UpdateAsync(user);
+            await context.SaveChangesAsync();
             return true;
         }
     }

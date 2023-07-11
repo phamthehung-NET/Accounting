@@ -9,6 +9,17 @@ namespace Accounting.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            Setting setting = new()
+            {
+                Id = 1,
+                Name = "IsLeapYear",
+                Value = "True",
+            };
+            modelBuilder.Entity<Setting>().HasData(setting);
+        }
+
         public DbSet<Meat> Meats { get; set; }
 
         public DbSet<Person> People { get; set; }
@@ -24,5 +35,7 @@ namespace Accounting.Data
         public DbSet<History> Histories { get; set; }
 
         public DbSet<Log> Logs { get; set; }
+
+        public DbSet<Setting> Settings { get; set; }
     }
 }

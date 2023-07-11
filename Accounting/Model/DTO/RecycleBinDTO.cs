@@ -13,5 +13,9 @@
         public DateTime? CreatedDate { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
+
+        public string LunarCreatedDate { get; set; }
+
+        public string LunarModifiedDate { get; set; }
     }
 }
