@@ -32,7 +32,8 @@ builder.Services.AddIdentity<CustomUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.ExpireTimeSpan = TimeSpan.FromHours(12);
+    options.ExpireTimeSpan = TimeSpan.FromHours(5);
+    options.Cookie.MaxAge = TimeSpan.FromHours(5);
 });
 
 builder.Services.AddLocalization(opt => opt.ResourcesPath = "Resources");

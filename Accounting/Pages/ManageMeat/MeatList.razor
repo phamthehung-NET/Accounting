@@ -106,8 +106,6 @@
 
     Uri Uri;
 
-    bool IsLeapYear;
-
     Dictionary<string, string> Query = new()
     {
         {"pageIndex", ""},
@@ -119,21 +117,50 @@
 
     List<Header> Headers = new();
 
+    List<Year> LeapYear = new();
+
     string Sorting = "id_desc";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        IsLeapYear = bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting));
-        Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        try
+        {
+            LeapYear.Clear();
+            var today = DateTime.Now;
+            var yesterday = DateTime.Now.AddDays(-1);
 
-        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
-        Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now.AddDays(-1))}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "TodayEntryPrice", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now)}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "YesterdaySalePrice", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now.AddDays(-1))}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "TodaySalePrice", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now)}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
+            if (today.Year != yesterday.Year)
+            {
+                LeapYear = SettingRepo.GetLeapYear(new List<int>() { today.Year, yesterday.Year });
+            }
+            else
+            {
+                LeapYear = SettingRepo.GetLeapYear(new List<int>() { today.Year });
+            }
+            Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+
+            Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
+            Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
+            Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
+            Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, yesterday)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "TodayEntryPrice", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, today)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "YesterdaySalePrice", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, yesterday)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "TodaySalePrice", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, today)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Meat List > OnInitialized()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
 @inject ISettingRepository SettingRepo
 @attribute [Authorize]
 
@@ -94,9 +95,9 @@
     {
         if (firstRender)
         {
-            IsLeapYear = bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting));
+            IsLeapYear = SettingRepo.IsLeapYear(DateTime.Now.Year);
             await GetWastedData();
-            GetChartData();
+            await GetChartData();
         }
     }
 
@@ -109,8 +110,17 @@
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Dashboard > GetWastedData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
@@ -121,39 +131,55 @@
         await GetWastedData();
     }
 
-    void GetChartData()
+    async Task GetChartData()
     {
-        var data = DasboardRepo.GetChartData();
-        
-        List<string> colors = new();
-        List<decimal> showingData = new();
-
-        data.ForEach(item =>
+        try
         {
-            if(item.WastedWeight > 0 && item.WastedWeight <= 3)
-            {
-                colors.Add(Constants.GoodChartColor);
-                showingData.Add(item.WastedWeight);
-                config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
-            }
-            else if(item.WastedWeight > 3 && item.WastedWeight <= 5)
-            {
-                colors.Add(Constants.WarningChartColor);
-                showingData.Add(item.WastedWeight);
-                config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
-            }
-            else if(item.WastedWeight > 5)
-            {
-                colors.Add(Constants.NotGoodChartColor);
-                showingData.Add(item.WastedWeight);
-                config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
-            }
-        });
+            var data = DasboardRepo.GetChartData();
 
-        BarDataset<decimal> dataset = new BarDataset<decimal>(showingData)
+            List<string> colors = new();
+            List<decimal> showingData = new();
+
+            data.ForEach(item =>
+            {
+                if (item.WastedWeight > 0 && item.WastedWeight <= 3)
+                {
+                    colors.Add(Constants.GoodChartColor);
+                    showingData.Add(item.WastedWeight);
+                    config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
+                }
+                else if (item.WastedWeight > 3 && item.WastedWeight <= 5)
+                {
+                    colors.Add(Constants.WarningChartColor);
+                    showingData.Add(item.WastedWeight);
+                    config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
+                }
+                else if (item.WastedWeight > 5)
+                {
+                    colors.Add(Constants.NotGoodChartColor);
+                    showingData.Add(item.WastedWeight);
+                    config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
+                }
+            });
+
+            BarDataset<decimal> dataset = new BarDataset<decimal>(showingData)
+                {
+                    BackgroundColor = colors.ToArray(),
+                };
+            config.Data.Datasets.Add(dataset);
+        }
+        catch (Exception ex)
         {
-            BackgroundColor = colors.ToArray(),
-        };
-        config.Data.Datasets.Add(dataset);
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Dashboard > GetChartData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 }

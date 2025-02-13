@@ -74,3 +74,21 @@ a, .btn-link {
 .sidebar .is-opened {
     transform: translateX(0);
 }
+
+.paid-box-vi {
+    content: url(/paid.png);
+    z-index: 1;
+    left: 25%;
+    top: 5%;
+    rotate: 30deg;
+    width: 300px;
+}
+
+.paid-box-en {
+    content: url(/paid-en.png);
+    z-index: 1;
+    left: 20%;
+    top: 15%;
+    rotate: 30deg;
+    width: 300px;
+}

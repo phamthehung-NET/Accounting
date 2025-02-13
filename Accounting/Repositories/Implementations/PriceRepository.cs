@@ -18,7 +18,7 @@ namespace Accounting.Repositories.Implementations
             context = _context;
             httpContext = _httpContext;
             userManager = _userManager;
-            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
+            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public async Task<bool> UpdateItemPrice(Dictionary<int, int?> inputEntryPrice, Dictionary<int, int?> inputSalePrice, DateTime? date)

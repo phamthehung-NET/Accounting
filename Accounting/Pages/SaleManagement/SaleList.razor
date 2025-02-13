@@ -60,6 +60,7 @@
                     <div class="card-header d-flex justify-content-between">
                         <div class="fw-bold">@bill.PersonName</div>
                         <div class="d-flex">
+                            <div class="me-2">@(bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(bill.LunarActiveDate) ? HelperFunctions.GetLunarDate(SettingRepo.IsLeapYear(bill.ActiveDate.Value.Year), bill.ActiveDate.Value) : bill.LunarActiveDate) + ")")</div>
                             <div>@(bill.Items.Count() + " " + LRes["item(s)"])</div>
                             @if (bill.Items.Any())
                             {
@@ -68,7 +69,11 @@
                         </div>
                     </div>
                     <div class="card-body overflow-auto" style="height: 15rem">
-                        <ul class="list-group list-group-flush">
+                        @if(bill.IsPaid.Value)
+                        {
+                            <div class="position-absolute paid-box-en"></div>
+                        }
+                        <ul class="list-group list-group-flush" style="position:relative">
                             @if (bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
                             {
                                 <li class="list-group-item">
@@ -160,7 +165,10 @@
 
     Pagination<BillDTO> Bills;
 
-    PaginationObject Pagination = new();
+    PaginationObject Pagination = new()
+    {
+        PageSize = 9
+    };
 
     Dictionary<string, string> Query = new()
     {
@@ -178,22 +186,20 @@
     BillDTO SelectedBill = new();
 
     DateRangeDTO DateRange = new()
-        {
-            StartDate = DateTimeOffset.Now,
-            EndDate = DateTimeOffset.Now,
-        };
+    {
+        StartDate = DateTimeOffset.Now,
+        EndDate = DateTimeOffset.Now,
+    };
+
+    List<Year> LeapYear = new();
 
     string ShowingDate = string.Empty;
 
     bool? IsPaid;
 
-    bool IsLeapYear;
-
     protected override void OnInitialized()
     {
-        IsLeapYear = bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting));
         Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        ShowingDate = HandleShowDate();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -262,6 +268,7 @@
             }
 
             Bills = BillRepo.GetAll(Keyword, DateRange.StartDate != null ? DateRange.StartDate.Value.DateTime : null, DateRange.EndDate != null ? DateRange.EndDate.Value.DateTime : null, Pagination.PageIndex, Pagination.PageSize, PriceType.Sale, IsPaid);
+            ShowingDate = await HandleShowDate();
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
@@ -332,21 +339,44 @@
         Query["isPaid"] = IsPaid.ToString();
 
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));
-
-        ShowingDate = HandleShowDate();
         await GetData();
     }
 
-    string HandleShowDate()
+    async Task<string> HandleShowDate()
     {
-        if (DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
+        try
         {
-            return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
+            LeapYear.Clear();
+            LeapYear = SettingRepo.GetLeapYear(new List<int>() { DateRange.StartDate.Value.DateTime.Year, DateRange.EndDate.Value.DateTime.Year });
+            if (!LeapYear.Any())
+            {
+                LeapYear.Add(new() { Id = 1, Name = DateRange.StartDate.Value.Year, IsLeapYear = false });
+                LeapYear.Add(new() { Id = 2, Name = DateRange.EndDate.Value.Year, IsLeapYear = false });
+            }
+            if (DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
+            {
+                return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
+            }
+            else
+            {
+                return $"{LRes["Showing"]}: {LRes["date"]} {LRes["from"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]}) {LRes["to"]} {DateRange.EndDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, DateRange.EndDate.Value.DateTime)} {LRes["LunarDate"]})";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            return $"{LRes["Showing"]}: {LRes["date"]} {LRes["from"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]}) {LRes["to"]} {DateRange.EndDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(IsLeapYear, DateRange.EndDate.Value.DateTime)} {LRes["LunarDate"]})";
+            Log log = new()
+                {
+                    CreatedDate = DateTime.Now,
+                    Location = "Sale List > HandleShowDate()",
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
+
+        return "";
     }
 
     async Task HandlePayingBill()
@@ -388,7 +418,7 @@
 
     async Task HandleShowMore()
     {
-        Pagination.PageSize += 5;
+        Pagination.PageSize += 6;
         Query["pageSize"] = Pagination.PageSize.ToString();
 
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString(Uri.AbsolutePath, Query.Where(x => !string.IsNullOrEmpty(x.Value))));

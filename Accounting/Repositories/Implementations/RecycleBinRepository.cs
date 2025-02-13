@@ -24,7 +24,7 @@ namespace Accounting.Repositories.Implementations
             billRepository = _billRepository;
             meatRepository = _meatRepository;
             peopleRepository = _peopleRepository;
-            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
+            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public Pagination<RecycleBinDTO> GetAll(string keyword, RecycleBinObjectType? type, string order, int pageIndex, int pageSize)
@@ -48,12 +48,12 @@ namespace Accounting.Repositories.Implementations
                                   LunarModifiedDate = r.LunarModifiedDate,
                                   ObjectId = r.ObjectId.Value,
                                   Type = r.Type,
-                                  ObjectName = r.Type == (int)RecycleBinObjectType.Meat ? 
-                                    $"{m.Name} {HelperFunctions.RenderMeatType(Lres, m.Type)}" : r.Type == (int)RecycleBinObjectType.Bill ? 
+                                  ObjectName = r.Type == (int)RecycleBinObjectType.Meat ?
+                                    $"{m.Name} {HelperFunctions.RenderMeatType(Lres, m.Type)}" : r.Type == (int)RecycleBinObjectType.Bill ?
                                     $"{((PriceType)b.Type == PriceType.Sale ? Lres["SaleBill"] : Lres["EntryBill"])} {Lres["of"]} {pb.Name} {Lres["at"]} {b.ActiveDate.Value.ToString("dd/MM/yyyy")}" : r.Type == (int)RecycleBinObjectType.Person ?
                                     $"{HelperFunctions.HandleDisplayPersonType(Lres, p.Source)} {Lres["named"]} {p.Name}" : string.Empty,
                               });
-            if(type != null)
+            if (type != null)
             {
                 recycleBin = recycleBin.Where(x => x.Type == (int)type);
             }
@@ -86,13 +86,13 @@ namespace Accounting.Repositories.Implementations
                         return false;
                     }
                     person.IsDeleted = false;
-                    
+
                     context.Remove(recycleBin);
                     context.SaveChanges();
                     return true;
                 case RecycleBinObjectType.Bill:
                     var bill = context.Bills.FirstOrDefault(x => x.Id == objectId);
-                    if(bill == null || IsBillExisted(bill))
+                    if (bill == null || IsBillExisted(bill))
                     {
                         return false;
                     }

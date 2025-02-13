@@ -1,0 +1,28 @@
+﻿@page "/system-setting"
+@using Microsoft.Extensions.Localization;
+@inject ISettingRepository SettingRepo
+@inject IStringLocalizer<Resource> LRes
+
+<div class="container-fluid">
+    <CommonLabel DisplayText="@LRes["SystemSettings"]" Color="@Constants.PrimaryColor"/>
+        <div class="d-flex mt-2">
+            <div class="nav flex-column nav-pills me-3 w-25" id="setting-tab" role="tablist" aria-orientation="vertical">
+                <button class="nav-link active" id="date-time-setting-tab" data-bs-toggle="pill" data-bs-target="#date-time-setting" type="button" role="tab" aria-controls="date-time-setting" aria-selected="true">@LRes["DateTimeSettings"]</button>
+                <button class="nav-link" id="language-setting-tab" data-bs-toggle="pill" data-bs-target="#language-setting" type="button" role="tab" aria-controls="language-setting" aria-selected="false">@LRes["Language"]</button>
+                @* <button class="nav-link" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Messages</button>
+                <button class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</button> *@
+            </div>
+            <div class="tab-content w-100" id="setting-tabContent">
+                <div class="tab-pane fade show active" id="date-time-setting" role="tabpanel" aria-labelledby="date-time-setting-tab">
+                    <DateTimeSettings/>
+                </div>
+                <div class="tab-pane fade" id="language-setting" role="tabpanel" aria-labelledby="language-setting-tab">
+                    <CultureSelector/>
+                </div>
+                @* <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">...</div>
+                <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div> *@
+            </div>
+        </div>
+</div>
+
+@code { }

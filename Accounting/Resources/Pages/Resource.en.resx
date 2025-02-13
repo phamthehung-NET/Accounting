@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
   <data name="Accounting" xml:space="preserve">
     <value>Accounting</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="BillIsCreated" xml:space="preserve">
     <value>Bill is created</value>
+  </data>
+  <data name="BillIsRemoved" xml:space="preserve">
+    <value>Move to recycle bin</value>
   </data>
   <data name="billwithprice" xml:space="preserve">
     <value>bill with prices</value>
@@ -306,6 +312,9 @@
   <data name="Frozen Meat" xml:space="preserve">
     <value>Frozen</value>
   </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Hello</value>
+  </data>
   <data name="here" xml:space="preserve">
     <value>here</value>
   </data>
@@ -327,8 +336,14 @@
   <data name="ItemDetail" xml:space="preserve">
     <value>Item detail</value>
   </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
   <data name="Lastest 10 days wasted weight" xml:space="preserve">
     <value>Lastest 10 days wasted weight</value>
+  </data>
+  <data name="LeapYearSetting" xml:space="preserve">
+    <value>Leap year setting</value>
   </data>
   <data name="Location" xml:space="preserve">
     <value>Location</value>
@@ -336,8 +351,14 @@
   <data name="Log" xml:space="preserve">
     <value>Activity log</value>
   </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Login</value>
+  </data>
   <data name="Log list" xml:space="preserve">
     <value>Log list</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Logout</value>
   </data>
   <data name="LunarDate" xml:space="preserve">
     <value>Lunar date</value>
@@ -476,6 +497,9 @@
   </data>
   <data name="Restore" xml:space="preserve">
     <value>Restore</value>
+  </data>
+  <data name="RestoreConfirmation" xml:space="preserve">
+    <value>Are you sure to restore this item?</value>
   </data>
   <data name="RestoreFailed" xml:space="preserve">
     <value>Current list is already exist a new item has the same properties, cannot restore</value>

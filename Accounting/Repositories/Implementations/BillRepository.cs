@@ -18,7 +18,7 @@ namespace Accounting.Repositories.Implementations
         {
             context = _context;
             Lres = _Lres;
-            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
+            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public async Task<bool> AddBill(BillDTO res, DateTime? currentDate)
@@ -197,13 +197,13 @@ namespace Accounting.Repositories.Implementations
 
                 if (itemDb != null && item.Price != null && item.Price.Value > 0 && item.Weight != null && item.Weight > 0)
                 {
-                    if(item.Price != itemDb.Price || item.Weight != itemDb.Weight)
+                    if (item.Price != itemDb.Price || item.Weight != itemDb.Weight)
                     {
-                        if(item.Price != itemDb.Price)
+                        if (item.Price != itemDb.Price)
                         {
                             itemDb.Price = item.Price;
                         }
-                        if(item.Weight.Value != itemDb.Weight)
+                        if (item.Weight.Value != itemDb.Weight)
                         {
                             itemDb.Weight = item.Weight.Value;
                         }

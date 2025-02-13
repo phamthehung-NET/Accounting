@@ -336,8 +336,14 @@
   <data name="ItemDetail" xml:space="preserve">
     <value>Chi tiết vật phẩm</value>
   </data>
+  <data name="Language" xml:space="preserve">
+    <value>Ngôn ngữ</value>
+  </data>
   <data name="Lastest 10 days wasted weight" xml:space="preserve">
     <value>Trọng lượng hao phí 10 ngày gần nhất</value>
+  </data>
+  <data name="LeapYearSetting" xml:space="preserve">
+    <value>Cài đặt năm nhuận</value>
   </data>
   <data name="Location" xml:space="preserve">
     <value>Vị trí</value>

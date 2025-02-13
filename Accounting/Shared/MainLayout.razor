@@ -14,13 +14,13 @@
     </AuthorizeView>
 
     <main>
-        <div class="top-row px-4 auth">
+        <div class="top-row px-4 auth" style="z-index: 2">
             <AuthorizeView>
                 <button title="Navigation menu" class="navbar-toggler me-auto" id="btn-nav-toggler" aria-expanded="true" @onclick="async () => await ToggleSideBar()">
                     <i class="fa-regular fa-xmark"></i>
                 </button>
             </AuthorizeView>
-            <CultureSelector/>
+            @* <CultureSelector/> *@
             <LoginDisplay />
             <a class="nav-link text-black ms-0" href="/system-info"><i class="fa-regular fa-circle-info"></i> @LRes["About"]</a>
         </div>

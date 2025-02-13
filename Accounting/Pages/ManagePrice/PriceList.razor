@@ -17,11 +17,11 @@
             @if (Meats != null)
             {
                 <CommonDataTable Context="Context" 
-                    Headers="Headers" 
-                    TData="MeatDTO"
-                    PaginationData="Meats" 
-                    Sorting="@Sorting" 
-                    SortData="async (sortingString) => await SortData(sortingString)">
+                Headers="Headers" 
+                TData="MeatDTO"
+                PaginationData="Meats" 
+                Sorting="@Sorting" 
+                SortData="async (sortingString) => await SortData(sortingString)">
                     <TBody>
                         <tr>
                             <td>@Context.Name</td>
@@ -63,19 +63,47 @@
 
     Dictionary<int, int?> InputSaleList = new();
 
-    bool IsLeapYear;
+    List<Year> LeapYear = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        IsLeapYear = bool.Parse(SettingRepo.GetSettingValue(Constants.IsLeapYearSetting));
+        try
+        {
+            LeapYear.Clear();
+            var today = DateTime.Now;
+            var yesterday = DateTime.Now.AddDays(-1);
 
-        Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
-        Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
-        Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now.AddDays(-1))}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now)}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now.AddDays(-1))}</div>", Ordering = true });
-        Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(IsLeapYear, DateTime.Now)}</div>", Ordering = true });
+            if (today.Year != yesterday.Year)
+            {
+                LeapYear = SettingRepo.GetLeapYear(new List<int>() { today.Year, yesterday.Year });
+            }
+            else
+            {
+                LeapYear = SettingRepo.GetLeapYear(new List<int>() { today.Year });
+            }
+
+            Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
+            Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
+            Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
+            Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, yesterday)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, today)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, yesterday)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, today)}</div>", Ordering = true });
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+                {
+                    CreatedDate = DateTime.Now,
+                    Location = "Price List > OnInitialized()",
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

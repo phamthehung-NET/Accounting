@@ -1,4 +1,13 @@
-﻿<h3><span class=@("border-start border-5 me-2 border-" + Color)></span> @DisplayText</h3>
+﻿<h3><span class=@("border-start border-5 me-2 border-" + Color)></span>
+    @if(HeaderContent != null)
+    {
+        @HeaderContent;
+    }
+    else
+    {
+        @DisplayText;
+    }
+</h3>
 
 @code {
     [Parameter]
@@ -6,4 +15,7 @@
 
     [Parameter]
     public string Color { get; set; }
+
+    [Parameter]
+    public RenderFragment HeaderContent { get; set; }
 }

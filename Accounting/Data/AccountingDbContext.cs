@@ -5,19 +5,17 @@ namespace Accounting.Data
 {
     public class AccountingDbContext : DbContext
     {
-        public AccountingDbContext(DbContextOptions<AccountingDbContext> options) : base(options)
-        {
-        }
+        public AccountingDbContext(DbContextOptions<AccountingDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Setting setting = new()
+            Year year = new()
             {
                 Id = 1,
-                Name = "IsLeapYear",
-                Value = "True",
+                IsLeapYear = false,
+                Name = DateTime.Now.Year,
             };
-            modelBuilder.Entity<Setting>().HasData(setting);
+            modelBuilder.Entity<Year>().HasData(year);
         }
 
         public DbSet<Meat> Meats { get; set; }
@@ -29,7 +27,7 @@ namespace Accounting.Data
         public DbSet<MeatBillPrice> MeatBillPrices { get; set; }
 
         public DbSet<Bill> Bills { get; set; }
-        
+
         public DbSet<RecycleBin> RecycleBins { get; set; }
 
         public DbSet<History> Histories { get; set; }
@@ -37,5 +35,7 @@ namespace Accounting.Data
         public DbSet<Log> Logs { get; set; }
 
         public DbSet<Setting> Settings { get; set; }
+
+        public DbSet<Year> YearSettings { get; set; }
     }
 }

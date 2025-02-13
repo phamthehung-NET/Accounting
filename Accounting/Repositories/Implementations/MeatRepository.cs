@@ -1,8 +1,8 @@
-﻿using Accounting.Utilities;
-using Accounting.Data;
+﻿using Accounting.Data;
 using Accounting.Model;
 using Accounting.Model.DTO;
 using Accounting.Repositories.Interfaces;
+using Accounting.Utilities;
 
 namespace Accounting.Repositories.Implementations
 {
@@ -14,7 +14,7 @@ namespace Accounting.Repositories.Implementations
         public MeatRepository(AccountingDbContext _context)
         {
             context = _context;
-            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
+            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public bool AddMeat(MeatDTO req)

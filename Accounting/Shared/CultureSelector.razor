@@ -1,12 +1,69 @@
 ﻿@using System.Globalization
 @inject NavigationManager Nav
 
-<select @bind="Culture" style="width: 15rem" class="form-control px-2">
+@* <select @bind="Culture" style="width: 15rem" class="form-control px-2">
     @foreach (var culture in supportedCultures)
     {
         <option value="@culture">@culture.NativeName</option>
     }
-</select>
+</select> *@
+<div class="row align-items-start">
+    <div class="col">
+        @foreach (var culture in supportedCultures)
+        {
+            if (culture.TwoLetterISOLanguageName.Equals(Culture.TwoLetterISOLanguageName))
+            {
+                <div class="form-check">
+                    <input class="form-check-input" @onclick="() => Culture = culture" type="radio" name="culture-radio" id="culture-radio-@(culture.Name)" checked>
+                    <label class="form-check-label" for="culture-radio-@(culture.Name)">
+                        @culture.NativeName
+                    </label>
+                </div>
+            }
+            else
+            {
+                <div class="form-check">
+                    <input class="form-check-input" @onclick="() => Culture = culture" type="radio" name="culture-radio" id="culture-radio-@(culture.Name)">
+                    <label class="form-check-label" for="culture-radio-@(culture.Name)">
+                        @culture.NativeName
+                    </label>
+                </div>
+            }
+        }
+
+        @foreach (var culture in AllCultures.Take(33))
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="culture-radio" id="culture-radio-@(culture.Name)" disabled>
+                <label class="form-check-label" for="culture-radio-@(culture.Name)">
+                    @culture.NativeName
+                </label>
+            </div>
+        }
+    </div>
+    <div class="col">
+        @foreach (var culture in AllCultures.Skip(33).Take(35))
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="culture-radio" id="culture-radio-@(culture.Name)" disabled>
+                <label class="form-check-label" for="culture-radio-@(culture.Name)">
+                    @culture.NativeName
+                </label>
+            </div>
+        }
+    </div>
+    <div class="col">
+        @foreach (var culture in AllCultures.Skip(68).Take(35))
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="culture-radio" id="culture-radio-@(culture.Name)" disabled>
+                <label class="form-check-label" for="culture-radio-@(culture.Name)">
+                    @culture.NativeName
+                </label>
+            </div>
+        }
+    </div>
+</div>
 
 @code
 {
@@ -19,12 +76,25 @@
         new CultureInfo("en-US"),
     };
 
+    List<CultureInfo> AllCultures;
+
     /// <summary>
     /// Initialize culture
     /// </summary>
     protected override void OnInitialized()
     {
         Culture = CultureInfo.CurrentCulture;
+        AllCultures = CultureInfo.GetCultures(CultureTypes.NeutralCultures)
+                        .Where(x => !x.Name.Equals("en") && !x.Name.Equals("vi"))
+                        .Take(100)
+                        .ToList();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+        }
     }
 
     /// <summary>

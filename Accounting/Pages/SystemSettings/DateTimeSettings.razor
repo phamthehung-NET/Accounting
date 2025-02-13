@@ -1,0 +1,49 @@
+﻿@inject IStringLocalizer<Resource> LRes
+@inject ISettingRepository SettingRepo
+
+
+<div class="accordion-item">
+    <button class="accordion-button fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#year-collapse" aria-expanded="true" aria-controls="year-collapse">
+        @LRes["LeapYearSetting"]
+    </button>
+    <div id="year-collapse" class="accordion-collapse collapse show" aria-labelledby="year-setting">
+        <div class="accordion-body">
+            @if (Years.Any())
+            {
+                @foreach (var item in Years)
+                {
+                    <div class="d-flex justify-content-between">
+                        <div class="fw-bold">@item.Name</div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" checked="@item.IsLeapYear" @onclick="() => ChangeSetting(item.Name, !item.IsLeapYear)">
+                        </div>
+                    </div>
+                    <hr>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    List<Year> Years = new();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            Years = (List<Year>)SettingRepo.GetListYear();
+            StateHasChanged();
+        }
+    }
+
+    void ChangeSetting(int year, bool isLeapYear)
+    {
+        if (SettingRepo.UpdateLeapYear(year, isLeapYear))
+        {
+            var record = Years.FirstOrDefault(x => x.Name == year);
+            record.IsLeapYear = isLeapYear;
+            StateHasChanged();
+        }
+    }
+}

@@ -14,7 +14,7 @@ namespace Accounting.Repositories.Implementations
         public PeopleRepository(AccountingDbContext _context)
         {
             context = _context;
-            IsLeapYear = bool.Parse(context.Settings.FirstOrDefault(x => x.Name.Equals(Constants.IsLeapYearSetting)).Value);
+            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public bool AddPerson(Person res)
@@ -76,7 +76,7 @@ namespace Accounting.Repositories.Implementations
                              {
                                  Id = y.NearestTransactionId,
                                  ActivateDate = y.NearestTransaction,
-                                 LunarActiveDate = y.LunarNearestTransaction                                 
+                                 LunarActiveDate = y.LunarNearestTransaction
                              }).Where(x => x.ActivateDate != null).OrderByDescending(x => x.ActivateDate).FirstOrDefault(),
                          });
 
