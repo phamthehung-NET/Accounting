@@ -2,12 +2,15 @@
 @using BlazorDateRangePicker
 @using Microsoft.AspNetCore.WebUtilities;
 @using Microsoft.Extensions.Localization;
+@using OfficeOpenXml.Style
+@using OfficeOpenXml.Table
 @inject IStringLocalizer<Resource> LRes
 @inject IBillRepository BillRepo
 @inject NavigationManager NavigationManager 
 @inject IJSRuntime JsRuntime
 @inject ILogRepository LogRepo
 @inject ISettingRepository SettingRepo
+@inject IPrintingService PrintingService
 @attribute [Authorize]
 
 <PageTitle>@LRes["Manage sale"]</PageTitle>
@@ -71,7 +74,7 @@
                     <div class="card-body overflow-auto" style="height: 15rem">
                         @if(bill.IsPaid.Value)
                         {
-                            <div class="position-absolute paid-box-en"></div>
+                            <div class="position-absolute paid-box-@(CultureInfo.CurrentCulture.TwoLetterISOLanguageName)"></div>
                         }
                         <ul class="list-group list-group-flush" style="position:relative">
                             @if (bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
@@ -110,6 +113,9 @@
                             {
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             }
+                            <button class="btn btn-outline-primary" @onclick="@(() => Print(bill))">
+                                <i class="fa-regular fa-print"></i>
+                            </button>
                             <div class="btn-group dropup">
                                 <button type="button" class="btn border-0 bg-transparent rounded-0 p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-regular fa-ellipsis-vertical"></i>
@@ -161,15 +167,27 @@
 </div>
 
 @code {
+    /// <summary>
+    /// Keyword to search
+    /// </summary>
     string Keyword = string.Empty;
 
+    /// <summary>
+    /// List data
+    /// </summary>
     Pagination<BillDTO> Bills;
 
+    /// <summary>
+    /// The pagination object to paginate data 
+    /// </summary>
     PaginationObject Pagination = new()
     {
         PageSize = 9
     };
 
+    /// <summary>
+    /// Query params of the page
+    /// </summary>
     Dictionary<string, string> Query = new()
     {
         {"pageSize", ""},
@@ -181,8 +199,9 @@
 
     Uri Uri;
 
-    List<BillDTO> SaveList = new();
-
+    /// <summary>
+    /// Save the selected bill
+    /// </summary>
     BillDTO SelectedBill = new();
 
     DateRangeDTO DateRange = new()
@@ -476,5 +495,90 @@
         {
             IsPaid = bool.Parse(value);
         }
+    }
+
+    void Print(BillDTO bill)
+    {
+        var file = Convert.ToBase64String(File.ReadAllBytes("wwwroot/a.pdf"));
+
+        ExcelPackage excel = new();
+
+        var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
+
+        workSheet.TabColor = System.Drawing.Color.Black;
+        workSheet.DefaultRowHeight = 12;
+
+        workSheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        workSheet.Row(1).Style.Font.Bold = true;
+        workSheet.Row(1).Style.Font.Size = 22;
+        workSheet.Cells["A1:D1"].Merge = true;
+        workSheet.Cells[1, 1].Value = "Quyet Viet";
+        workSheet.Row(1).Height = 23;
+        workSheet.Cells[2, 4].Value = "Id: 100";
+        workSheet.Cells["A3:D3"].Merge = true;
+        workSheet.Cells["A3"].Value = "Buyer name: Abcd Efgh";
+        workSheet.Cells["A4:D4"].Merge = true;
+        workSheet.Row(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        workSheet.Cells[4, 1].Value = "Sale Bill";
+        workSheet.Row(4).Style.Font.Size = 20;
+        workSheet.Cells[5, 1].Value = "Name";
+        workSheet.Cells[5, 2].Value = "Weight (Kg)";
+        workSheet.Cells[5, 3].Value = "Price";
+        workSheet.Cells[5, 4].Value = "Total";
+        workSheet.Row(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+        int row = 6;
+        foreach(var item in bill.Items)
+        {
+            workSheet.Cells[row, 1].Value = item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType);
+            workSheet.Cells[row, 2].Value = item.Weight + " Kg";
+            workSheet.Cells[row, 3].Value = item.Price;
+            workSheet.Cells[row, 4].Value = item.ItemPrice == 0 ? string.Empty : item.ItemPrice.ToString("n0") + ".000 VND";
+            workSheet.Cells[$"B{row}:D{row}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            row++;
+        }
+
+        var maxProduct = 20;
+        var resSpace = maxProduct - row;
+
+        workSheet.Cells[maxProduct, 1].Value = "Total";
+        workSheet.Cells[maxProduct, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        workSheet.Cells[maxProduct, 4].Value = bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND";
+
+        ExcelRange range = workSheet.Cells[$"A5:D{maxProduct}"];
+        ExcelTable table = workSheet.Tables.Add(range, "Table1");
+        table.TableStyle = TableStyles.Light1;
+
+        workSheet.Cells[maxProduct + 1, 2, maxProduct + 1, 4].Merge = true;
+        workSheet.Row(maxProduct + 1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+        workSheet.Cells[maxProduct + 1, 2].Value = $"Hai Duong, ngay {bill.ActiveDate.Value.Day} thang {bill.ActiveDate.Value.Month} nam {bill.ActiveDate.Value.Year}";
+
+        workSheet.Cells[maxProduct + 2, 3, maxProduct + 2, 4].Merge = true;
+        workSheet.Row(maxProduct + 2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        workSheet.Cells[maxProduct + 2, 3].Value = "Owner";
+
+        workSheet.Cells[maxProduct + 5, 3, maxProduct + 5, 4].Merge = true;
+        workSheet.Row(maxProduct + 5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        workSheet.Cells[maxProduct + 5, 3].Value = "Pham Thi Viet";
+
+        workSheet.Cells[$"A1:D{maxProduct + 5}"].Style.Font.Name = "Times New Roman";
+
+        workSheet.Columns[1, 4].AutoFit();
+        string path = @"C:\Users\Admin\Downloads\test.xlsx";
+        
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+
+        FileStream objFileStrm = File.Create(path);
+        objFileStrm.Close();
+
+        // Write content to excel file
+        File.WriteAllBytes(path, excel.GetAsByteArray());
+        //Close Excel package
+        excel.Dispose();
+
+        PrintingService.Print(new PrintOptions(file) { Base64 = true });
     }
 }

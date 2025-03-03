@@ -5,7 +5,7 @@
         public int? Id { get; set; }
 
         public int? MeatId { get; set; }
-        
+
         public string MeatName { get; set; }
 
         public int? MeatType { get; set; }
@@ -29,5 +29,13 @@
         public string LunarCreatedDate { get; set; }
 
         public string LunarModifiedDate { get; set; }
+
+        public decimal ItemPrice
+        {
+            get
+            {
+                return (Weight ?? 0) * (Price ?? 0);
+            }
+        }
     }
 }
