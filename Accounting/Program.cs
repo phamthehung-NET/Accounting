@@ -2,6 +2,7 @@ using Accounting.Data;
 using Accounting.Model;
 using Accounting.Repositories.Implementations;
 using Accounting.Repositories.Interfaces;
+using Append.Blazor.Printing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IRecycleBinRepository, RecycleBinRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<ISettingRepository, SettingRepository>();
+builder.Services.AddScoped<IPrintingService, PrintingService>();
 
 builder.Services.AddHttpContextAccessor();
 

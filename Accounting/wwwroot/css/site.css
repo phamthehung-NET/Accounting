@@ -82,6 +82,7 @@ a, .btn-link {
     top: 5%;
     rotate: 30deg;
     width: 300px;
+    opacity: .3;
 }
 
 .paid-box-en {
@@ -91,4 +92,5 @@ a, .btn-link {
     top: 15%;
     rotate: 30deg;
     width: 300px;
+    opacity: .3;
 }

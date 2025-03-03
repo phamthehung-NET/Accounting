@@ -5,6 +5,7 @@
 @inject IJSRuntime JsRuntime
 @inject ILogRepository LogRepo
 @inject ISettingRepository SettingRepo
+@inject IPrintingService PrintingService
 @attribute [Authorize]
 
 <PageTitle>@LRes["Manage entries"]</PageTitle>
@@ -107,6 +108,9 @@
                             {
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             }
+                            <button class="btn btn-outline-primary" @onclick="@(() => Print())">
+                                <i class="fa-regular fa-print"></i>
+                            </button>
                             <div class="btn-group dropup">
                                 <button type="button" class="btn border-0 bg-transparent rounded-0 p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-regular fa-ellipsis-vertical"></i>
@@ -473,5 +477,11 @@
         {
             IsPaid = bool.Parse(value);
         }
+    }
+
+    void Print()
+    {
+        var file = Convert.ToBase64String(File.ReadAllBytes("wwwroot/a.pdf"));
+        PrintingService.Print(new PrintOptions(file) {Base64 = true});
     }
 }
