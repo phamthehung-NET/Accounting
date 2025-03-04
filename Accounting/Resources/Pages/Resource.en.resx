@@ -189,6 +189,9 @@
   <data name="Buyer" xml:space="preserve">
     <value>Buyer</value>
   </data>
+  <data name="BuyerName" xml:space="preserve">
+    <value>Buyer name</value>
+  </data>
   <data name="Calves" xml:space="preserve">
     <value>Calves</value>
   </data>
@@ -236,6 +239,9 @@
   </data>
   <data name="DateTimeSettings" xml:space="preserve">
     <value>Date and time</value>
+  </data>
+  <data name="day" xml:space="preserve">
+    <value>day</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
@@ -393,6 +399,9 @@
   <data name="ModifiedHistory" xml:space="preserve">
     <value>Modified histories</value>
   </data>
+  <data name="month" xml:space="preserve">
+    <value>month</value>
+  </data>
   <data name="Move to recycle bin success" xml:space="preserve">
     <value>Move to recycle bin successfully</value>
   </data>
@@ -426,6 +435,9 @@
   <data name="Normal Meat" xml:space="preserve">
     <value>Fresh</value>
   </data>
+  <data name="Number" xml:space="preserve">
+    <value>Number</value>
+  </data>
   <data name="of" xml:space="preserve">
     <value>of</value>
   </data>
@@ -452,6 +464,9 @@
   </data>
   <data name="PeopleList" xml:space="preserve">
     <value>People list</value>
+  </data>
+  <data name="PerPrice" xml:space="preserve">
+    <value>Per price</value>
   </data>
   <data name="Person" xml:space="preserve">
     <value>Person</value>
@@ -515,6 +530,9 @@
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Sale list</value>
+  </data>
+  <data name="SallingBill" xml:space="preserve">
+    <value>Sale Bill</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
@@ -605,6 +623,9 @@
   </data>
   <data name="withPrice" xml:space="preserve">
     <value>with price</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>year</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>

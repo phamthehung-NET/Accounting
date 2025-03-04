@@ -189,6 +189,9 @@
   <data name="Buyer" xml:space="preserve">
     <value>Người mua</value>
   </data>
+  <data name="BuyerName" xml:space="preserve">
+    <value>Tên người mua</value>
+  </data>
   <data name="Calves" xml:space="preserve">
     <value>Bê</value>
   </data>
@@ -236,6 +239,9 @@
   </data>
   <data name="DateTimeSettings" xml:space="preserve">
     <value>Thời gian</value>
+  </data>
+  <data name="day" xml:space="preserve">
+    <value>ngày</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Xóa</value>
@@ -393,6 +399,9 @@
   <data name="ModifiedHistory" xml:space="preserve">
     <value>Lịch sử sửa đổi</value>
   </data>
+  <data name="month" xml:space="preserve">
+    <value>tháng</value>
+  </data>
   <data name="Move to recycle bin success" xml:space="preserve">
     <value>Đã chuyển vào thùng rác</value>
   </data>
@@ -426,6 +435,9 @@
   <data name="Normal Meat" xml:space="preserve">
     <value>Thịt tươi</value>
   </data>
+  <data name="Number" xml:space="preserve">
+    <value>Số</value>
+  </data>
   <data name="of" xml:space="preserve">
     <value>của</value>
   </data>
@@ -452,6 +464,9 @@
   </data>
   <data name="PeopleList" xml:space="preserve">
     <value>Danh sách người mua/bán</value>
+  </data>
+  <data name="PerPrice" xml:space="preserve">
+    <value>Đơn giá</value>
   </data>
   <data name="Person" xml:space="preserve">
     <value>Người</value>
@@ -515,6 +530,9 @@
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Danh sách bán hàng</value>
+  </data>
+  <data name="SallingBill" xml:space="preserve">
+    <value>Hóa đơn bán hàng</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Lưu</value>
@@ -605,6 +623,9 @@
   </data>
   <data name="withPrice" xml:space="preserve">
     <value>với giá</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>năm</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Có</value>

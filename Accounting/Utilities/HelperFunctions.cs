@@ -1,6 +1,8 @@
 ﻿using Accounting.Pages;
 using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
+using System.Drawing.Imaging;
+using System.Drawing;
 using System.Globalization;
 
 namespace Accounting.Utilities
@@ -92,6 +94,33 @@ namespace Accounting.Utilities
         public static async Task ToggleSideBar(IJSRuntime jSRuntime)
         {
             await jSRuntime.InvokeVoidAsync("toggleSideBar");
+        }
+
+        public static Image SetImageOpacityAndRotate(string imagePath, float opacity, float angle)
+        {
+            Image img = Image.FromFile(imagePath);
+            int width = img.Width;
+            int height = img.Height;
+
+            Bitmap bmp = new Bitmap(width, height);
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.Clear(Color.Transparent);
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                g.TranslateTransform(width / 2, height / 2);
+                g.RotateTransform(angle); 
+                g.TranslateTransform(-width / 2, -height / 2);
+
+                ColorMatrix matrix = new ColorMatrix();
+                matrix.Matrix33 = opacity;
+                ImageAttributes attributes = new ImageAttributes();
+                attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                g.DrawImage(img, new Rectangle(0, 0, width, height), 0, 0, width, height, GraphicsUnit.Pixel, attributes);
+            }
+            return bmp;
         }
     }
 }

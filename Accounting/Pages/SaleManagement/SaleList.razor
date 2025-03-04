@@ -2,8 +2,13 @@
 @using BlazorDateRangePicker
 @using Microsoft.AspNetCore.WebUtilities;
 @using Microsoft.Extensions.Localization;
+@using OfficeOpenXml.Drawing
 @using OfficeOpenXml.Style
 @using OfficeOpenXml.Table
+@using PdfSharp.Drawing
+@using PdfSharp.Pdf
+@using System.Drawing.Imaging
+@using System.Diagnostics
 @inject IStringLocalizer<Resource> LRes
 @inject IBillRepository BillRepo
 @inject NavigationManager NavigationManager 
@@ -13,7 +18,7 @@
 @inject IPrintingService PrintingService
 @attribute [Authorize]
 
-<PageTitle>@LRes["Manage sale"]</PageTitle>
+<PageTitle>@LRes["Manage Sale"]</PageTitle>
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-2">
@@ -113,7 +118,7 @@
                             {
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             }
-                            <button class="btn btn-outline-primary" @onclick="@(() => Print(bill))">
+                            <button class="btn btn-outline-primary ms-1" @onclick="@(async () => await Print(bill))">
                                 <i class="fa-regular fa-print"></i>
                             </button>
                             <div class="btn-group dropup">
@@ -126,6 +131,7 @@
                                         <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPriceModal" @onclick="() => HandleSelecteBill(bill)">@LRes["EditItemsPrice"]</li>
                                     }
                                     <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#historyModal" @onclick="() => HandleSelecteBill(bill)">@LRes["ViewHistory"]</li>
+                                    <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#historyModal" @onclick="() => Print(bill, true)">@LRes["ExportToExcel"]</li>
                                 </ul>
                             </div>
                         </div>
@@ -497,88 +503,212 @@
         }
     }
 
-    void Print(BillDTO bill)
+    async Task Print(BillDTO bill, bool exportToExcel = false)
     {
-        var file = Convert.ToBase64String(File.ReadAllBytes("wwwroot/a.pdf"));
-
-        ExcelPackage excel = new();
-
-        var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
-
-        workSheet.TabColor = System.Drawing.Color.Black;
-        workSheet.DefaultRowHeight = 12;
-
-        workSheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        workSheet.Row(1).Style.Font.Bold = true;
-        workSheet.Row(1).Style.Font.Size = 22;
-        workSheet.Cells["A1:D1"].Merge = true;
-        workSheet.Cells[1, 1].Value = "Quyet Viet";
-        workSheet.Row(1).Height = 23;
-        workSheet.Cells[2, 4].Value = "Id: 100";
-        workSheet.Cells["A3:D3"].Merge = true;
-        workSheet.Cells["A3"].Value = "Buyer name: Abcd Efgh";
-        workSheet.Cells["A4:D4"].Merge = true;
-        workSheet.Row(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        workSheet.Cells[4, 1].Value = "Sale Bill";
-        workSheet.Row(4).Style.Font.Size = 20;
-        workSheet.Cells[5, 1].Value = "Name";
-        workSheet.Cells[5, 2].Value = "Weight (Kg)";
-        workSheet.Cells[5, 3].Value = "Price";
-        workSheet.Cells[5, 4].Value = "Total";
-        workSheet.Row(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
-        int row = 6;
-        foreach(var item in bill.Items)
+        try
         {
-            workSheet.Cells[row, 1].Value = item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType);
-            workSheet.Cells[row, 2].Value = item.Weight + " Kg";
-            workSheet.Cells[row, 3].Value = item.Price;
-            workSheet.Cells[row, 4].Value = item.ItemPrice == 0 ? string.Empty : item.ItemPrice.ToString("n0") + ".000 VND";
-            workSheet.Cells[$"B{row}:D{row}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            row++;
+            await HelperFunctions.AddIndicator(JsRuntime);
+
+            ExcelPackage excel = new();
+
+            var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
+
+            workSheet.TabColor = System.Drawing.Color.Black;
+            workSheet.DefaultRowHeight = 12;
+
+            workSheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Row(1).Style.Font.Bold = true;
+            workSheet.Row(1).Style.Font.Size = 22;
+            workSheet.Cells["A1:D1"].Merge = true;
+            workSheet.Cells[1, 1].Value = "Quyết Viết";
+            workSheet.Row(1).Height = 23;
+            workSheet.Cells[2, 4].Value = LRes["Number"] + ": " + bill.Id;
+            workSheet.Cells["A3:D3"].Merge = true;
+            workSheet.Cells["A3"].Value = LRes["BuyerName"]+ ": " + bill.PersonName;
+            workSheet.Cells["A4:D4"].Merge = true;
+            workSheet.Row(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[4, 1].Value = LRes["SallingBill"];
+            workSheet.Row(4).Style.Font.Size = 20;
+            workSheet.Cells[5, 1].Value = LRes["Name"];
+            workSheet.Cells[5, 2].Value = LRes["Weight"] + " (Kg)";
+            workSheet.Cells[5, 3].Value = LRes["PerPrice"];
+            workSheet.Cells[5, 4].Value = LRes["Total"];
+            workSheet.Row(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            int row = 6;
+            foreach (var item in bill.Items)
+            {
+                workSheet.Cells[row, 1].Value = item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType);
+                workSheet.Cells[row, 2].Value = item.Weight + " Kg";
+                workSheet.Cells[row, 3].Value = item.Price;
+                workSheet.Cells[row, 4].Value = item.ItemPrice == 0 ? string.Empty : item.ItemPrice.ToString("n0") + ".000";
+                workSheet.Cells[$"B{row}:D{row}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                row++;
+            }
+
+            var maxProduct = 20;
+            var resSpace = maxProduct - row;
+
+            workSheet.Cells[maxProduct, 1].Value = LRes["Total"];
+            workSheet.Cells[maxProduct, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[maxProduct, 4].Value = bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND";
+
+            ExcelRange range = workSheet.Cells[$"A5:D{maxProduct}"];
+            ExcelTable table = workSheet.Tables.Add(range, "Table1");
+            table.TableStyle = TableStyles.Light1;
+
+            workSheet.Cells[maxProduct + 1, 2, maxProduct + 1, 4].Merge = true;
+            workSheet.Row(maxProduct + 1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+            workSheet.Cells[maxProduct + 1, 2].Value = $"Hải Dương, {LRes["day"]} {bill.ActiveDate.Value.Day} {LRes["month"]} {bill.ActiveDate.Value.Month} {LRes["year"]} {bill.ActiveDate.Value.Year}";
+
+            workSheet.Cells[maxProduct + 2, 3, maxProduct + 2, 4].Merge = true;
+            workSheet.Row(maxProduct + 2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[maxProduct + 2, 3].Value = LRes["Seller"];
+
+            workSheet.Cells[maxProduct + 5, 3, maxProduct + 5, 4].Merge = true;
+            workSheet.Row(maxProduct + 5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[maxProduct + 5, 3].Value = "Phạm Thị Viết";
+
+            workSheet.Cells[$"A1:D{maxProduct + 5}"].Style.Font.Name = "Times New Roman";
+
+            workSheet.Columns[1, 4].AutoFit();
+
+            if (bill.IsPaid.Value)
+            {
+                AddPictureToExcelFile(workSheet);
+            }
+
+            if (exportToExcel)
+            {
+                string path = @"wwwroot\bill.xlsx";
+
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                FileStream objFileStrm = File.Create(path);
+                objFileStrm.Close();
+
+                // Write content to excel file
+                File.WriteAllBytes(path, excel.GetAsByteArray());
+                //Close Excel package
+                excel.Dispose();
+
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            }
+            else
+            {
+                var path = ConvertToPdf(workSheet);
+
+                var file = Convert.ToBase64String(File.ReadAllBytes(path));
+
+                await PrintingService.Print(new PrintOptions(file) { Base64 = true });
+
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+        }
+        catch (Exception)
+        {
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+        }
+    }
+
+    string ConvertToPdf(ExcelWorksheet workSheet)
+    {
+        string path = @"wwwroot\test.pdf";
+        string fontName = "Times New Roman";
+        PdfDocument pdfDocument = new PdfDocument();
+        PdfPage page = pdfDocument.AddPage();
+        XGraphics gfx = XGraphics.FromPdfPage(page);
+        XFont font = new XFont(fontName, 12);
+
+        int startX = 50;
+        int startY = 50;
+        int lineHeight = 20;
+        int columnWidth = 120;
+        var headerFont = new XFont(fontName, 22, XFontStyleEx.Bold);
+
+        for (int excelRow = 1; excelRow <= workSheet.Dimension.End.Row; excelRow++)
+        {
+            for (int col = 1; col <= workSheet.Dimension.End.Column; col++)
+            {
+                string cellValue = workSheet.Cells[excelRow, col].Text;
+                if (excelRow == 1 || excelRow == 4)
+                {
+                    // Bill header
+                    XSize textSize = gfx.MeasureString(cellValue, headerFont);
+                    double centerX = (page.Width.Point - textSize.Width) / 2;
+                    gfx.DrawString(cellValue, headerFont, XBrushes.Black, centerX, startY + (excelRow - 1) * lineHeight);
+                }
+                else if (excelRow >= workSheet.Dimension.End.Row - 4 || excelRow == 2)
+                {
+                    // Bill footer
+                    XSize textSize = gfx.MeasureString(cellValue, font);
+
+                    double rightAlignX = page.Width.Point - textSize.Width - 20 - 50 - (excelRow == workSheet.Dimension.End.Row - 3 ? 15 : 0);
+
+                    gfx.DrawString(cellValue, font, XBrushes.Black, rightAlignX, startY + 5 + (excelRow - 1) * lineHeight);
+                }
+                else
+                {
+                    if (excelRow == 5)
+                    {
+                        // Table header
+                        var bold = new XFont(fontName, 12, XFontStyleEx.Bold);
+                        XSize textSize = gfx.MeasureString(cellValue, bold);
+                        double textX = startX + (col - 1) * columnWidth + (columnWidth - textSize.Width) / 2;
+                        gfx.DrawString(cellValue, bold, XBrushes.Black, textX, startY + 5 + (excelRow - 1) * lineHeight);
+                    }
+                    else
+                    {
+                        // Others
+                        gfx.DrawString(cellValue, font, XBrushes.Black, startX + (col - 1) * columnWidth, startY + 5 + (excelRow - 1) * lineHeight);
+                    }
+                    if (excelRow > 4 && excelRow < workSheet.Dimension.End.Row - 4)
+                    {
+                        // Draw table border
+                        gfx.DrawRectangle(XPens.Black, startX - 2 + (col - 1) * columnWidth, startY + 7 + (excelRow - 2) * lineHeight, columnWidth, lineHeight);
+                    }
+                }
+
+            }
         }
 
-        var maxProduct = 20;
-        var resSpace = maxProduct - row;
+        AddPictureToPdfFile(gfx);
 
-        workSheet.Cells[maxProduct, 1].Value = "Total";
-        workSheet.Cells[maxProduct, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        workSheet.Cells[maxProduct, 4].Value = bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND";
+        pdfDocument.Save(path);
+        return path;
+    }
 
-        ExcelRange range = workSheet.Cells[$"A5:D{maxProduct}"];
-        ExcelTable table = workSheet.Tables.Add(range, "Table1");
-        table.TableStyle = TableStyles.Light1;
-
-        workSheet.Cells[maxProduct + 1, 2, maxProduct + 1, 4].Merge = true;
-        workSheet.Row(maxProduct + 1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-        workSheet.Cells[maxProduct + 1, 2].Value = $"Hai Duong, ngay {bill.ActiveDate.Value.Day} thang {bill.ActiveDate.Value.Month} nam {bill.ActiveDate.Value.Year}";
-
-        workSheet.Cells[maxProduct + 2, 3, maxProduct + 2, 4].Merge = true;
-        workSheet.Row(maxProduct + 2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        workSheet.Cells[maxProduct + 2, 3].Value = "Owner";
-
-        workSheet.Cells[maxProduct + 5, 3, maxProduct + 5, 4].Merge = true;
-        workSheet.Row(maxProduct + 5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        workSheet.Cells[maxProduct + 5, 3].Value = "Pham Thi Viet";
-
-        workSheet.Cells[$"A1:D{maxProduct + 5}"].Style.Font.Name = "Times New Roman";
-
-        workSheet.Columns[1, 4].AutoFit();
-        string path = @"C:\Users\Admin\Downloads\test.xlsx";
-        
-        if (File.Exists(path))
+    void AddPictureToExcelFile(ExcelWorksheet worksheet)
+    {
+        var image = HelperFunctions.SetImageOpacityAndRotate("wwwroot/paid.png", 0.3f, 30);
+        using (MemoryStream imageStream = new MemoryStream())
         {
-            File.Delete(path);
+            image.Save(imageStream, ImageFormat.Png);
+            imageStream.Position = 0;
+
+            ExcelPicture picture = worksheet.Drawings.AddPicture("MyImage", imageStream);
+            picture.SetPosition(6, 0, 1, 0); 
+            picture.SetSize(200, 200); 
         }
+    }
 
-        FileStream objFileStrm = File.Create(path);
-        objFileStrm.Close();
+    void AddPictureToPdfFile(XGraphics gfx)
+    {
+        var image = HelperFunctions.SetImageOpacityAndRotate("wwwroot/paid.png", 0.3f, 30);
+        using (MemoryStream imageStream = new MemoryStream())
+        {
+            image.Save(imageStream, ImageFormat.Png);
+            imageStream.Position = 0;
 
-        // Write content to excel file
-        File.WriteAllBytes(path, excel.GetAsByteArray());
-        //Close Excel package
-        excel.Dispose();
-
-        PrintingService.Print(new PrintOptions(file) { Base64 = true });
+            XImage xImage = XImage.FromStream(imageStream);
+            gfx.DrawImage(xImage, 170, 150, 200, 200);
+        }
     }
 }
