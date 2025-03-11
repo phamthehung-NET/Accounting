@@ -1,4 +1,4 @@
-﻿@page "/manage-entry"
+﻿@* @page "/manage-entry" *@
 @inject IStringLocalizer<Resource> LRes
 @inject IBillRepository BillRepo
 @inject NavigationManager NavigationManager 
@@ -31,7 +31,7 @@
                 <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@Keyword" @onchange="(ChangeEventArgs e) => {Keyword = e.Value.ToString();}" />
             </div>
             <div class="col-md-2 col-lg-2 col-sm-12">
-                <button class="btn btn-primary w-100" @onclick="() => OnParamSubmit()"><i class="fa-regular fa-filter"></i> @LRes["Filter"]</button>
+                <button class="btn btn-primary w-100" @onclick="() => OnParamSubmit()"><i class="fa-regular fa-filter"></i> <p class="btn-filter-text">@LRes["Filter"]</p></button>
             </div>
         </div>
     </div>
@@ -58,7 +58,7 @@
                     <div class="card-header d-flex justify-content-between">
                         <div class="fw-bold">@bill.PersonName</div>
                         <div class="d-flex">
-                            <div class="me-2">@(bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(bill.LunarActiveDate) ? HelperFunctions.GetLunarDate(SettingRepo.IsLeapYear(bill.ActiveDate.Value.Year), bill.ActiveDate.Value) : bill.LunarActiveDate) + ")")</div>
+                            <div class="me-2">@(bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(bill.LunarActiveDate) ? HelperFunctions.ConvertSolarToLunar(bill.ActiveDate.Value) : bill.LunarActiveDate) + LRes["LunarDate"] + ")")</div>
                             <div>@(bill.Items.Count() + " " + LRes["item(s)"])</div>
                             @if (bill.Items.Any())
                             {
@@ -108,15 +108,15 @@
                             {
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-solid fa-recycle"></i> @LRes["Delete"]</button>
                             }
-                            <button class="btn btn-outline-primary" @onclick="@(() => Print())">
+                            @* <button class="btn btn-outline-primary" @onclick="@(() => Print())">
                                 <i class="fa-regular fa-print"></i>
-                            </button>
+                            </button> *@
                             <div class="btn-group dropup">
                                 <button type="button" class="btn border-0 bg-transparent rounded-0 p-1 ms-2" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-regular fa-ellipsis-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    @if (bill.ActiveDate.Value.Date == DateTime.Now.Date && !bill.IsPaid.Value)
+                                    @if (!bill.IsPaid.Value)
                                     {
                                         <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPriceModal" @onclick="() => HandleSelecteBill(bill)">@LRes["EditItemsPrice"]</li>
                                     }
@@ -356,11 +356,11 @@
             }
             if (DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
             {
-                return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
+                return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
             }
             else
             {
-                return $"{LRes["Showing"]}: {LRes["date"]} {LRes["from"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]}) {LRes["to"]} {DateRange.EndDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, DateRange.EndDate.Value.DateTime)} {LRes["LunarDate"]})";
+                return $"{LRes["Showing"]}: {LRes["date"]} {LRes["from"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]}) {LRes["to"]} {DateRange.EndDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(DateRange.EndDate.Value.DateTime)} {LRes["LunarDate"]})";
             }
         }
         catch (Exception ex)
@@ -477,11 +477,5 @@
         {
             IsPaid = bool.Parse(value);
         }
-    }
-
-    void Print()
-    {
-        var file = Convert.ToBase64String(File.ReadAllBytes("wwwroot/a.pdf"));
-        PrintingService.Print(new PrintOptions(file) {Base64 = true});
     }
 }

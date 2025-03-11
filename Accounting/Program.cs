@@ -60,6 +60,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+    app.UseHttpsRedirection();
 }
 else
 {
@@ -76,7 +77,7 @@ var localizationOptions = new RequestLocalizationOptions()
 
 app.UseRequestLocalization(localizationOptions);
 
-app.UseHttpsRedirection();
+app.UsePathBase("/Accounting");
 
 app.UseStaticFiles();
 

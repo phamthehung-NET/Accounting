@@ -1,6 +1,4 @@
-﻿@using System.Globalization
-@using Microsoft.Extensions.Localization;
-@inject IPriceRepository PriceRepository
+﻿@inject IPriceRepository PriceRepository
 @inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
@@ -63,32 +61,20 @@
 
     Dictionary<int, int?> InputSaleList = new();
 
-    List<Year> LeapYear = new();
-
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            LeapYear.Clear();
             var today = DateTime.Now;
             var yesterday = DateTime.Now.AddDays(-1);
-
-            if (today.Year != yesterday.Year)
-            {
-                LeapYear = SettingRepo.GetLeapYear(new List<int>() { today.Year, yesterday.Year });
-            }
-            else
-            {
-                LeapYear = SettingRepo.GetLeapYear(new List<int>() { today.Year });
-            }
 
             Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
             Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
             Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
-            Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, yesterday)}</div>", Ordering = true });
-            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, today)}</div>", Ordering = true });
-            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, yesterday)}</div>", Ordering = true });
-            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, today)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "YesterdayEntryPrice", DisplayName = $"{LRes["Yesterday Entry Price"]}/Kg <div>{HelperFunctions.ConvertSolarToLunar(yesterday)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Entry Price"]}/Kg <div>{HelperFunctions.ConvertSolarToLunar(today)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Yesterday Sale Price"]}/Kg <div>{HelperFunctions.ConvertSolarToLunar(yesterday)}</div>", Ordering = true });
+            Headers.Add(new Header() { Name = "Today Entry Price", DisplayName = $"{LRes["Today Sale Price"]}/Kg <div>{HelperFunctions.ConvertSolarToLunar(today)}</div>", Ordering = true });
         }
         catch (Exception ex)
         {

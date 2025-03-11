@@ -101,7 +101,8 @@ namespace Accounting.Repositories.Implementations
         public Pagination<BillDTO> GetAll(string keyword, DateTime? startDate, DateTime? endDate, int pageIndex, int pageSize, PriceType priceType, bool? isPaid)
         {
             var bills = (from b in context.Bills
-                         join p in context.People on b.PersonId equals p.Id
+                         join p in context.People on b.PersonId equals p.Id into people
+                         from p in people.DefaultIfEmpty()
                          join mbp in context.MeatBillPrices on b.Id equals mbp.BillId into meatBillPrices
                          from mbp in meatBillPrices.DefaultIfEmpty()
                          join m in context.Meats on mbp.MeatId equals m.Id into meats
@@ -114,7 +115,7 @@ namespace Accounting.Repositories.Implementations
                                             : startDate == null || endDate == null || (b.ActiveDate.Value.Date.CompareTo(startDate.Value.Date) >= 0 && b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date) <= 0))
                             && (isPaid == null || b.IsPaid == isPaid)
                             && b.Type == (int)priceType && !b.IsDeleted
-                         select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarCreatedDate, b.LunarActiveDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
+                         select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarCreatedDate, b.LunarActiveDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type, frozen = m.Frozen })
                         .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
                         .Select(x => new BillDTO
                         {
@@ -137,6 +138,7 @@ namespace Accounting.Repositories.Implementations
                                 MeatName = y.meatName,
                                 MeatType = y.meatType,
                                 PriceType = y.PriceType,
+                                Frozen = y.frozen.Value,
                                 Weight = y.Weight,
                                 MeatId = y.MeatId,
                                 ActiveDate = y.ActiveDate,
@@ -304,7 +306,7 @@ namespace Accounting.Repositories.Implementations
                     join m in context.Meats on mbp.MeatId equals m.Id into meats
                     from m in meats.DefaultIfEmpty()
                     where b.Id == id
-                    select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarActiveDate, b.LunarCreatedDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type })
+                    select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarActiveDate, b.LunarCreatedDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type, frozen = m.Frozen })
             .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
             .Select(x => new BillDTO
             {
@@ -328,6 +330,7 @@ namespace Accounting.Repositories.Implementations
                     MeatType = y.meatType,
                     PriceType = y.PriceType,
                     Weight = y.Weight,
+                    Frozen = y.frozen.Value,
                     MeatId = y.MeatId,
                     ActiveDate = y.ActiveDate,
                     CreatedDate = y.CreatedDate,
@@ -356,6 +359,7 @@ namespace Accounting.Repositories.Implementations
                         LunarActiveDate = mbp.LunarActiveDate,
                         LunarCreatedDate = mbp.LunarCreatedDate,
                         Price = mbp.Price,
+                        Frozen = m.Frozen.Value,
                         PriceType = mbp.PriceType,
                         Weight = mbp.Weight,
                         MeatName = m.Name,

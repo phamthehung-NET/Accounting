@@ -10,6 +10,8 @@
 
         public int? MeatType { get; set; }
 
+        public bool Frozen { get; set; }
+
         public int? BillId { get; set; }
 
         public decimal? Price { get; set; }

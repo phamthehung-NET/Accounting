@@ -51,3 +51,5 @@ window.toggleSideBar = () => {
     }
     $this.blur();
 }
+
+//document.querySelector("base").setAttribute("href", window.location.pathname);

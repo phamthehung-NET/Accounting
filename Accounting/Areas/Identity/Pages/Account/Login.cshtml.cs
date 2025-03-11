@@ -3,6 +3,7 @@
 #nullable disable
 
 using Accounting.Model;
+using Accounting.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -116,7 +117,7 @@ namespace Accounting.Areas.Identity.Pages.Account
                     var user = await userManager.FindByNameAsync(Input.Username);
                     if (user.UpdatedPriceDate.Date < DateTime.Today)
                     {
-                        returnUrl = "/updatePrice";
+                        returnUrl = Constants.UpdatePrice;
                     }
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);

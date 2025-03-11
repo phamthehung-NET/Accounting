@@ -1,0 +1,58 @@
+﻿@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+
+@if (RequiredAuth)
+{
+    <AuthorizeView>
+        <Authorized>
+            @if (ActivePage != null)
+            {
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)" />
+            }
+        </Authorized>
+        <NotAuthorized>
+            <UnAuthorized />
+        </NotAuthorized>
+    </AuthorizeView>
+}
+else
+{
+    @if (ActivePage != null)
+    {
+        <RouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)" />
+    }
+}
+
+@code {
+    private RouteData routeData;
+    private Type ActivePage;
+    private bool RequiredAuth;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        var relativeUrl = Nav.ToAbsoluteUri(Nav.Uri).AbsolutePath;
+        var (pageType, requiresAuth) = Routes.GetPage(relativeUrl);
+
+        RequiredAuth = requiresAuth;
+
+        if (!typeof(ComponentBase).IsAssignableFrom(pageType))
+        {
+            ActivePage = typeof(Pages.NotFound);
+        }
+        else if (requiresAuth && !user.Identity.IsAuthenticated)
+        {
+            // Nav.NavigateTo($"{syste}/login?returnUrl={relativeUrl}", true);
+            ActivePage = typeof(UnAuthorized);
+            return;
+        }
+        else
+        {
+            ActivePage = pageType;
+        }
+
+        routeData = new RouteData(ActivePage, new Dictionary<string, object>());
+    }
+}

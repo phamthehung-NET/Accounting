@@ -4,41 +4,42 @@
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="manage-meat">@LRes["Accounting"]</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        @* <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
-        </button>
+        </button> *@
     </div>
 </div>
 
-<div class="@NavMenuCssClass" id="system-nav" @onclick="ToggleNavMenu">
+@* <div class="@NavMenuCssClass" id="system-nav" @onclick="ToggleNavMenu"> *@
+<div class="" id="system-nav" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="dashboard">
+            <NavLink class="nav-link" href="@Constants.Dashboad">
                 <i class="fa-duotone fa-chart-line me-3"></i> @LRes["Dashboard"]
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage-meat">
-                <i class="fa-duotone fa-meat me-3"></i> @LRes["Manage product"]
+            <NavLink class="nav-link" href="@Constants.MeatList">
+                <i class="fa-duotone fa-meat me-3"></i> <span class="short-txt">@LRes["Product"]</span> <span class="long-txt">@LRes["Manage product"]</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="people-management">
-                <i class="fa-duotone fa-users me-3"></i> @LRes["Manage person"]
+            <NavLink class="nav-link" href="@Constants.PeopleMng">
+                <i class="fa-duotone fa-users me-3"></i> <span class="short-txt">@LRes["Entry/sale people"]</span> <span class="long-txt">@LRes["Manage person"]</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage-entry">
-                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> @LRes["Manage entries"]
+            <NavLink class="nav-link" href="@Constants.EntryMng">
+                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> <span class="short-txt">@LRes["Entries"]</span> <span class="long-txt">@LRes["Manage entries"]</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage-sale">
-                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> @LRes["Manage Sale"]
+            <NavLink class="nav-link" href="@Constants.SaleMng">
+                <i class="fa-duotone fa-scale-unbalanced-flip me-3"></i> <span class="short-txt">@LRes["Sales"]</span> <span class="long-txt">@LRes["Manage Sale"]</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="recycle-bin">
+            <NavLink class="nav-link" href="@Constants.RecycleBin">
                 <i class="fa-solid fa-recycle me-3"></i> @LRes["Recycle bin"]
             </NavLink>
         </div>

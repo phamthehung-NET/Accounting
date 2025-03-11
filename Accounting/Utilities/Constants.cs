@@ -16,6 +16,27 @@ namespace Accounting.Utilities
         public const string NotGoodChartColor = "rgba(255, 12, 12, 0.8)";
 
         public const string IsLeapYearSetting = "IsLeapYear";
+
+        #region Routes
+
+        public const string SystemPrefix = "/accounting";
+
+        public const string Dashboad = $"{SystemPrefix}/dashboard";
+        public const string UpdatePrice = $"{SystemPrefix}/updatePrice";
+        public const string UnAuthorized = $"{SystemPrefix}/unauthorized";
+        public const string MeatList = $"{SystemPrefix}/manage-meat";
+        public const string PeopleMng = $"{SystemPrefix}/people-management";
+        public const string EntryMng = $"{SystemPrefix}/manage-entry";
+        public const string SaleMng = $"{SystemPrefix}/manage-sale";
+        public const string RecycleBin = $"{SystemPrefix}/recycle-bin";
+        public const string SysSettings = $"{SystemPrefix}/system-setting";
+        public const string SysInfo = $"{SystemPrefix}/system-info";
+        public const string SysLog = $"{SystemPrefix}/log";
+        public const string SeedData = $"{SystemPrefix}/seed-data";
+        public const string Login = $"{SystemPrefix}/login";
+        public const string Logout = $"{SystemPrefix}/logout";
+
+        #endregion
     }
 
     public enum MeatType

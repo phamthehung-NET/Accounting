@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Accounting.Model
 {
@@ -11,10 +12,12 @@ namespace Accounting.Model
 
         public int? BillId { get; set; }
 
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal? Price { get; set; }
 
         public int PriceType { get; set; }
-
+        
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal Weight { get; set; }
 
         public DateTime? ActiveDate { get; set; }

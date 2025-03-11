@@ -19,7 +19,7 @@ a, .btn-link {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -63,17 +63,17 @@ a, .btn-link {
     color: white;
 }
 
-.blazor-error-boundary::after {
-    content: "An error has occurred."
-}
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }
 
 .sidebar {
     transition: margin-left .3s ease-in-out,width .3s ease-in-out;
 }
 
-.sidebar .is-opened {
-    transform: translateX(0);
-}
+    .sidebar .is-opened {
+        transform: translateX(0);
+    }
 
 .paid-box-vi {
     content: url(/paid.png);
@@ -93,4 +93,100 @@ a, .btn-link {
     rotate: 30deg;
     width: 300px;
     opacity: .3;
+}
+
+.short-txt {
+    display: none;
+}
+
+.long-txt {
+    display: block;
+}
+
+@media (min-width: 1000px) and (max-width: 1366px) {
+    .paid-box-vi {
+        content: url(/paid.png);
+        z-index: 1;
+        left: 10%;
+        top: 10%;
+        rotate: 30deg;
+        width: 300px;
+        opacity: .3;
+    }
+
+    .paid-box-en {
+        content: url(/paid-en.png);
+        z-index: 1;
+        left: 10%;
+        top: 10%;
+        rotate: 30deg;
+        width: 300px;
+        opacity: .3;
+    }
+
+    .btn-filter-text {
+        display: none;
+    }
+
+    li.dropdown-item {
+        height: 50px;
+        padding-top: 13px;
+    }
+
+    button {
+        height: 50px;
+        min-width: 50px;
+    }
+
+    .row > .card {
+        width: 50% !important
+    }
+
+    body {
+        font-size: 20px
+    }
+
+    select, input {
+        height: 50px;
+    }
+
+    .long-txt {
+        display: none;
+    }
+
+    .short-txt {
+        display: block;
+    }
+}
+
+@media only screen and (max-width: 412px) {
+    body {
+        font-size: 20px
+    }
+
+    .btn-filter-text {
+        display: none;
+    }
+
+    button {
+        height: 50px;
+        min-width: 50px;
+    }
+
+    li.dropdown-item {
+        height: 50px;
+        padding-top: 13px;
+    }
+
+    select, input {
+        height: 50px;
+    }
+
+    .long-txt {
+        display: none;
+    }
+
+    .short-txt {
+        display: block;
+    }
 }

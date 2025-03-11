@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Resource> LRes
 <h3 class="display-4 text-center">Unauthorized</h3>
-<div class="text-center">@LRes["Redirecting to login in"] @CountDown @LRes["or click"] <a href="/Identity/Account/Login">@LRes["here"]</a></div>
+<div class="text-center">@LRes["Redirecting to login in"] @CountDown @LRes["or click"] <a href="@Constants.Login">@LRes["here"]</a></div>
 
 @code {
     int CountDown = 11;
@@ -25,7 +25,7 @@
         }
         else
         {
-            NavigationManager.NavigateTo("/Identity/Account/Login", true);
+            NavigationManager.NavigateTo(Constants.Login, true);
         }
     }
 }

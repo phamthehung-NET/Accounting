@@ -1,5 +1,6 @@
 ﻿@using Accounting.Model;
 @using Accounting.Pages;
+@using Accounting.Utilities;
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.Extensions.Localization;
 @inject SignInManager<CustomUser> SignInManager
@@ -14,7 +15,7 @@
         <a  class="nav-link text-dark" title="Manage">@LRes["Hello"] @User.Identity?.Name!</a>
     </li>
     <li class="nav-item">
-        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">
+        <form class="form-inline" asp-area="Identity" asp-page="@Constants.Logout" asp-route-returnUrl="@(Constants.SystemPrefix + "/")" method="post">
             <button  type="submit" class="nav-link btn btn-link text-dark">@LRes["Log out"]</button>
         </form>
     </li>
@@ -22,7 +23,7 @@
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" href="/">@LRes["Home"]</a>
+            <a class="nav-link text-dark" href="@(Constants.SystemPrefix + "/")">@LRes["Home"]</a>
     </li>
     @*<li class="nav-item">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">@LRes["Log in"]</a>

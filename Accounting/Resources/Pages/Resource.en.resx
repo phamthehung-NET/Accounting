@@ -300,11 +300,20 @@
   <data name="EnterWeight" xml:space="preserve">
     <value>Enter weight</value>
   </data>
+  <data name="Entries" xml:space="preserve">
+    <value>Entries</value>
+  </data>
+  <data name="Entry/sale people" xml:space="preserve">
+    <value>Entry/sale people</value>
+  </data>
   <data name="EntryBill" xml:space="preserve">
     <value>Entry bill</value>
   </data>
   <data name="EntryList" xml:space="preserve">
     <value>Entry list</value>
+  </data>
+  <data name="ExportToExcel" xml:space="preserve">
+    <value>Export to Excel</value>
   </data>
   <data name="Filter" xml:space="preserve">
     <value>Filter</value>
@@ -368,6 +377,9 @@
   </data>
   <data name="LunarDate" xml:space="preserve">
     <value>Lunar date</value>
+  </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Manage</value>
   </data>
   <data name="Manage entries" xml:space="preserve">
     <value>Manage entries</value>
@@ -477,6 +489,9 @@
   <data name="PleseEnterWeight" xml:space="preserve">
     <value>Weight is required</value>
   </data>
+  <data name="Product" xml:space="preserve">
+    <value>Product</value>
+  </data>
   <data name="Product List" xml:space="preserve">
     <value>Product List</value>
   </data>
@@ -530,6 +545,9 @@
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Sale list</value>
+  </data>
+  <data name="Sales" xml:space="preserve">
+    <value>Sales</value>
   </data>
   <data name="SallingBill" xml:space="preserve">
     <value>Sale Bill</value>

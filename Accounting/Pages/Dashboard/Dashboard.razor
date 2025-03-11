@@ -1,4 +1,4 @@
-﻿@page "/dashboard"
+﻿@* @page "/dashboard" *@
 @using BlazorDateRangePicker
 @using ChartJs.Blazor
 @using ChartJs.Blazor.BarChart;
@@ -23,7 +23,7 @@
     <div class="card col-md-5 col-sm-12 col-lg-5 col-xl-5 mb-4 p-0">
         <div class="card-header d-flex justify-content-between">
             <div class="fw-bold">@LRes["WastedMeatWeight"]</div>
-            <div>@($"{WastedDate.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(IsLeapYear, WastedDate)})")</div>
+            <div>@($"{WastedDate.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(WastedDate)})")</div>
         </div>
         <div class="card-body">
             <div class="mb-2">
@@ -69,8 +69,6 @@
 
     BarConfig config;
 
-    bool IsLeapYear;
-
     protected override void OnInitialized()
     {
         config = new()
@@ -95,7 +93,6 @@
     {
         if (firstRender)
         {
-            IsLeapYear = SettingRepo.IsLeapYear(DateTime.Now.Year);
             await GetWastedData();
             await GetChartData();
         }
@@ -146,19 +143,19 @@
                 {
                     colors.Add(Constants.GoodChartColor);
                     showingData.Add(item.WastedWeight);
-                    config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
+                    config.Data.Labels.Add(HelperFunctions.ConvertSolarToLunar(item.ActivateDate));
                 }
                 else if (item.WastedWeight > 3 && item.WastedWeight <= 5)
                 {
                     colors.Add(Constants.WarningChartColor);
                     showingData.Add(item.WastedWeight);
-                    config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
+                    config.Data.Labels.Add(HelperFunctions.ConvertSolarToLunar(item.ActivateDate));
                 }
                 else if (item.WastedWeight > 5)
                 {
                     colors.Add(Constants.NotGoodChartColor);
                     showingData.Add(item.WastedWeight);
-                    config.Data.Labels.Add(HelperFunctions.GetLunarDate(IsLeapYear, item.ActivateDate));
+                    config.Data.Labels.Add(HelperFunctions.ConvertSolarToLunar(item.ActivateDate));
                 }
             });
 

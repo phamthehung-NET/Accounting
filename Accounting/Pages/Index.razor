@@ -1,11 +1,11 @@
-﻿@page "/"
+﻿@* @page "/"
 @page "/updatePrice"
-@page "/unauthorized"
+@page "/unauthorized" *@
 
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.AspNetCore.WebUtilities;
 @using Microsoft.Extensions.Localization;
-@inject IHttpContextAccessor HttpContext
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IMeatRepository MeatRepository
 @inject IJSRuntime JsRuntime
@@ -37,8 +37,9 @@
     {
         if (firstRender)
         {
-            var user = HttpContext.HttpContext.User;
-            if (user.Identity.IsAuthenticated && Uri.AbsolutePath.Equals("/updatePrice"))
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            if (user != null && user.Identity.IsAuthenticated && Uri.AbsolutePath.Equals(Constants.UpdatePrice))
             {
                 var lastUpdatePriceDate = userManager.FindByNameAsync(user.Identity.Name).Result.UpdatedPriceDate;
                 if (lastUpdatePriceDate.Date < DateTime.Today)

@@ -300,11 +300,20 @@
   <data name="EnterWeight" xml:space="preserve">
     <value>Nhập cân nặng</value>
   </data>
+  <data name="Entries" xml:space="preserve">
+    <value>Nhập vào</value>
+  </data>
+  <data name="Entry/sale people" xml:space="preserve">
+    <value>Người mua/bán</value>
+  </data>
   <data name="EntryBill" xml:space="preserve">
     <value>Hóa đơn nhập</value>
   </data>
   <data name="EntryList" xml:space="preserve">
     <value>Danh sách nhập hàng</value>
+  </data>
+  <data name="ExportToExcel" xml:space="preserve">
+    <value>Xuất file excel</value>
   </data>
   <data name="Filter" xml:space="preserve">
     <value>Lọc</value>
@@ -367,7 +376,10 @@
     <value>Đăng xuất</value>
   </data>
   <data name="LunarDate" xml:space="preserve">
-    <value>Âm lịch</value>
+    <value>ÂL</value>
+  </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Quản lý</value>
   </data>
   <data name="Manage entries" xml:space="preserve">
     <value>Quản lý nhập vào</value>
@@ -477,6 +489,9 @@
   <data name="PleseEnterWeight" xml:space="preserve">
     <value>Vui lòng nhập số cân</value>
   </data>
+  <data name="Product" xml:space="preserve">
+    <value>Mặt hàng</value>
+  </data>
   <data name="Product List" xml:space="preserve">
     <value>Danh sách mặt hàng</value>
   </data>
@@ -530,6 +545,9 @@
   </data>
   <data name="SaleList" xml:space="preserve">
     <value>Danh sách bán hàng</value>
+  </data>
+  <data name="Sales" xml:space="preserve">
+    <value>Bán ra</value>
   </data>
   <data name="SallingBill" xml:space="preserve">
     <value>Hóa đơn bán hàng</value>
