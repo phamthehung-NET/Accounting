@@ -48,7 +48,7 @@
             <tr>
                 <td>@Context.ObjectName</td>
                 <td>@HandleShowObjectType(Context.Type)</td>
-                <td>@Context.CreatedDate.Value.ToString("dd/MM/yyyy") (@(string.IsNullOrEmpty(Context.LunarCreatedDate) ? HelperFunctions.GetLunarDate(SettingRepo.IsLeapYear(Context.CreatedDate.Value.Year), Context.CreatedDate.Value) : Context.LunarCreatedDate) @LRes["LunarDate"])</td>
+                <td>@Context.CreatedDate.Value.ToString("dd/MM/yyyy") (@(string.IsNullOrEmpty(Context.LunarCreatedDate) ? HelperFunctions.ConvertSolarToLunar(Context.CreatedDate.Value) : Context.LunarCreatedDate) @LRes["LunarDate"])</td>
                 <td>
                     <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#detailObjectModal" @onclick="() => SelectObject(Context) "><i class="fa-regular fa-circle-info"></i> @LRes["Detail"]</button>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#restoreObjectModal" @onclick="() => SelectObject(Context)"><i class="fa-duotone fa-trash-can-undo"></i> @LRes["Restore"]</button>

@@ -1,0 +1,60 @@
+﻿@using System.Globalization
+@inherits InputBase<decimal?>
+
+<input @bind="FormattedValue" @onblur="FormatOnBlur" @oninput="OnInputChange" class="form-control" />
+
+@code {
+
+    private string FormattedValue { get; set; } = "";
+
+    protected override void OnParametersSet()
+    {
+        // Khi giá trị thay đổi từ bên ngoài, cập nhật lại hiển thị
+        FormattedValue = Value.HasValue ? Value.Value.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) : "";
+    }
+
+    private void OnInputChange(ChangeEventArgs e)
+    {
+        string input = e.Value?.ToString() ?? "";
+        string cleanedInput = input.Replace(",", "").Trim();
+
+        if (decimal.TryParse(cleanedInput, out decimal result))
+        {
+            Value = result;
+            FormattedValue = result.ToString("N0", CultureInfo.GetCultureInfo("vi-VN"));
+        }
+        else
+        {
+            FormattedValue = "";
+            Value = null;
+        }
+
+        // Thông báo giá trị mới cho Blazor
+        ValueChanged.InvokeAsync(Value);
+    }
+
+    private void FormatOnBlur()
+    {
+        if (Value.HasValue)
+        {
+            FormattedValue = Value.Value.ToString("N0", CultureInfo.GetCultureInfo("vi-VN"));
+        }
+    }
+
+    protected override bool TryParseValueFromString(string value, out decimal? result, out string validationErrorMessage)
+    {
+        string cleanedValue = value.Replace(",", "").Trim();
+        if (decimal.TryParse(cleanedValue, out decimal parsedValue))
+        {
+            result = parsedValue;
+            validationErrorMessage = null;
+            return true;
+        }
+        else
+        {
+            result = null;
+            validationErrorMessage = "Invalid currency format";
+            return false;
+        }
+    }
+}

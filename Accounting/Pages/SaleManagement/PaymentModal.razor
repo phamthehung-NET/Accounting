@@ -1,0 +1,96 @@
+﻿@inject IStringLocalizer<Resource> LRes
+@inject IBillRepository BillRepo
+@inject NavigationManager NavigationManager
+@inject ILogRepository LogRepo
+@inject IJSRuntime JsRuntime
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["Pay"]" Color="@Constants.PrimaryColor"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
+        </div>
+        <div class="modal-body">
+            <label>@LRes["PaidAmount"]</label>
+            <div class="d-flex">
+                <CurrencyInput @bind-Value="PaidAmount" class="@(!string.IsNullOrEmpty(ErrorMsg) ? "form-control is-invalid" : "form-control")" placeholder="@LRes["EnterPaidAmount"]" min="0" />
+                <span class="w-100 ms-2 d-flex align-items-center">000 VND</span>
+            </div>
+            <div class="text-danger">@ErrorMsg</div>
+            <div class="text-warning"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnDismiss">@LRes["Close"]</button>
+            <button class="btn btn-primary" @onclick="async () => await OnSubmit()">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Action GetData { get; set; }
+
+    [Parameter]
+    public BillDTO Bill { get; set; }
+
+    decimal? PaidAmount = null;
+
+    string ErrorMsg = string.Empty;
+
+    void OnInputChange(ChangeEventArgs e)
+    {
+        PaidAmount = decimal.Parse(!string.IsNullOrEmpty(e.Value.ToString()) ? e.Value.ToString().Replace('.', ',') : "0");
+    }
+
+    void OnDismiss()
+    {
+        Bill = new();
+        PaidAmount = null;
+        ErrorMsg = string.Empty;
+    }
+
+    async Task OnSubmit(){
+        try
+        {
+            if (Bill.Id > 0)
+            {
+                await HelperFunctions.AddIndicator(JsRuntime);
+                decimal amount = 0;
+                if(!PaidAmount.HasValue || PaidAmount.Value >= Bill.TotalPrice){
+                    amount = Bill.TotalPrice;
+                }
+                else
+                {
+                    amount = PaidAmount.Value;
+                }
+                if (BillRepo.PayingBill(Bill.Id, amount))
+                {
+                    GetData.Invoke();
+                    await HelperFunctions.HideModal(JsRuntime, "payingBill");
+                    OnDismiss();
+                    await HelperFunctions.RemoveIndicator(JsRuntime);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
+                }
+                else
+                {
+                    await HelperFunctions.RemoveIndicator(JsRuntime);
+                    await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["PaidFailed"]);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+                {
+                    CreatedDate = DateTime.Now,
+                    Location = "Sale List > PaymentModal > OnSubmit()",
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+}

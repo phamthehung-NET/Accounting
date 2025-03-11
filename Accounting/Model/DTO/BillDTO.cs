@@ -26,8 +26,10 @@
 
         public bool IsDeleted { get; set; }
 
-        public decimal TotalPrice 
-        { 
+        public decimal PaidAmount { get; set; }
+
+        public decimal TotalPrice
+        {
             get
             {
                 decimal value = 0;
@@ -41,9 +43,9 @@
                         }
                     }
                 }
-                return value;
+                return value - PaidAmount;
             }
-        } 
+        }
 
         public IEnumerable<MeatBillPriceDTO> Items { get; set; }
 

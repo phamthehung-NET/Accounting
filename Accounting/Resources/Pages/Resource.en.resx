@@ -297,6 +297,9 @@
   <data name="EditProductSuccess" xml:space="preserve">
     <value>Edit product successully</value>
   </data>
+  <data name="EnterPaidAmount" xml:space="preserve">
+    <value>Enter payment amount</value>
+  </data>
   <data name="EnterWeight" xml:space="preserve">
     <value>Enter weight</value>
   </data>
@@ -458,6 +461,9 @@
   </data>
   <data name="Paid" xml:space="preserve">
     <value>Paid</value>
+  </data>
+  <data name="PaidAmount" xml:space="preserve">
+    <value>Paid amount</value>
   </data>
   <data name="PaidFailed" xml:space="preserve">
     <value>Paying bill failed</value>

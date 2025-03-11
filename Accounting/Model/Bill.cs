@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Accounting.Model
 {
@@ -24,6 +25,9 @@ namespace Accounting.Model
         public DateTime? ModifiedDate { get; set; }
 
         public string LunarModifiedDate { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal PaidAmount { get; set; }
 
         public bool IsPaid { get; set; }
     }

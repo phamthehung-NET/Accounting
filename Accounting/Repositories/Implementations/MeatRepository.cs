@@ -9,12 +9,10 @@ namespace Accounting.Repositories.Implementations
     public class MeatRepository : IMeatRepository
     {
         private readonly AccountingDbContext context;
-        private readonly bool IsLeapYear;
 
         public MeatRepository(AccountingDbContext _context)
         {
             context = _context;
-            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public bool AddMeat(MeatDTO req)
@@ -103,7 +101,7 @@ namespace Accounting.Repositories.Implementations
         public bool DeleteMeat(int id)
         {
             var currentDate = DateTime.Now;
-            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
+            var currentLunarDate = HelperFunctions.ConvertSolarToLunar(currentDate);
 
             var meatDb = context.Meats.FirstOrDefault(x => x.Id == id);
             if (meatDb != null)

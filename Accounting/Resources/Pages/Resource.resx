@@ -297,6 +297,9 @@
   <data name="EditProductSuccess" xml:space="preserve">
     <value>Cập nhật thông tin sản phẩm thành công</value>
   </data>
+  <data name="EnterPaidAmount" xml:space="preserve">
+    <value>Nhập số tiền thanh toán</value>
+  </data>
   <data name="EnterWeight" xml:space="preserve">
     <value>Nhập cân nặng</value>
   </data>
@@ -458,6 +461,9 @@
   </data>
   <data name="Paid" xml:space="preserve">
     <value>Đã thanh toán</value>
+  </data>
+  <data name="PaidAmount" xml:space="preserve">
+    <value>Số tiền thanh toán</value>
   </data>
   <data name="PaidFailed" xml:space="preserve">
     <value>Thanh toán hóa đơn thất bại</value>

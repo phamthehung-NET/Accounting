@@ -64,16 +64,16 @@
                     <div class="card-header d-flex justify-content-between">
                         <div class="fw-bold">@bill.PersonName</div>
                         <div class="d-flex">
-                            <div class="me-2">@(bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(bill.LunarActiveDate) ? HelperFunctions.GetLunarDate(SettingRepo.IsLeapYear(bill.ActiveDate.Value.Year), bill.ActiveDate.Value) : bill.LunarActiveDate) + LRes["LunarDate"] + ")")</div>
+                            <div class="me-2">@(bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(bill.LunarActiveDate) ? HelperFunctions.ConvertSolarToLunar(bill.ActiveDate.Value) : bill.LunarActiveDate) + LRes["LunarDate"] + ")")</div>
                             <div>@(bill.Items.Count() + " " + LRes["item(s)"])</div>
                             @if (bill.Items.Any())
                             {
-                                @((MarkupString)HandleShowStatus(bill.IsPaid))
+                                @((MarkupString)HandleShowStatus(bill.TotalPrice == 0))
                             }
                         </div>
                     </div>
                     <div class="card-body overflow-auto" style="height: 15rem">
-                        @if(bill.IsPaid.Value)
+                        @if (bill.TotalPrice== 0)
                         {
                             <div class="position-absolute paid-box-@(CultureInfo.CurrentCulture.TwoLetterISOLanguageName)"></div>
                         }
@@ -106,7 +106,7 @@
                             @(bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND")
                         </div>
                         <div class="text-end">
-                            @if ((bill.IsPaid == null || !bill.IsPaid.Value) && bill.Items.Any())
+                            @if (bill.TotalPrice != 0 && bill.Items.Any())
                             {
                                 <button class="btn btn-primary me-1" data-bs-toggle="modal" data-bs-target="#payingBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-brands fa-amazon-pay"></i> @LRes["Pay"]</button>
                             }
@@ -164,8 +164,12 @@
             <EditItemsPrice BillId="SelectedBill.Id" GetParentData="async () => await GetData()" />
         </ModalContent>
     </CommonModalWrapper>
+    <CommonModalWrapper Id="payingBill">
+        <ModalContent>
+            <PaymentModal GetData="async () => await GetData()" Bill="SelectedBill" />
+        </ModalContent>
+    </CommonModalWrapper>
     <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteBillConfimation"]" ModalID="deleteBill" SubmitEvent="async () => await HandleDeleteBill()"/>
-    <CommonConfirmModal Title="@LRes["PayingTitle"]" Message="@LRes["PayingBillConfimation"]" ModalID="payingBill" SubmitEvent="async () => await HandlePayingBill()"/>
 </div>
 
 @code {
@@ -211,8 +215,6 @@
         StartDate = DateTimeOffset.Now,
         EndDate = DateTimeOffset.Now,
     };
-
-    List<Year> LeapYear = new();
 
     string ShowingDate = string.Empty;
 
@@ -396,20 +398,13 @@
     {
         try
         {
-            LeapYear.Clear();
-            LeapYear = SettingRepo.GetLeapYear(new List<int>() { DateRange.StartDate.Value.DateTime.Year, DateRange.EndDate.Value.DateTime.Year });
-            if (!LeapYear.Any())
-            {
-                LeapYear.Add(new() { Id = 1, Name = DateRange.StartDate.Value.Year, IsLeapYear = false });
-                LeapYear.Add(new() { Id = 2, Name = DateRange.EndDate.Value.Year, IsLeapYear = false });
-            }
             if (DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
             {
-                return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
+                return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";
             }
             else
             {
-                return $"{LRes["Showing"]}: {LRes["date"]} {LRes["from"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.First().IsLeapYear, DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]}) {LRes["to"]} {DateRange.EndDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.GetLunarDate(LeapYear.Last().IsLeapYear, DateRange.EndDate.Value.DateTime)} {LRes["LunarDate"]})";
+                return $"{LRes["Showing"]}: {LRes["date"]} {LRes["from"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]}) {LRes["to"]} {DateRange.EndDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(DateRange.EndDate.Value.DateTime)} {LRes["LunarDate"]})";
             }
         }
         catch (Exception ex)

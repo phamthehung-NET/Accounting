@@ -15,7 +15,6 @@ namespace Accounting.Repositories.Implementations
         private readonly IMeatRepository meatRepository;
         private readonly IPeopleRepository peopleRepository;
         private readonly IBillRepository billRepository;
-        private readonly bool IsLeapYear;
 
         public RecycleBinRepository(AccountingDbContext _context, IStringLocalizer<Resource> _Lres, IMeatRepository _meatRepository, IPeopleRepository _peopleRepository, IBillRepository _billRepository)
         {
@@ -24,7 +23,6 @@ namespace Accounting.Repositories.Implementations
             billRepository = _billRepository;
             meatRepository = _meatRepository;
             peopleRepository = _peopleRepository;
-            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public Pagination<RecycleBinDTO> GetAll(string keyword, RecycleBinObjectType? type, string order, int pageIndex, int pageSize)
@@ -64,7 +62,7 @@ namespace Accounting.Repositories.Implementations
         public bool Restore(int objectId, RecycleBinObjectType objectType)
         {
             var currentDate = DateTime.Now;
-            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
+            var currentLunarDate = HelperFunctions.ConvertSolarToLunar(currentDate);
             RecycleBin recycleBin = context.RecycleBins.FirstOrDefault(x => x.ObjectId == objectId && x.Type == (int)objectType);
             switch (objectType)
             {

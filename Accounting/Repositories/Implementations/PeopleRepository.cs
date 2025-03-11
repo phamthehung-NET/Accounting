@@ -9,12 +9,10 @@ namespace Accounting.Repositories.Implementations
     public class PeopleRepository : IPeopleRepository
     {
         private readonly AccountingDbContext context;
-        private readonly bool IsLeapYear;
 
         public PeopleRepository(AccountingDbContext _context)
         {
             context = _context;
-            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public bool AddPerson(Person res)
@@ -28,7 +26,7 @@ namespace Accounting.Repositories.Implementations
         public bool DeletePerson(int id)
         {
             var currentDate = DateTime.Now;
-            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, currentDate);
+            var currentLunarDate = HelperFunctions.ConvertSolarToLunar(currentDate);
             var person = context.People.FirstOrDefault(x => x.Id == id);
             if (person != null)
             {

@@ -347,13 +347,6 @@
     {
         try
         {
-            LeapYear.Clear();
-            LeapYear = SettingRepo.GetLeapYear(new List<int>() { DateRange.StartDate.Value.DateTime.Year, DateRange.EndDate.Value.DateTime.Year });
-            if (!LeapYear.Any())
-            {
-                LeapYear.Add(new() { Id = 1, Name = DateRange.StartDate.Value.Year, IsLeapYear = false });
-                LeapYear.Add(new() { Id = 2, Name = DateRange.EndDate.Value.Year, IsLeapYear = false });
-            }
             if (DateRange.StartDate.Value.Date.CompareTo(DateRange.EndDate.Value.Date) == 0)
             {
                 return $"{LRes["Showing"]}: {LRes["date"]} {DateRange.StartDate.Value.DateTime.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(DateRange.StartDate.Value.DateTime)} {LRes["LunarDate"]})";

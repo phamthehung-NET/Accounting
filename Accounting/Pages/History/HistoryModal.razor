@@ -22,7 +22,7 @@
                         {  
                             <tr>
                                 <td>@(i + 1)</td>
-                                <td>@Histories.Items[i].CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                <td>@Histories.Items[i].LunarCreatedDate</td>
                                 <td>@HandleShowAction(Histories.Items[i].Action)</td>
                                 <td>@Histories.Items[i].Content</td>
                             </tr>

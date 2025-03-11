@@ -1,6 +1,6 @@
-﻿using Accounting.Utilities;
-using Accounting.Model;
+﻿using Accounting.Model;
 using Accounting.Model.DTO;
+using Accounting.Utilities;
 
 namespace Accounting.Repositories.Interfaces
 {

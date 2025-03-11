@@ -11,20 +11,18 @@ namespace Accounting.Repositories.Implementations
         private readonly AccountingDbContext context;
         private readonly IHttpContextAccessor httpContext;
         private readonly UserManager<CustomUser> userManager;
-        private readonly bool IsLeapYear;
 
         public PriceRepository(AccountingDbContext _context, IHttpContextAccessor _httpContext, UserManager<CustomUser> _userManager)
         {
             context = _context;
             httpContext = _httpContext;
             userManager = _userManager;
-            IsLeapYear = context.YearSettings.FirstOrDefault(x => x.Name == DateTime.Now.Year).IsLeapYear;
         }
 
         public async Task<bool> UpdateItemPrice(Dictionary<int, int?> inputEntryPrice, Dictionary<int, int?> inputSalePrice, DateTime? date)
         {
             date ??= DateTime.Now;
-            var currentLunarDate = HelperFunctions.GetLunarDate(IsLeapYear, date.Value);
+            var currentLunarDate = HelperFunctions.ConvertSolarToLunar(date.Value);
             var user = userManager.FindByNameAsync(httpContext.HttpContext.User.Identity.Name).Result;
             if (!inputEntryPrice.Any() && !inputSalePrice.Any())
             {
