@@ -88,9 +88,11 @@
                     total += x.Weight != null ? x.Weight.Value : 0;
                 });
 
-                return total;
+                return total - RestMeatWeight;
             }
         }
+
+        public decimal RestMeatWeight { get; set; }
 
         public DateTime ActivateDate { get; set ; } = DateTime.Now;
     }

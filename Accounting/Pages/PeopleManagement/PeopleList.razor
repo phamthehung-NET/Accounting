@@ -30,6 +30,7 @@
                 <td>@Context.Address</td>
                 <td>@HelperFunctions.HandleDisplayPersonType(LRes, Context.Source)</td>
                 <td>@(Context.NearestTransaction != null ? (Context.NearestTransaction.ActivateDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(Context.NearestTransaction.LunarActiveDate) ? HelperFunctions.ConvertSolarToLunar(Context.NearestTransaction.ActivateDate.Value) : Context.NearestTransaction.LunarActiveDate) + LRes["LunarDate"] + ")") : LRes["No data"])</td>
+                <td role="button" data-bs-toggle="modal" data-bs-target="#debtModal" @onclick="() => OnBtnDebtClick(Context)">@(Context.TotalDebt.ToString("n0") + ".000 VND")</td>
                 <td>
                     <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#nearestTransactionModal" disabled="@(Context.NearestTransaction == null)" @onclick="() => {SelectedPersonDTO = Context;}"><i class="fa-regular fa-circle-info"></i> @LRes["ViewNearestTransaction"]</button>
                     <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPersonModal" @onclick="() => OnSelectPerson(Context)"><i class="fa-duotone fa-pen-to-square"></i> @LRes["Edit"]</button>
@@ -51,6 +52,11 @@
     <CommonModalWrapper Id="nearestTransactionModal">
         <ModalContent>
             <NearestTransaction BillId="SelectedPersonDTO != null && SelectedPersonDTO.NearestTransaction != null ? SelectedPersonDTO.NearestTransaction.Id : 0" />
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonModalWrapper Id="debtModal">
+        <ModalContent>
+            <DebtInfoModal Person="SelectedPersonDTO" IsOpened ="@IsDebtModalOpened" CloseModal="() => IsDebtModalOpened = false" />
         </ModalContent>
     </CommonModalWrapper>
     <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeletePersonConfirmation"]" ModalID="deletePerson" SubmitEvent="async () => await DeletePerson(SelectedPerson.Id)"/>
@@ -83,6 +89,8 @@
 
     PersonDTO SelectedPersonDTO;
 
+    bool IsDebtModalOpened = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -99,6 +107,7 @@
         Headers.Add(new Header() { Name = "Address", DisplayName = LRes["Address"], Ordering = true });
         Headers.Add(new Header() { Name = "Source", DisplayName = LRes["Type"], Ordering = true });
         Headers.Add(new Header() { Name = "NearestTransaction", DisplayName = LRes["NearestTransaction"]});
+        Headers.Add(new Header() { Name = "TotalDebt", DisplayName = LRes["TotalDebt"], Ordering = true });
         Headers.Add(new Header() { Name = "Actions", DisplayName = LRes["Actions"] });
     }
 
@@ -225,5 +234,11 @@
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
+    }
+
+    void OnBtnDebtClick(PersonDTO selectedPerson)
+    {
+        SelectedPersonDTO = selectedPerson;
+        IsDebtModalOpened = true;
     }
 }

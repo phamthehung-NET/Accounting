@@ -131,5 +131,20 @@ namespace Accounting.Utilities
             }
             return bmp;
         }
+
+        public static string GetTimeDifference(IStringLocalizer<Resource> Lres, DateTime date)
+        {
+            TimeSpan timeSpan = DateTime.Now - date;
+
+            return timeSpan.TotalSeconds switch
+            {
+                < 60 => $"{(int)timeSpan.TotalSeconds} {Lres["seconds ago"]}",
+                < 3600 => $"{(int)timeSpan.TotalMinutes} {Lres["minutes ago"]}",
+                < 86400 => $"{(int)timeSpan.TotalHours} {Lres["hours ago"]}",
+                < 2592000 => $"{(int)timeSpan.TotalDays} {Lres["days ago"]}",
+                < 31536000 => $"{(int)(timeSpan.TotalDays / 30)} {Lres["months ago"]}",
+                _ => $"{(int)(timeSpan.TotalDays / 365)} {Lres["years ago"]}"
+            };
+        }
     }
 }

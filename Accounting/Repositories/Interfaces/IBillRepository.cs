@@ -13,7 +13,7 @@ namespace Accounting.Repositories.Interfaces
 
         bool DeleteBill(int id);
 
-        bool PayingBill(int id, decimal totalPrice);
+        bool PayingBill(int id, decimal totalPrice, decimal totalAmount);
 
         Task<bool> AddMeatToBill(int id, decimal weight, int billId, PriceType priceType);
 
@@ -22,5 +22,9 @@ namespace Accounting.Repositories.Interfaces
         BillDTO GetBillDetail(int id);
 
         Pagination<MeatBillPriceDTO> GetAllMeatOfBill(int billId);
+
+        List<DebtDTO> GetDebtByPerson(int personId);
+
+        bool AddRestMeat(int billId, decimal weight);
     }
 }

@@ -135,6 +135,9 @@
   <data name="Add" xml:space="preserve">
     <value>Thêm mới</value>
   </data>
+  <data name="Add own bill" xml:space="preserve">
+    <value>Thêm hóa đơn</value>
+  </data>
   <data name="AddBillMeatFailed" xml:space="preserve">
     <value>Thêm mặt hàng vào hóa đơn thất bại</value>
   </data>
@@ -161,6 +164,12 @@
   </data>
   <data name="Address" xml:space="preserve">
     <value>Địa chỉ</value>
+  </data>
+  <data name="AddRestMeat" xml:space="preserve">
+    <value>Thêm thịt còn lại</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Tất cả</value>
   </data>
   <data name="at" xml:space="preserve">
     <value>tại</value>
@@ -242,6 +251,15 @@
   </data>
   <data name="day" xml:space="preserve">
     <value>ngày</value>
+  </data>
+  <data name="days ago" xml:space="preserve">
+    <value>ngày trước</value>
+  </data>
+  <data name="Debt" xml:space="preserve">
+    <value>Dư nợ</value>
+  </data>
+  <data name="Debt date" xml:space="preserve">
+    <value>Ngày</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Xóa</value>
@@ -339,6 +357,9 @@
   <data name="Home" xml:space="preserve">
     <value>Trang chủ</value>
   </data>
+  <data name="hours ago" xml:space="preserve">
+    <value>giờ trước</value>
+  </data>
   <data name="in" xml:space="preserve">
     <value>trong</value>
   </data>
@@ -378,6 +399,9 @@
   <data name="Log out" xml:space="preserve">
     <value>Đăng xuất</value>
   </data>
+  <data name="LongestDebtPeople" xml:space="preserve">
+    <value>Người nợ lâu nhất</value>
+  </data>
   <data name="LunarDate" xml:space="preserve">
     <value>ÂL</value>
   </data>
@@ -411,11 +435,17 @@
   <data name="Message" xml:space="preserve">
     <value>Thông điệp</value>
   </data>
+  <data name="minutes ago" xml:space="preserve">
+    <value>phút trước</value>
+  </data>
   <data name="ModifiedHistory" xml:space="preserve">
     <value>Lịch sử sửa đổi</value>
   </data>
   <data name="month" xml:space="preserve">
     <value>tháng</value>
+  </data>
+  <data name="months ago" xml:space="preserve">
+    <value>tháng trước</value>
   </data>
   <data name="Move to recycle bin success" xml:space="preserve">
     <value>Đã chuyển vào thùng rác</value>
@@ -480,6 +510,9 @@
   <data name="PayingTitle" xml:space="preserve">
     <value>Xác nhận thanh toán</value>
   </data>
+  <data name="PeopleIndebt" xml:space="preserve">
+    <value>Người còn nợ</value>
+  </data>
   <data name="PeopleList" xml:space="preserve">
     <value>Danh sách người mua/bán</value>
   </data>
@@ -531,6 +564,9 @@
   <data name="RemoveItem" xml:space="preserve">
     <value>Xóa sản phẩm</value>
   </data>
+  <data name="Rest" xml:space="preserve">
+    <value>Còn lại</value>
+  </data>
   <data name="Restore" xml:space="preserve">
     <value>Khôi phục</value>
   </data>
@@ -563,6 +599,9 @@
   </data>
   <data name="Search by name" xml:space="preserve">
     <value>Tìm theo tên</value>
+  </data>
+  <data name="seconds ago" xml:space="preserve">
+    <value>giây trước</value>
   </data>
   <data name="Seller" xml:space="preserve">
     <value>Người bán</value>
@@ -606,6 +645,12 @@
   <data name="Total" xml:space="preserve">
     <value>Tổng</value>
   </data>
+  <data name="TotalDebt" xml:space="preserve">
+    <value>Tổng nợ</value>
+  </data>
+  <data name="TotalDebtModal" xml:space="preserve">
+    <value>Chi tiết dư nợ</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Kiểu</value>
   </data>
@@ -628,7 +673,7 @@
     <value>Xem lịch sử</value>
   </data>
   <data name="ViewNearestTransaction" xml:space="preserve">
-    <value>Xem thông tin giao dịch gần nhất</value>
+    <value>Thông tin giao dịch</value>
   </data>
   <data name="Wasted" xml:space="preserve">
     <value>Khấu hao</value>
@@ -650,6 +695,9 @@
   </data>
   <data name="year" xml:space="preserve">
     <value>năm</value>
+  </data>
+  <data name="years ago" xml:space="preserve">
+    <value>năm trước</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Có</value>

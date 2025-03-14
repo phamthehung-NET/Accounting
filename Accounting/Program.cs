@@ -29,6 +29,11 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 builder.Services.AddIdentity<CustomUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 1;
 }).AddEntityFrameworkStores<IdentityDbContext>();
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -77,7 +82,8 @@ var localizationOptions = new RequestLocalizationOptions()
 
 app.UseRequestLocalization(localizationOptions);
 
-app.UsePathBase("/Accounting");
+// Running on IIS server with domain/accounting path
+//app.UsePathBase("/Accounting");
 
 app.UseStaticFiles();
 

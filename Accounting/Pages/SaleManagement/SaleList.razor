@@ -66,14 +66,14 @@
                         <div class="d-flex">
                             <div class="me-2">@(bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(bill.LunarActiveDate) ? HelperFunctions.ConvertSolarToLunar(bill.ActiveDate.Value) : bill.LunarActiveDate) + LRes["LunarDate"] + ")")</div>
                             <div>@(bill.Items.Count() + " " + LRes["item(s)"])</div>
-                            @if (bill.Items.Any())
+                            @if (bill.Items.Any() && bill.PersonId != 0)
                             {
-                                @((MarkupString)HandleShowStatus(bill.TotalPrice == 0))
+                                @((MarkupString)HandleShowStatus(bill.IsPaid))
                             }
                         </div>
                     </div>
                     <div class="card-body overflow-auto" style="height: 15rem">
-                        @if (bill.TotalPrice== 0)
+                        @if (bill.IsPaid.Value)
                         {
                             <div class="position-absolute paid-box-@(CultureInfo.CurrentCulture.TwoLetterISOLanguageName)"></div>
                         }
@@ -86,6 +86,24 @@
                                         <span>@LRes["Add"]</span>
                                     </button>
                                 </li>
+                            }
+                            @if (bill.PersonId == 0)
+                            {
+                                @if (bill.RestMeatWeigt == 0)
+                                {
+                                    <li class="list-group-item">
+                                        <button class="btn border-0 bg-transparent text-primary w-100 py-0" data-bs-toggle="modal" data-bs-target="#addRestMeatModal" @onclick="() => HandleSelecteBill(bill)">
+                                            <i class="fa-regular fa-circle-plus"></i>
+                                            <span>@LRes["AddRestMeat"]</span>
+                                        </button>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="list-group-item">
+                                        <div>@(LRes["Rest"] + ": " + bill.RestMeatWeigt + " kg")</div>
+                                    </li>
+                                }
                             }
                             @foreach (var item in bill.Items)
                             {
@@ -103,10 +121,18 @@
                     </div>
                     <div class="card-footer d-flex justify-content-between">
                         <div>
-                            @(bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND")
+                            @* @(bill.TotalPrice == 0 ? string.Empty : bill.TotalPrice.ToString("n0") + ".000 VND") *@
+                            @if (bill.TotalPrice > 0 && bill.PaidAmount == 0)
+                            {
+                                <div>@(bill.TotalPrice.ToString("n0") + ".000 VND")</div>
+                            }
+                            else if (bill.RestAmount >= 0 && bill.RestAmount < bill.TotalPrice)
+                            {
+                                <div class="d-flex"><span class="text-muted text-decoration-line-through me-1">@(bill.TotalPrice.ToString("n0") + ".000 VND")</span>@(bill.RestAmount.ToString("n0") + ".000 VND")</div>
+                            }
                         </div>
-                        <div class="text-end">
-                            @if (bill.TotalPrice != 0 && bill.Items.Any())
+                        <div class="me-0">
+                            @if (!bill.IsPaid.Value && bill.Items.Any() && bill.PersonId != 0)
                             {
                                 <button class="btn btn-primary me-1" data-bs-toggle="modal" data-bs-target="#payingBill" @onclick="() => HandleSelecteBill(bill)"><i class="fa-brands fa-amazon-pay"></i> @LRes["Pay"]</button>
                             }
@@ -122,7 +148,7 @@
                                     <i class="fa-regular fa-ellipsis-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    @if (!bill.IsPaid.Value)
+                                    @if (!bill.IsPaid.Value && bill.PaidAmount == 0)
                                     {
                                         <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPriceModal" @onclick="() => HandleSelecteBill(bill)">@LRes["EditItemsPrice"]</li>
                                     }
@@ -167,6 +193,11 @@
     <CommonModalWrapper Id="payingBill">
         <ModalContent>
             <PaymentModal GetData="async () => await GetData()" Bill="SelectedBill" />
+        </ModalContent>
+    </CommonModalWrapper>
+    <CommonModalWrapper Id="addRestMeatModal">
+        <ModalContent>
+            <AddRestMeatModal GetData="async () => await GetData()" Bill="SelectedBill" />
         </ModalContent>
     </CommonModalWrapper>
     <CommonConfirmModal Title="@LRes["DeleteTitle"]" Message="@LRes["DeleteBillConfimation"]" ModalID="deleteBill" SubmitEvent="async () => await HandleDeleteBill()"/>
@@ -431,10 +462,9 @@
             if (SelectedBill.Id > 0)
             {
                 await HelperFunctions.AddIndicator(JsRuntime);
-                if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice))
+                if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.RestAmount, SelectedBill.TotalPrice))
                 {
-                    Bills.Items.FirstOrDefault(x => x.Id == SelectedBill.Id).IsPaid = true;
-                    SelectedBill = new();
+                    await GetData();
                     await HelperFunctions.RemoveIndicator(JsRuntime);
                     await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
                 }
@@ -542,6 +572,7 @@
             workSheet.Cells["A1:D1"].Merge = true;
             workSheet.Cells[1, 1].Value = "Quyết Viết";
             workSheet.Row(1).Height = 23;
+            workSheet.Cells[2, 1].Value = LRes["Paid"] + ": " + bill.PaidAmount.ToString("n0") + ".000";
             workSheet.Cells[2, 4].Value = LRes["Number"] + ": " + bill.Id;
             workSheet.Cells["A3:D3"].Merge = true;
             workSheet.Cells["A3"].Value = LRes["BuyerName"]+ ": " + bill.PersonName;
@@ -558,7 +589,7 @@
             int row = 6;
             foreach (var item in bill.Items)
             {
-                workSheet.Cells[row, 1].Value = item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType) + (item.Frozen ? "❄️" : "");
+                workSheet.Cells[row, 1].Value = item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType) + (item.Frozen ? " ĐL" : "");
                 workSheet.Cells[row, 2].Value = item.Weight + " Kg";
                 workSheet.Cells[row, 3].Value = item.Price;
                 workSheet.Cells[row, 4].Value = item.ItemPrice == 0 ? string.Empty : item.ItemPrice.ToString("n0") + ".000";
@@ -579,7 +610,7 @@
 
             workSheet.Cells[maxProduct + 1, 2, maxProduct + 1, 4].Merge = true;
             workSheet.Row(maxProduct + 1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-            workSheet.Cells[maxProduct + 1, 2].Value = $"Hải Dương, {LRes["day"]} {Convert.ToDateTime(bill.LunarActiveDate).Day} {LRes["month"]} {Convert.ToDateTime(bill.LunarActiveDate).Month} {LRes["year"]} {Convert.ToDateTime(bill.LunarActiveDate).Year}";
+            workSheet.Cells[maxProduct + 1, 2].Value = $"Hải Dương, {LRes["day"]} {Convert.ToDateTime(bill.LunarActiveDate).Day} {LRes["month"]} {Convert.ToDateTime(bill.LunarActiveDate).Month} {LRes["year"]} {Convert.ToDateTime(bill.LunarActiveDate).Year} {LRes["LunarDate"]}";
 
             workSheet.Cells[maxProduct + 2, 3, maxProduct + 2, 4].Merge = true;
             workSheet.Row(maxProduct + 2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -610,12 +641,12 @@
                 FileStream objFileStrm = File.Create(path);
                 objFileStrm.Close();
 
-                // Write content to excel file
-                File.WriteAllBytes(path, excel.GetAsByteArray());
-                //Close Excel package
-                excel.Dispose();
+                // // Write content to excel file
+                // File.WriteAllBytes(path, excel.GetAsByteArray());
+                // //Close Excel package
+                // excel.Dispose();
 
-                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+                // Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
             }
             else
             {
@@ -668,7 +699,7 @@
                         // Bill header
                         XSize textSize = gfx.MeasureString(cellValue, headerFont);
                         double centerX = (page.Width.Point - textSize.Width) / 2;
-                        gfx.DrawString(cellValue, headerFont, XBrushes.Black, centerX, startY + 10 + (excelRow - 1) * headerLineHeight);
+                        gfx.DrawString(cellValue, headerFont, XBrushes.Black, centerX, startY + 10 + (excelRow - 1) * lineHeight);
                     }
                     else
                     {
@@ -678,7 +709,7 @@
                         gfx.DrawString(cellValue, headerFont, XBrushes.Black, centerX, startY + 16 + (excelRow - 1) * headerLineHeight);
                     }
                 }
-                else if (excelRow >= workSheet.Dimension.End.Row - 4 || excelRow == 2)
+                else if (excelRow >= workSheet.Dimension.End.Row - 4)
                 {
                     // Bill footer
                     XSize textSize = gfx.MeasureString(cellValue, font);
@@ -707,7 +738,7 @@
                         else
                         {
                             // Others
-                            gfx.DrawString(cellValue, font, XBrushes.Black, startX + (col - 1) * columnWidth, startY + 20 + (excelRow - 1) * lineHeight);
+                            gfx.DrawString(cellValue, font, XBrushes.Black, startX + (col - 1) * columnWidth, startY  + (excelRow - 1) * lineHeight);
                         }
                     }
                     if (excelRow > 4 && excelRow < workSheet.Dimension.End.Row - 4)

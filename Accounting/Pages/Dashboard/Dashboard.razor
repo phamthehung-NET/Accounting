@@ -20,41 +20,113 @@
 <PageTitle>@LRes["Dashboard"]</PageTitle>
 
 <div class="container-fluid">
-    <div class="card col-md-5 col-sm-12 col-lg-5 col-xl-5 mb-4 p-0">
-        <div class="card-header d-flex justify-content-between">
-            <div class="fw-bold">@LRes["WastedMeatWeight"]</div>
-            <div>@($"{WastedDate.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(WastedDate)})")</div>
-        </div>
-        <div class="card-body">
-            <div class="mb-2">
-                <DateRangePicker class="form-control" placeholder="@LRes["ChooseDate"]" OnRangeSelect="async (dateRange) => await OnRangeSelect(dateRange) " MinDate="DateTime.Now.AddYears(-10)" MaxDate="DateTime.Now" ApplyLabel="@LRes["Done"]" CancelLabel="@LRes["Close"]" ShowOnlyOneCalendar="true" SingleDatePicker="true"/>
+    <div class="row">
+        <div class="card col-md-6 col-sm-12 col-lg-6 col-xl-6 mb-4 p-0">
+            <div class="card-header d-flex justify-content-between">
+                <div class="fw-bold">@LRes["WastedMeatWeight"]</div>
+                <div>@($"{WastedDate.ToString("dd/MM/yyyy")} ({HelperFunctions.ConvertSolarToLunar(WastedDate)} {LRes["LunarDate"]})")</div>
             </div>
-            @if (Data != null && Data.Result != null && Data.Result.Any())
-            {
-                <table class="table table-bordered table-striped text-center table-responsive">
-                    <thead>
-                        <tr>
-                            <th>@LRes["Name"]</th>
-                            <th>@LRes["Meat Type"]</th>
-                            <th>@LRes["Wasted"]</th>
-                        </tr>
-                    </thead>
-                    <tbody class="overflow-auto" style="height: 10rem">
-                        @foreach (var item in Data.Result)
-                        {
+            <div class="card-body">
+                <div class="mb-2">
+                    <DateRangePicker class="form-control" placeholder="@LRes["ChooseDate"]" OnRangeSelect="async (dateRange) => await OnRangeSelect(dateRange) " MinDate="DateTime.Now.AddYears(-10)" MaxDate="DateTime.Now" ApplyLabel="@LRes["Done"]" CancelLabel="@LRes["Close"]" ShowOnlyOneCalendar="true" SingleDatePicker="true" />
+                </div>
+                @if (WastedData != null && WastedData.Result != null && WastedData.Result.Any())
+                {
+                    <table class="table table-bordered table-striped text-center table-responsive">
+                        <thead>
                             <tr>
-                                <td>@item.MeatName</td>
-                                <td>@HelperFunctions.RenderMeatType(LRes, item.MeatType)</td>
-                                <td>@(item.Weight + " Kg")</td>
+                                <th>@LRes["Name"]</th>
+                                <th>@LRes["Meat Type"]</th>
+                                <th>@LRes["Wasted"]</th>
                             </tr>
-                        }
-                        <tr>
-                            <td class="fw-bold" colspan="2">@LRes["Total"]</td>
-                            <td>@(Data.WastedWeight + " Kg")</td>
-                        </tr>
-                    </tbody>
-                </table>
-            }
+                        </thead>
+                        <tbody class="overflow-auto" style="height: 10rem">
+                            @foreach (var item in WastedData.Result)
+                            {
+                                <tr>
+                                    <td>@item.MeatName</td>
+                                    <td>@HelperFunctions.RenderMeatType(LRes, item.MeatType)</td>
+                                    <td>@(item.Weight + " Kg")</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td class="fw-bold" colspan="2">@LRes["Total"]</td>
+                                <td>@(WastedData.WastedWeight + " Kg")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="card col-md-6 col-sm-12 col-lg-6 col-xl-6 mb-4 p-0">
+            <div class="card-header d-flex justify-content-between">
+                <div class="fw-bold">@LRes["PeopleIndebt"]</div>
+                <div class="d-flex">
+                    <button class="btn btn-outline-primary me-1" onclick="@(async () => {MostDebtNumberOfItem = 10; await GetMostDebtedData();})">@LRes["Top 10"]</button>
+                    <button class="btn btn-outline-primary" onclick="@(async () => {MostDebtNumberOfItem = 0; await GetMostDebtedData();})">@LRes["All"]</button>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (MostDebtData.Any())
+                {
+                    <table class="table table-striped text-center table-responsive">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>@LRes["Name"]</th>
+                                <th>@LRes["TotalDebt"]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-auto" style="height: 10rem">
+                            @foreach (var item in MostDebtData)
+                            {
+                                <tr>
+                                    <td>@(MostDebtData.IndexOf(item) + 1)</td>
+                                    <td>@item.Name</td>
+                                    <td>@(item.Debt.ToString("n0") + ".000 VND")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="card col-md-6 col-sm-12 col-lg-6 col-xl-6 mb-4 p-0">
+            <div class="card-header d-flex justify-content-between">
+                <div class="fw-bold">@LRes["LongestDebtPeople"]</div>
+                <div>
+                    <div class="d-flex">
+                        <button class="btn btn-outline-primary me-1" onclick="@(async () => {LongestDebtNumberOfItem = 10; await GetLongestDebtedData();})">@LRes["Top 10"]</button>
+                        <button class="btn btn-outline-primary" onclick="@(async () => {LongestDebtNumberOfItem = 0; await GetLongestDebtedData();})">@LRes["All"]</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (LongestDebtData.Any())
+                {
+                    <table class="table table-striped text-center table-responsive">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>@LRes["Name"]</th>
+                                <th>@LRes["Debt date"]</th>
+                                <th>@LRes["TotalDebt"]</th>
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-auto" style="height: 10rem">
+                            @foreach (var item in LongestDebtData)
+                            {
+                                <tr>
+                                    <td>@(LongestDebtData.IndexOf(item) + 1)</td>
+                                    <td>@item.Name</td>
+                                    <td>@(item.Date.ToString("dd/MM/yyyy") + $" ({item.LunarDate} {LRes["LunarDate"]})" + " " + HelperFunctions.GetTimeDifference(LRes, item.Date))</td>
+                                    <td>@(item.Debt.ToString("n0") + ".000 VND")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
         </div>
     </div>
     <div class="card col-12">
@@ -63,7 +135,15 @@
 </div>
 
 @code {
-    DashboardDTO Data;
+    DashboardDTO WastedData;
+
+    List<DebtDashboardDTO> MostDebtData = new();
+
+    List<DebtDashboardDTO> LongestDebtData = new();
+
+    int MostDebtNumberOfItem = 10;
+
+    int LongestDebtNumberOfItem = 10;
 
     DateTime WastedDate = DateTime.Now;
 
@@ -95,6 +175,8 @@
         {
             await GetWastedData();
             await GetChartData();
+            await GetMostDebtedData();
+            await GetLongestDebtedData();
         }
     }
 
@@ -103,7 +185,7 @@
         try
         {
             await HelperFunctions.AddIndicator(JsRuntime);
-            Data = DasboardRepo.GetWastedWeight(WastedDate);
+            WastedData = DasboardRepo.GetWastedWeight(WastedDate);
             await HelperFunctions.RemoveIndicator(JsRuntime);
             StateHasChanged();
         }
@@ -122,6 +204,57 @@
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
     }
+
+    async Task GetMostDebtedData()
+    {
+        try
+        {
+            await HelperFunctions.AddIndicator(JsRuntime);
+            MostDebtData = DasboardRepo.GetDebtData(DasboardDebtFilterType.MostDebt, MostDebtNumberOfItem);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Dashboard > GetMostDebtedData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+
+    async Task GetLongestDebtedData()
+    {
+        try
+        {
+            await HelperFunctions.AddIndicator(JsRuntime);
+            LongestDebtData = DasboardRepo.GetDebtData(DasboardDebtFilterType.LongestDebt, LongestDebtNumberOfItem);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Dashboard > GetLongestDebtedData()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.RemoveIndicator(JsRuntime);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+
     async Task OnRangeSelect(DateRange range)
     {
         WastedDate = range.Start.DateTime;

@@ -7,17 +7,16 @@
 <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["Pay"]" Color="@Constants.PrimaryColor"></CommonLabel>
+            <CommonLabel DisplayText="@LRes["AddRestMeat"]" Color="@Constants.PrimaryColor"></CommonLabel>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="OnDismiss"></button>
         </div>
         <div class="modal-body">
-            <label>@LRes["PaidAmount"]</label>
+            <label>@LRes["Weight"]</label>
             <div class="d-flex">
-                <CurrencyInput @bind-Value="PaidAmount" class="@(!string.IsNullOrEmpty(ErrorMsg) ? "form-control is-invalid" : "form-control")" placeholder="@LRes["EnterPaidAmount"]" min="0" />
-                <span class="w-100 ms-2 d-flex align-items-center">000 VND</span>
+                <input class="form-control @(!string.IsNullOrEmpty(ErrorMsg) ? "is-invalid" : "")" type="number" value="@(Weight == 0 ? null : Weight)" placeholder="@LRes["EnterWeight"]" min="0" @onchange="OnWeightChange" />
+                <span class="w-100 ms-2 d-flex align-items-center">kg</span>
             </div>
             <div class="text-danger">@ErrorMsg</div>
-            <div class="text-warning"></div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" data-bs-dismiss="modal" @onclick="OnDismiss">@LRes["Close"]</button>
@@ -25,7 +24,6 @@
         </div>
     </div>
 </div>
-
 @code {
     [Parameter]
     public Action GetData { get; set; }
@@ -33,40 +31,36 @@
     [Parameter]
     public BillDTO Bill { get; set; }
 
-    decimal? PaidAmount = null;
+    decimal? Weight = null;
 
     string ErrorMsg = string.Empty;
-
-    void OnInputChange(ChangeEventArgs e)
-    {
-        PaidAmount = decimal.Parse(!string.IsNullOrEmpty(e.Value.ToString()) ? e.Value.ToString().Replace('.', ',') : "0");
-    }
 
     void OnDismiss()
     {
         Bill = new();
-        PaidAmount = null;
+        Weight = 0;
         ErrorMsg = string.Empty;
     }
 
-    async Task OnSubmit(){
+    async Task OnSubmit()
+    {
         try
         {
             if (Bill.Id > 0)
             {
                 await HelperFunctions.AddIndicator(JsRuntime);
-                decimal amount = 0;
-                if(!PaidAmount.HasValue || PaidAmount.Value >= Bill.TotalPrice){
-                    amount = Bill.TotalPrice;
+                if (!Weight.HasValue)
+                {
+                    ErrorMsg = LRes["EnterWeight"];
                 }
                 else
                 {
-                    amount = PaidAmount.Value;
+                    ErrorMsg = string.Empty;
                 }
-                if (BillRepo.PayingBill(Bill.Id, amount, Bill.TotalPrice))
+                if (BillRepo.AddRestMeat(Bill.Id, Weight.Value))
                 {
                     GetData.Invoke();
-                    await HelperFunctions.HideModal(JsRuntime, "payingBill");
+                    await HelperFunctions.HideModal(JsRuntime, "addRestMeatModal");
                     OnDismiss();
                     await HelperFunctions.RemoveIndicator(JsRuntime);
                     await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
@@ -83,7 +77,7 @@
             Log log = new()
                 {
                     CreatedDate = DateTime.Now,
-                    Location = "Sale List > PaymentModal > OnSubmit()",
+                    Location = "Sale List > AddRestMeatModal > OnSubmit()",
                     Message = ex.Message,
                     StackTrace = ex.StackTrace
                 };
@@ -92,5 +86,10 @@
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
         }
+    }
+
+    void OnWeightChange(ChangeEventArgs e)
+    {
+        Weight = decimal.Parse(!string.IsNullOrEmpty(e.Value.ToString()) ? e.Value.ToString().Replace('.', ',') : "0");
     }
 }

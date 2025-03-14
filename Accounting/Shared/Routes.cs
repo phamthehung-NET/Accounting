@@ -6,8 +6,7 @@ namespace Accounting.Shared
     {
         public static readonly Dictionary<string, (Type Page, bool RequiresAuth)> Pages = new()
         {
-            {Constants.SystemPrefix + "/", (typeof(Pages.Index), false) },
-            {Constants.SystemPrefix, (typeof(Pages.Index), false) },
+            {"/", (typeof(Pages.Index), false) },
             {Constants.UpdatePrice, (typeof(Pages.Index), true) },
             {Constants.UnAuthorized, (typeof(Pages.Index), true) },
             {Constants.Dashboad, (typeof(Pages.Dashboard.Dashboard), true) },

@@ -18,6 +18,8 @@ namespace Accounting.Model.DTO
 
         [AllowNull]
         public NearestTransaction NearestTransaction { get; set; }
+
+        public decimal TotalDebt { get; set; }
     }
 
     public class NearestTransaction

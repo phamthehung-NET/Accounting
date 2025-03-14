@@ -15,7 +15,7 @@
         <a  class="nav-link text-dark" title="Manage">@LRes["Hello"] @User.Identity?.Name!</a>
     </li>
     <li class="nav-item">
-        <form class="form-inline" asp-area="Identity" asp-page="@Constants.Logout" asp-route-returnUrl="@(Constants.SystemPrefix + "/")" method="post">
+        <form class="form-inline" asp-area="Identity" asp-page="@Constants.Logout" asp-route-returnUrl="@("/")" method="post">
             <button  type="submit" class="nav-link btn btn-link text-dark">@LRes["Log out"]</button>
         </form>
     </li>

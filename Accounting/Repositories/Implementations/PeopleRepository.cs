@@ -50,6 +50,8 @@ namespace Accounting.Repositories.Implementations
             var people = (from p in context.People
                           join b in context.Bills on p.Id equals b.PersonId into bills
                           from bill in bills.DefaultIfEmpty()
+                          join mbp in context.MeatBillPrices on bill.Id equals mbp.BillId into meatbills
+                          from mbps in meatbills.DefaultIfEmpty()
                           select new
                           {
                               p.Id,
@@ -61,6 +63,13 @@ namespace Accounting.Repositories.Implementations
                               NearestTransaction = bill.ActiveDate,
                               NearestTransactionId = bill.Id,
                               LunarNearestTransaction = bill.LunarActiveDate,
+                              billId = bill.Id,
+                              bill.IsPaid,
+                              bill.PaidAmount,
+                              deletedBill = bill.IsDeleted,
+                              mbps.Weight,
+                              mbps.Price,
+                              mbps.PriceType
                           }).GroupBy(x => new { x.Id, x.Name, x.Source, x.Address, x.IsDeleted, x.PhoneNumber })
                          .Select(x => new PersonDTO
                          {
@@ -76,6 +85,7 @@ namespace Accounting.Repositories.Implementations
                                  ActivateDate = y.NearestTransaction,
                                  LunarActiveDate = y.LunarNearestTransaction
                              }).Where(x => x.ActivateDate != null).OrderByDescending(x => x.ActivateDate).FirstOrDefault(),
+                             TotalDebt = x.Where(y => y.billId > 0 && !y.IsPaid && !y.deletedBill && y.PriceType == (int)PriceType.Sale).Select(y => new { y.Weight, y.Price }).Sum(y => y.Weight * (y.Price ?? 0)) - x.Sum(y => y.PaidAmount)
                          });
 
 

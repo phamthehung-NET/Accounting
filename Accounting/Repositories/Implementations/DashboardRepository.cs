@@ -1,7 +1,11 @@
 ﻿using Accounting.Data;
+using Accounting.Model;
 using Accounting.Model.DTO;
 using Accounting.Repositories.Interfaces;
 using Accounting.Utilities;
+using BlazorDateRangePicker;
+using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Accounting.Repositories.Implementations
 {
@@ -40,6 +44,14 @@ namespace Accounting.Repositories.Implementations
                 EntryMeats = data.Where(x => x.PriceType == (int)PriceType.Entry).ToList(),
                 SaleMeats = data.Where(x => x.PriceType == (int)PriceType.Sale).ToList(),
             };
+
+            var bill = context.Bills.FirstOrDefault(x => x.ActiveDate.Value.Date.CompareTo(date.Value.Date) == 0 && x.PersonId == 0);
+
+            if(bill != null)
+            {
+                returnedData.RestMeatWeight = bill.RestMeatWeight;
+            }
+
             return returnedData;
         }
 
@@ -89,18 +101,93 @@ namespace Accounting.Repositories.Implementations
                     MeatType = y.MeatType,
                 }).Where(x => x.Id != null && x.Id > 0)
             }).OrderBy(x => x.ActivateDate);
-            
-            foreach(var item in data)
+
+            var bills = context.Bills.Where(x => x.ActiveDate.Value.Date.CompareTo(dateTime.AddDays(-10).Date) >= 0 && x.ActiveDate.Value.Date.CompareTo(dateTime.Date) <= 0 && x.PersonId == 0).ToList();
+
+            foreach (var item in data)
             {
+                var bill = bills.FirstOrDefault(x => x.ActiveDate.Value.Date.CompareTo(item.ActivateDate.Date) == 0);
                 DashboardDTO wastedData = new()
                 {
                     EntryMeats = item.Data.Where(x => x.PriceType == (int)PriceType.Entry).ToList(),
                     SaleMeats = item.Data.Where(x => x.PriceType == (int)PriceType.Sale).ToList(),
                     ActivateDate = item.ActivateDate,
+                    RestMeatWeight = bill != null ? bill.RestMeatWeight : 0
                 };
                 returnedData.Add(wastedData);
             };
 
+            return returnedData;
+        }
+
+        public decimal GetRestMeatInADay(DateTime dateTime)
+        {
+            var data = context.Bills.FirstOrDefault(x => x.ActiveDate.Value.CompareTo(dateTime) == 0 && x.PersonId == 0);
+            if (data != null)
+            {
+                return data.RestMeatWeight;
+            }
+            return 0;
+        }
+
+        public List<(DateTime , decimal)> GetRestMeatInDays(DateRange range)
+        {
+            var data = context.Bills.Where(x => x.ActiveDate.Value.Date.CompareTo(range.Start.Date) >= 0 && x.ActiveDate.Value.Date.CompareTo(range.End.Date) <= 0).ToList();
+            return data.Select(x => (x.ActiveDate.Value, x.RestMeatWeight)).ToList();
+        }
+
+        public List<DebtDashboardDTO> GetDebtData(DasboardDebtFilterType type, int numberItemTake = 0)
+        {
+            var data = context.People
+                .Select(person => new
+                {
+                    PersonId = person.Id,
+                    PersonName = person.Name,
+                    Bills = context.Bills
+                        .Where(bill => bill.PersonId == person.Id && bill.Id > 0 && !bill.IsPaid && !bill.IsDeleted)
+                        .Select(bill => new BillDTO
+                        {
+                            Id = bill.Id,
+                            ActiveDate = bill.ActiveDate,
+                            LunarActiveDate = bill.LunarActiveDate,
+                            PaidAmount = bill.PaidAmount,
+                            Items = context.MeatBillPrices
+                                .Where(meat => meat.BillId == bill.Id && meat.PriceType == (int)PriceType.Sale)
+                                .Select(mbp => new MeatBillPriceDTO
+                                {
+                                    Id = mbp.Id,
+                                    Weight = mbp.Weight,
+                                    Price = mbp.Price
+                                }).AsEnumerable()
+                        }).AsEnumerable()
+                });
+
+            List<DebtDashboardDTO> returnedData = new();
+            foreach (var item in data)
+            {
+                var debt = new DebtDashboardDTO
+                {
+                    Name = item.PersonName,
+                    Debt = item.Bills.Sum(x => x.TotalPrice) - item.Bills.Sum(x => x.PaidAmount),
+                    Date = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault().ActiveDate.Value,
+                    LunarDate = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault().LunarActiveDate,
+                };
+                returnedData.Add(debt);
+            }
+            switch (type)
+            {
+                case DasboardDebtFilterType.MostDebt:
+                    returnedData.OrderByDescending(x => x.Debt);
+                    break;
+                case DasboardDebtFilterType.LongestDebt:
+                    returnedData.OrderBy(x => x.Date);
+                    break;
+                default: break;
+            }
+            if(numberItemTake > 0)
+            {
+                return returnedData.Take(numberItemTake).ToList();
+            }
             return returnedData;
         }
     }

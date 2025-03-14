@@ -107,8 +107,8 @@ a, .btn-link {
     .paid-box-vi {
         content: url(/paid.png);
         z-index: 1;
-        left: 10%;
-        top: 10%;
+        left: 25%;
+        top: 15%;
         rotate: 30deg;
         width: 300px;
         opacity: .3;

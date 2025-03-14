@@ -29,6 +29,9 @@ namespace Accounting.Model
         [Column(TypeName = "decimal(18, 2)")]
         public decimal PaidAmount { get; set; }
 
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal RestMeatWeight { get; set; }
+
         public bool IsPaid { get; set; }
     }
 }

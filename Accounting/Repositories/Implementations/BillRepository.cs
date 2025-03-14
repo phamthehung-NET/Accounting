@@ -113,8 +113,8 @@ namespace Accounting.Repositories.Implementations
                                             : startDate == null || endDate == null || (b.ActiveDate.Value.Date.CompareTo(startDate.Value.Date) >= 0 && b.ActiveDate.Value.Date.CompareTo(endDate.Value.Date) <= 0))
                             && (isPaid == null || b.IsPaid == isPaid)
                             && b.Type == (int)priceType && !b.IsDeleted
-                         select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.PaidAmount, b.CreatedDate, b.ModifiedDate, b.LunarCreatedDate, b.LunarActiveDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type, frozen = m.Frozen })
-                        .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.PaidAmount, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
+                         select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.RestMeatWeight, b.PaidAmount, b.CreatedDate, b.ModifiedDate, b.LunarCreatedDate, b.LunarActiveDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type, frozen = m.Frozen })
+                        .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.PaidAmount, x.RestMeatWeight, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
                         .Select(x => new BillDTO
                         {
                             Id = x.Key.Id,
@@ -126,9 +126,9 @@ namespace Accounting.Repositories.Implementations
                             LunarActiveDate = x.Key.LunarActiveDate,
                             LunarCreatedDate = x.Key.LunarCreatedDate,
                             LunarModifiedDate = x.Key.LunarModifiedDate,
-                            IsPaid = x.Key.IsPaid,
                             PersonName = x.Key.Name,
                             PaidAmount = x.Key.PaidAmount,
+                            RestMeatWeigt = x.Key.RestMeatWeight,
                             Items = x.Select(y => new MeatBillPriceDTO
                             {
                                 Id = y.meatBillId,
@@ -152,15 +152,15 @@ namespace Accounting.Repositories.Implementations
             return bills.OrderByDescending(x => x.Id).Paginate(pageIndex, pageSize);
         }
 
-        public bool PayingBill(int id, decimal paidAmount)
+        public bool PayingBill(int id, decimal paidAmount, decimal totalAmount)
         {
             var currentDate = DateTime.Now;
             var currentLunarDate = HelperFunctions.ConvertSolarToLunar(currentDate);
             var bill = context.Bills.FirstOrDefault(x => x.Id == id);
             if (bill != null)
             {
-                bill.IsPaid = true;
                 bill.PaidAmount += paidAmount;
+                bill.IsPaid = bill.PaidAmount == totalAmount;
                 History history = new()
                 {
                     ObjectId = id,
@@ -319,7 +319,6 @@ namespace Accounting.Repositories.Implementations
                 LunarActiveDate = x.Key.LunarActiveDate,
                 LunarCreatedDate = x.Key.LunarCreatedDate,
                 LunarModifiedDate = x.Key.LunarModifiedDate,
-                IsPaid = x.Key.IsPaid,
                 PersonName = x.Key.Name,
                 Items = x.Select(y => new MeatBillPriceDTO
                 {
@@ -365,6 +364,56 @@ namespace Accounting.Repositories.Implementations
                         MeatName = m.Name,
                         MeatType = m.Type,
                     }).Paginate(1, 10000);
+        }
+
+        public List<DebtDTO> GetDebtByPerson(int personId)
+        {
+            var data = context.People.Where(x => x.Id == personId)
+                .Select(person => new
+                {
+                    PersonId = person.Id,
+                    PersonName = person.Name,
+                    Bills = context.Bills
+                        .Where(bill => bill.PersonId == person.Id && bill.Id > 0 && !bill.IsPaid && !bill.IsDeleted)
+                        .Select(bill => new BillDTO
+                        {
+                            Id = bill.Id,
+                            ActiveDate = bill.ActiveDate,
+                            LunarActiveDate = bill.LunarActiveDate,
+                            PaidAmount = bill.PaidAmount,
+                            Items = context.MeatBillPrices
+                                .Where(meat => meat.BillId == bill.Id && meat.PriceType == (int)PriceType.Sale)
+                                .Select(mbp => new MeatBillPriceDTO
+                                {
+                                    Id = mbp.Id,
+                                    Weight = mbp.Weight,
+                                    Price = mbp.Price
+                                }).AsEnumerable()
+                        }).AsEnumerable()
+                }).FirstOrDefault();
+
+            if (data != null)
+            {
+                return data.Bills.Where(x => x.RestAmount > 0).Select(x => new DebtDTO
+                {
+                    Date = x.ActiveDate.Value.ToString("dd/MM/yyyy") + $" ({x.LunarActiveDate} {Lres["LunarDate"]})",
+                    Debt = x.RestAmount,
+                    TotalPrice = x.TotalPrice,
+                }).ToList();
+            }
+            return new();
+        }
+
+        public bool AddRestMeat(int billId, decimal weight)
+        {
+            var bill = context.Bills.FirstOrDefault(x => x.Id == billId && x.PersonId == 0);
+            if (bill != null)
+            {
+                bill.RestMeatWeight = weight;
+                context.SaveChanges();
+                return true;
+            }
+            return false;
         }
     }
 }

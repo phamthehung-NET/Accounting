@@ -1,0 +1,103 @@
+﻿@inject IBillRepository BillRepo
+@inject IJSRuntime JsRuntime
+@inject IStringLocalizer<Resource> LRes
+@inject ILogRepository LogRepo
+@inject ISettingRepository SettingRepo
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <CommonLabel DisplayText="@LRes["TotalDebtModal"]" Color="@Constants.PrimaryColor"></CommonLabel>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="@OnModalDismiss"></button>
+        </div>
+        <div class="modal-body">
+            <div class="card col-md-12 col-sm-12 col-lg-12 col-xl-12 mb-4 p-0">
+                @if(Debts != null)
+                {
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="fw-bold">@Person.Name</div>
+                        <strong>@(LRes["TotalDebt"] + ": " + Person.TotalDebt.ToString("n0") + ".000 VND")</strong>
+                    </div>
+                    <div class="card-body overflow-auto" style="height: 15rem">
+                        <table class="table table-striped text-center table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>@LRes["Debt date"]</th>
+                                    <th>@LRes["Debt"]</th>
+                                </tr>
+                            </thead>
+                            <tbody class="overflow-auto" style="height: 10rem">
+                                @foreach (var item in Debts)
+                                {
+                                    <tr>
+                                        <td>@item.Date</td>
+                                        <td>
+                                            @if(item.TotalPrice > item.Debt)
+                                            {
+                                                <span class="text-muted text-decoration-line-through me-1">@(item.TotalPrice.ToString("n0") + ".000")</span>
+
+                                                @(item.Debt.ToString("n0") + ".000 VND")
+                                            }
+                                            else
+                                            {
+                                                @(item.Debt.ToString("n0") + ".000 VND")
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-dismiss="modal" onclick="@OnModalDismiss">@LRes["Done"]</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public PersonDTO Person { get; set; }
+
+    [Parameter]
+    public bool IsOpened { get; set; } = false;
+
+    [Parameter]
+    public Action CloseModal { get; set; }
+
+    List<DebtDTO> Debts;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            if(IsOpened && Person?.Id > 0)
+            {
+                Debts = BillRepo.GetDebtByPerson(Person.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log log = new()
+            {
+                CreatedDate = DateTime.Now,
+                Location = "Manage People > Person debt Modal > OnParameterSet()",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            LogRepo.Add(log);
+            await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);
+        }
+    }
+
+    void OnModalDismiss()
+    {
+        Person = new();
+        IsOpened = false;
+        CloseModal?.Invoke();
+    }
+}

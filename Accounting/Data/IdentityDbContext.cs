@@ -30,7 +30,7 @@ public class IdentityDbContext : IdentityDbContext<CustomUser>
             UserName = "admin",
             //NormalizedEmail = "admin@gmail.com",
             NormalizedUserName = "admin",
-            PasswordHash = passwordHasher.HashPassword(null, "Abc@12345"),
+            PasswordHash = passwordHasher.HashPassword(null, "123456"),
             EmailConfirmed = true,
             LockoutEnabled = true,
             UpdatedPriceDate = DateTime.UtcNow,

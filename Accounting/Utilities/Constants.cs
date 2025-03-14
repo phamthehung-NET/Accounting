@@ -21,20 +21,20 @@ namespace Accounting.Utilities
 
         public const string SystemPrefix = "/accounting";
 
-        public const string Dashboad = $"{SystemPrefix}/dashboard";
-        public const string UpdatePrice = $"{SystemPrefix}/updatePrice";
-        public const string UnAuthorized = $"{SystemPrefix}/unauthorized";
-        public const string MeatList = $"{SystemPrefix}/manage-meat";
-        public const string PeopleMng = $"{SystemPrefix}/people-management";
-        public const string EntryMng = $"{SystemPrefix}/manage-entry";
-        public const string SaleMng = $"{SystemPrefix}/manage-sale";
-        public const string RecycleBin = $"{SystemPrefix}/recycle-bin";
-        public const string SysSettings = $"{SystemPrefix}/system-setting";
-        public const string SysInfo = $"{SystemPrefix}/system-info";
-        public const string SysLog = $"{SystemPrefix}/log";
-        public const string SeedData = $"{SystemPrefix}/seed-data";
-        public const string Login = $"{SystemPrefix}/login";
-        public const string Logout = $"{SystemPrefix}/logout";
+        public const string Dashboad = $"/dashboard";
+        public const string UpdatePrice = $"/updatePrice";
+        public const string UnAuthorized = $"/unauthorized";
+        public const string MeatList = $"/manage-meat";
+        public const string PeopleMng = $"/people-management";
+        public const string EntryMng = $"/manage-entry";
+        public const string SaleMng = $"/manage-sale";
+        public const string RecycleBin = $"/recycle-bin";
+        public const string SysSettings = $"/system-setting";
+        public const string SysInfo = $"/system-info";
+        public const string SysLog = $"/log";
+        public const string SeedData = $"/seed-data";
+        public const string Login = $"/login";
+        public const string Logout = $"/logout";
 
         #endregion
     }
@@ -81,5 +81,11 @@ namespace Accounting.Utilities
         AddItem,
         EditItemPrice,
         Restore,
+    }
+
+    public enum DasboardDebtFilterType
+    {
+        MostDebt,
+        LongestDebt,
     }
 }

@@ -22,7 +22,20 @@
 
         public string LunarModifiedDate { get; set; }
 
-        public bool? IsPaid { get; set; }
+        public decimal RestMeatWeigt { get; set; }
+
+        public bool? IsPaid
+        {
+            get
+            {
+                var isPaid = false;
+                if(RestAmount == 0 && Items.Any())
+                {
+                    isPaid = true;
+                }
+                return isPaid;
+            }
+        }
 
         public bool IsDeleted { get; set; }
 
@@ -43,7 +56,15 @@
                         }
                     }
                 }
-                return value - PaidAmount;
+                return value;
+            }
+        }
+
+        public decimal RestAmount
+        {
+            get
+            {
+                return TotalPrice - PaidAmount;
             }
         }
 

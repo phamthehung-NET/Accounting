@@ -380,10 +380,9 @@
             if (SelectedBill.Id > 0)
             {
                 await HelperFunctions.AddIndicator(JsRuntime);
-                if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice))
+                if (BillRepo.PayingBill(SelectedBill.Id, SelectedBill.TotalPrice, SelectedBill.TotalPrice))
                 {
-                    Bills.Items.FirstOrDefault(x => x.Id == SelectedBill.Id).IsPaid = true;
-                    SelectedBill = new();
+                    await GetData();
                     await HelperFunctions.RemoveIndicator(JsRuntime);
                     await HelperFunctions.ShowNotification(JsRuntime, ToastType.Success, LRes["SucessfullyPaid"]);
                 }
