@@ -1,11 +1,8 @@
 ﻿using Accounting.Data;
-using Accounting.Model;
 using Accounting.Model.DTO;
 using Accounting.Repositories.Interfaces;
 using Accounting.Utilities;
 using BlazorDateRangePicker;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Accounting.Repositories.Implementations
 {
@@ -47,7 +44,7 @@ namespace Accounting.Repositories.Implementations
 
             var bill = context.Bills.FirstOrDefault(x => x.ActiveDate.Value.Date.CompareTo(date.Value.Date) == 0 && x.PersonId == 0);
 
-            if(bill != null)
+            if (bill != null)
             {
                 returnedData.RestMeatWeight = bill.RestMeatWeight;
             }
@@ -130,7 +127,7 @@ namespace Accounting.Repositories.Implementations
             return 0;
         }
 
-        public List<(DateTime , decimal)> GetRestMeatInDays(DateRange range)
+        public List<(DateTime, decimal)> GetRestMeatInDays(DateRange range)
         {
             var data = context.Bills.Where(x => x.ActiveDate.Value.Date.CompareTo(range.Start.Date) >= 0 && x.ActiveDate.Value.Date.CompareTo(range.End.Date) <= 0).ToList();
             return data.Select(x => (x.ActiveDate.Value, x.RestMeatWeight)).ToList();
@@ -169,8 +166,8 @@ namespace Accounting.Repositories.Implementations
                 {
                     Name = item.PersonName,
                     Debt = item.Bills.Sum(x => x.TotalPrice) - item.Bills.Sum(x => x.PaidAmount),
-                    Date = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault().ActiveDate.Value,
-                    LunarDate = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault().LunarActiveDate,
+                    Date = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault()?.ActiveDate.Value ?? DateTime.Now,
+                    LunarDate = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault()?.LunarActiveDate,
                 };
                 returnedData.Add(debt);
             }
@@ -184,9 +181,9 @@ namespace Accounting.Repositories.Implementations
                     break;
                 default: break;
             }
-            if(numberItemTake > 0)
+            if (numberItemTake > 0)
             {
-                return returnedData.Take(numberItemTake).ToList();
+                return returnedData.Where(x => x.Debt > 0).Take(numberItemTake).ToList();
             }
             return returnedData;
         }
