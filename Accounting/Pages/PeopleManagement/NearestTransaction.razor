@@ -12,24 +12,28 @@
         </div>
         <div class="modal-body">
             <div class="card col-md-12 col-sm-12 col-lg-12 col-xl-12 mb-4 p-0">
-                @if(Bill != null)
+                @if (Bill != null)
                 {
                     <div class="card-header d-flex justify-content-between">
                         <div class="fw-bold">@Bill.PersonName</div>
                         <div class="d-flex">
                             <div>@(Bill.Items.Count() + " " + LRes["item(s)"])</div>
-                            @if (Bill.Items.Any())
+                            @if (Bill.Items.Any() && Bill.PersonId != 0)
                             {
                                 @((MarkupString)HandleShowStatus(Bill.IsPaid))
                             }
                         </div>
                     </div>
                     <div class="card-body overflow-auto" style="height: 15rem">
-                        <ul class="list-group list-group-flush">
+                        @if (Bill.IsPaid.Value)
+                        {
+                            <div class="position-absolute paid-box-@(CultureInfo.CurrentCulture.TwoLetterISOLanguageName)"></div>
+                        }
+                        <ul class="list-group list-group-flush" style="position:relative">
                             @foreach (var item in Bill.Items)
                             {
                                 <li class="list-group-item d-flex justify-content-between">
-                                    <div>@(item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType != null ? item.MeatType.Value : null))</div>
+                                    <div>@(item.MeatName + " " + HelperFunctions.RenderMeatType(LRes, item.MeatType != null ? item.MeatType.Value : null) + (item.Frozen ? "❄️" : ""))</div>
                                     <div>@(item.Weight + " Kg")</div>
                                     <div>@item.Price</div>
                                 </li>
@@ -38,11 +42,17 @@
                     </div>
                     <div class="card-footer d-flex justify-content-between">
                         <div>
-                            @(Bill.TotalPrice == 0 ? string.Empty : Bill.TotalPrice.ToString("n0") + ".000 VND")
+                            @* @(Bill.TotalPrice == 0 ? string.Empty : Bill.TotalPrice.ToString("n0") + ".000 VND") *@
+                            @if (Bill.TotalPrice > 0 && Bill.PaidAmount == 0)
+                            {
+                                <div>@(Bill.TotalPrice.ToString("n0") + ".000 VND")</div>
+                            }
+                            else if (Bill.RestAmount > 0 && Bill.RestAmount < Bill.TotalPrice)
+                            {
+                                <div class="d-flex"><span class="text-muted text-decoration-line-through me-1">@(Bill.TotalPrice.ToString("n0") + ".000 VND")</span>@(Bill.RestAmount == 0 ? string.Empty : Bill.RestAmount.ToString("n0") + ".000 VND")</div>
+                            }
                         </div>
-                        <div>
-                            @(Bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(Bill.LunarActiveDate) ? HelperFunctions.ConvertSolarToLunar(Bill.ActiveDate.Value) : Bill.LunarActiveDate) + LRes["LunarDate"] + ")")
-                        </div>
+                        <div class="me-2">@(Bill.ActiveDate.Value.ToString("dd/MM/yyyy") + " (" + (string.IsNullOrEmpty(Bill.LunarActiveDate) ? HelperFunctions.ConvertSolarToLunar(Bill.ActiveDate.Value) : Bill.LunarActiveDate) + LRes["LunarDate"] + ")")</div>
                     </div>
                 }
             </div>
@@ -64,7 +74,7 @@
     {
         try
         {
-            if(BillId > 0)
+            if (BillId > 0)
             {
                 Bill = BillRepo.GetBillDetail(BillId);
             }
@@ -72,12 +82,12 @@
         catch (Exception ex)
         {
             Log log = new()
-            {
-                CreatedDate = DateTime.Now,
-                Location = "Manage People > Nearest Transaction Modal > OnParameterSet()",
-                Message = ex.Message,
-                StackTrace = ex.StackTrace
-            };
+                {
+                    CreatedDate = DateTime.Now,
+                    Location = "Manage People > Nearest Transaction Modal > OnParameterSet()",
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
 
             LogRepo.Add(log);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["CommonErrMsg"]);

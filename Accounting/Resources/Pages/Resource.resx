@@ -249,8 +249,8 @@
   <data name="DateTimeSettings" xml:space="preserve">
     <value>Thời gian</value>
   </data>
-  <data name="day" xml:space="preserve">
-    <value>ngày</value>
+  <data name="Day" xml:space="preserve">
+    <value>Ngày</value>
   </data>
   <data name="days ago" xml:space="preserve">
     <value>ngày trước</value>

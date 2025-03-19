@@ -306,8 +306,8 @@ namespace Accounting.Repositories.Implementations
                     join m in context.Meats on mbp.MeatId equals m.Id into meats
                     from m in meats.DefaultIfEmpty()
                     where b.Id == id
-                    select new { b.Id, b.PersonId, b.Type, p.Name, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarActiveDate, b.LunarCreatedDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type, frozen = m.Frozen })
-            .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
+                    select new { b.Id, b.PersonId, b.Type, p.Name, b.PaidAmount, b.ActiveDate, b.CreatedDate, b.ModifiedDate, b.LunarActiveDate, b.LunarCreatedDate, b.LunarModifiedDate, b.IsPaid, mbp.MeatId, meatBillId = mbp.Id, mbp.Price, mbp.PriceType, mbp.Weight, meatName = m.Name, meatType = m.Type, frozen = m.Frozen })
+            .GroupBy(x => new { x.Id, x.PersonId, x.Type, x.Name, x.PaidAmount, x.ActiveDate, x.CreatedDate, x.ModifiedDate, x.LunarActiveDate, x.LunarCreatedDate, x.LunarModifiedDate, x.IsPaid })
             .Select(x => new BillDTO
             {
                 Id = x.Key.Id,
@@ -320,6 +320,7 @@ namespace Accounting.Repositories.Implementations
                 LunarCreatedDate = x.Key.LunarCreatedDate,
                 LunarModifiedDate = x.Key.LunarModifiedDate,
                 PersonName = x.Key.Name,
+                PaidAmount = x.Key.PaidAmount,
                 Items = x.Select(y => new MeatBillPriceDTO
                 {
                     Id = y.meatBillId,

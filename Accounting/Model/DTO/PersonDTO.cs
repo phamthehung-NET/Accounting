@@ -19,7 +19,15 @@ namespace Accounting.Model.DTO
         [AllowNull]
         public NearestTransaction NearestTransaction { get; set; }
 
-        public decimal TotalDebt { get; set; }
+        public decimal TotalDebt
+        {
+            get
+            {
+                return Bills == null ? 0 : Bills.Sum(x => x.RestAmount);
+            }
+        }
+
+        public IEnumerable<BillDTO> Bills { get; set; }
     }
 
     public class NearestTransaction

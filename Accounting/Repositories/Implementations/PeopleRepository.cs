@@ -47,47 +47,91 @@ namespace Accounting.Repositories.Implementations
 
         public Pagination<PersonDTO> GetAllPeople(string keyword, string order, bool? isSource, int pageIndex, int pageSize)
         {
-            var people = (from p in context.People
-                          join b in context.Bills on p.Id equals b.PersonId into bills
-                          from bill in bills.DefaultIfEmpty()
-                          join mbp in context.MeatBillPrices on bill.Id equals mbp.BillId into meatbills
-                          from mbps in meatbills.DefaultIfEmpty()
-                          select new
-                          {
-                              p.Id,
-                              p.Address,
-                              p.IsDeleted,
-                              p.Name,
-                              p.PhoneNumber,
-                              p.Source,
-                              NearestTransaction = bill.ActiveDate,
-                              NearestTransactionId = bill.Id,
-                              LunarNearestTransaction = bill.LunarActiveDate,
-                              billId = bill.Id,
-                              bill.IsPaid,
-                              bill.PaidAmount,
-                              deletedBill = bill.IsDeleted,
-                              mbps.Weight,
-                              mbps.Price,
-                              mbps.PriceType
-                          }).GroupBy(x => new { x.Id, x.Name, x.Source, x.Address, x.IsDeleted, x.PhoneNumber })
-                         .Select(x => new PersonDTO
-                         {
-                             Id = x.Key.Id,
-                             Address = x.Key.Address,
-                             IsDeleted = x.Key.IsDeleted,
-                             Name = x.Key.Name,
-                             PhoneNumber = x.Key.PhoneNumber,
-                             Source = x.Key.Source,
-                             NearestTransaction = x.Select(y => new NearestTransaction
-                             {
-                                 Id = y.NearestTransactionId,
-                                 ActivateDate = y.NearestTransaction,
-                                 LunarActiveDate = y.LunarNearestTransaction
-                             }).Where(x => x.ActivateDate != null).OrderByDescending(x => x.ActivateDate).FirstOrDefault(),
-                             TotalDebt = x.Where(y => y.billId > 0 && !y.IsPaid && !y.deletedBill && y.PriceType == (int)PriceType.Sale).Select(y => new { y.Weight, y.Price }).Sum(y => y.Weight * (y.Price ?? 0)) - x.Sum(y => y.PaidAmount)
-                         });
+            //var people = (from p in context.People
+            //              join b in context.Bills on p.Id equals b.PersonId into bills
+            //              from bill in bills.DefaultIfEmpty()
+            //              join mbp in context.MeatBillPrices on bill.Id equals mbp.BillId into meatbills
+            //              from mbps in meatbills.DefaultIfEmpty()
+            //              select new
+            //              {
+            //                  p.Id,
+            //                  p.Address,
+            //                  p.IsDeleted,
+            //                  p.Name,
+            //                  p.PhoneNumber,
+            //                  p.Source,
+            //                  NearestTransaction = bill.ActiveDate,
+            //                  NearestTransactionId = bill.Id,
+            //                  LunarNearestTransaction = bill.LunarActiveDate,
+            //                  billId = bill.Id,
+            //                  bill.IsPaid,
+            //                  bill.PaidAmount,
+            //                  deletedBill = bill.IsDeleted,
+            //                  mbps.Weight,
+            //                  mbps.Price,
+            //                  mbps.PriceType
+            //              }).GroupBy(x => new { x.Id, x.Name, x.Source, x.Address, x.IsDeleted, x.PhoneNumber })
+            //             .Select(x => new PersonDTO
+            //             {
+            //                 Id = x.Key.Id,
+            //                 Address = x.Key.Address,
+            //                 IsDeleted = x.Key.IsDeleted,
+            //                 Name = x.Key.Name,
+            //                 PhoneNumber = x.Key.PhoneNumber,
+            //                 Source = x.Key.Source,
+            //                 NearestTransaction = x.Select(y => new NearestTransaction
+            //                 {
+            //                     Id = y.NearestTransactionId,
+            //                     ActivateDate = y.NearestTransaction,
+            //                     LunarActiveDate = y.LunarNearestTransaction
+            //                 }).Where(x => x.ActivateDate != null).OrderByDescending(x => x.ActivateDate).FirstOrDefault(),
+            //                 Bills = x.Where(y => y.billId > 0 && !y.IsPaid && !y.IsDeleted.Value && y.PriceType == (int)PriceType.Sale).Select(y => new BillDTO
+            //                 {
+            //                     Id = y.billId,
+            //                     IsDeleted = y.IsDeleted.Value,
+            //                     Items = x.Where(z => z.billId > 0 && !z.IsPaid && !z.IsDeleted.Value && z.PriceType == (int)PriceType.Sale).Select(z => new MeatBillPriceDTO
+            //                     {
+            //                         Price = z.Price,
+            //                         Weight = z.Weight,
+            //                         BillId = z.billId
+            //                     }),
+            //                     PaidAmount = y.PaidAmount
+            //                 }),
+            //             });
 
+            var people = context.People
+                .Select(person => new PersonDTO
+                {
+                    Id = person.Id,
+                    Name = person.Name,
+                    Address = person.Address,
+                    IsDeleted = person.IsDeleted,
+                    PhoneNumber = person.PhoneNumber,
+                    Source = person.Source,
+                    NearestTransaction = context.Bills.Where(x => x.PersonId == person.Id && !x.IsDeleted && x.ActiveDate != null).OrderByDescending(x => x.ActiveDate).Select(y => new NearestTransaction
+                    {
+                        Id = y.Id,
+                        ActivateDate = y.ActiveDate,
+                        LunarActiveDate = y.LunarActiveDate,
+                    }).FirstOrDefault(),
+                    Bills = context.Bills
+                        .Where(bill => bill.PersonId == person.Id && bill.Id > 0 && !bill.IsPaid && !bill.IsDeleted)
+                        .Select(bill => new BillDTO
+                        {
+                            Id = bill.Id,
+                            ActiveDate = bill.ActiveDate,
+                            LunarActiveDate = bill.LunarActiveDate,
+                            PaidAmount = bill.PaidAmount,
+                            Items = context.MeatBillPrices
+                                .Where(meat => meat.BillId == bill.Id && meat.PriceType == (int)PriceType.Sale)
+                                .Select(mbp => new MeatBillPriceDTO
+                                {
+                                    Id = mbp.Id,
+                                    Weight = mbp.Weight,
+                                    Price = mbp.Price
+                                }).AsEnumerable()
+                        }).AsEnumerable()
+                });
 
             if (!string.IsNullOrEmpty(keyword))
             {
