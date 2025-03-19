@@ -56,8 +56,8 @@
             {
                 await HelperFunctions.AddIndicator(JsRuntime);
                 decimal amount = 0;
-                if(!PaidAmount.HasValue || PaidAmount.Value >= Bill.TotalPrice){
-                    amount = Bill.TotalPrice;
+                if(!PaidAmount.HasValue || PaidAmount.Value >= Bill.RestAmount){
+                    amount = Bill.RestAmount;
                 }
                 else
                 {
