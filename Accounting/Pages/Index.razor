@@ -31,6 +31,13 @@
     protected override void OnInitialized()
     {
         Uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+
+        var hasher = new PasswordHasher<string>();
+        string password = "123456";
+
+        // Hash password theo chuẩn ASP.NET Identity
+        string hashedPassword = hasher.HashPassword(null, password);
+        Console.WriteLine($"Hashed Password: {hashedPassword}");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
