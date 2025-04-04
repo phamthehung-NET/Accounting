@@ -1,4 +1,5 @@
 ﻿using Accounting.Data;
+using Accounting.Model;
 using Accounting.Model.DTO;
 using Accounting.Repositories.Interfaces;
 using Accounting.Utilities;
@@ -114,7 +115,22 @@ namespace Accounting.Repositories.Implementations
                 returnedData.Add(wastedData);
             };
 
-            return returnedData;
+            for(var i = DateTime.Now.AddDays(-9); i <= DateTime.Now; i = i.AddDays(1))
+            {
+                if(!returnedData.Any(x => DateTime.Compare(x.ActivateDate.Date, i) == 0))
+                {
+                    DashboardDTO wastedData = new()
+                    {
+                        EntryMeats = new(),
+                        SaleMeats = new(),
+                        ActivateDate = i,
+                        RestMeatWeight = 0
+                    };
+                    returnedData.Add(wastedData);
+                }
+            }
+
+            return returnedData.OrderBy(x => x.ActivateDate).ToList();
         }
 
         public decimal GetRestMeatInADay(DateTime dateTime)
@@ -135,7 +151,7 @@ namespace Accounting.Repositories.Implementations
 
         public List<DebtDashboardDTO> GetDebtData(DasboardDebtFilterType type, int numberItemTake = 0)
         {
-            var data = context.People
+            var data = context.People.Where(person => !person.IsDeleted.Value)
                 .Select(person => new
                 {
                     PersonId = person.Id,
@@ -160,6 +176,7 @@ namespace Accounting.Repositories.Implementations
                 });
 
             List<DebtDashboardDTO> returnedData = new();
+            IEnumerable<DebtDashboardDTO> orderedData = new List<DebtDashboardDTO>();
             foreach (var item in data)
             {
                 var debt = new DebtDashboardDTO
@@ -169,23 +186,26 @@ namespace Accounting.Repositories.Implementations
                     Date = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault()?.ActiveDate.Value ?? DateTime.Now,
                     LunarDate = item.Bills.OrderBy(x => x.ActiveDate.Value).FirstOrDefault()?.LunarActiveDate,
                 };
-                returnedData.Add(debt);
+                if(debt.Debt > 0)
+                {
+                    returnedData.Add(debt);
+                }
             }
             switch (type)
             {
                 case DasboardDebtFilterType.MostDebt:
-                    returnedData.OrderByDescending(x => x.Debt);
+                    orderedData = returnedData.OrderByDescending(x => x.Debt);
                     break;
                 case DasboardDebtFilterType.LongestDebt:
-                    returnedData.OrderBy(x => x.Date);
+                    orderedData = returnedData.OrderBy(x => x.Date);
                     break;
                 default: break;
             }
             if (numberItemTake > 0)
             {
-                return returnedData.Where(x => x.Debt > 0).Take(numberItemTake).ToList();
+                return orderedData.Where(x => x.Debt > 0).Take(numberItemTake).ToList();
             }
-            return returnedData;
+            return orderedData.ToList();
         }
     }
 }

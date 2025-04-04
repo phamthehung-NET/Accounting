@@ -1,29 +1,34 @@
-﻿@using Microsoft.Extensions.Localization;
+﻿@using Accounting.Pages.PeopleManagement
+@using Microsoft.Extensions.Localization;
 @inject IPeopleRepository PeopleRepo
 @inject IBillRepository BillRepo
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Resource> LRes
 @inject ILogRepository LogRepo
 
-<div class="modal-dialog modal-lg">
-    <div class="modal-content">
-        <div class="modal-header">
-            <CommonLabel DisplayText="@LRes["ChoosePerson"]" Color="@Constants.PrimaryColor"></CommonLabel>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body overflow-auto" style="height: 73vh">
-            <div class="mb-2">
-                <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@(async (ChangeEventArgs e) => {Keyword = e.Value.ToString(); await GetPeopleData();})"/>
+@if (!IsAdd)
+{
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <CommonLabel DisplayText="@LRes["ChoosePerson"]" Color="@Constants.PrimaryColor"></CommonLabel>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body overflow-auto" style="height: 73vh">
+                <div class="mb-2">
+                    <button type="button" class="btn btn-outline-primary mb-2" onclick="@OnAddBtnClick"><i class="fa-duotone fa-plus"></i> @LRes["Add"]</button>
+                    <input type="text" class="form-control" placeholder="@LRes["Search by name"]" value="@(Keyword)" onchange="@(async (ChangeEventArgs e) => {Keyword = e.Value.ToString(); await GetPeopleData();})" />
+                </div>
                 @if (People != null && People.Items.Any())
                 {
                     <CommonDataTable Context="Context"
-                        Headers="Headers"
-                        TData="PersonDTO"
-                        PaginationData="People"
-                        DisplayPaging="false">
+                    Headers="Headers"
+                    TData="PersonDTO"
+                    PaginationData="People"
+                    DisplayPaging="false">
                         <TBody>
                             <tr role="button" @onclick="() => OnSelectPerson(Context.Id)">
+                                <td>@(People.Items.IndexOf(Context) + 1)</td>
                                 <td>@Context.Name</td>
                                 <td>@Context.PhoneNumber</td>
                                 <td>@Context.Address</td>
@@ -32,13 +37,17 @@
                         </TBody>
                     </CommonDataTable>
                 }
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal">@LRes["Done"]</button>
+            </div>
         </div>
     </div>
-</div>
-
+}
+else
+{
+    <AddPerson GetData="GetData" OnClose="OnAddBtnClick" />
+}
 
 @code {
     [Parameter]
@@ -53,8 +62,11 @@
 
     string Keyword = string.Empty;
 
+    bool IsAdd = false;
+
     protected override void OnInitialized()
     {
+        Headers.Add(new Header() { Name = "Number", DisplayName = LRes["Number"] });
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"] });
         Headers.Add(new Header() { Name = "PhoneNumber", DisplayName = LRes["PhoneNumber"] });
         Headers.Add(new Header() { Name = "Address", DisplayName = LRes["Address"] });
@@ -104,7 +116,7 @@
             PersonId = id,
             Type = (int)PriceType
         };
-        
+
         await HelperFunctions.AddIndicator(JsRuntime);
         if (await BillRepo.AddBill(bill, null))
         {
@@ -119,5 +131,11 @@
             await HelperFunctions.RemoveIndicator(JsRuntime);
             await HelperFunctions.ShowNotification(JsRuntime, ToastType.Error, LRes["ThisPersonIsExisted"]);
         }
+    }
+
+    void OnAddBtnClick()
+    {
+        IsAdd = !IsAdd;
+        StateHasChanged();
     }
 }

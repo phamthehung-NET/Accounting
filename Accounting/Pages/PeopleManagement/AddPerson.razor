@@ -55,6 +55,9 @@
     [Parameter]
     public EventCallback GetData { get; set; }
 
+    [Parameter]
+    public Action OnClose { get; set; }
+
     protected override void OnInitialized()
     {
         editContext = new(person);
@@ -106,6 +109,7 @@
     {
         person = new() { Source = false };
         editContext = new(person);
+        OnClose?.Invoke();
     }
 
     void OnSelectType(bool value)

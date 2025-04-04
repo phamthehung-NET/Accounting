@@ -81,6 +81,11 @@ namespace Accounting.Utilities
             await jSRuntime.InvokeVoidAsync("hideModal", modalId);
         }
 
+        public static async Task HideModalAndShowAnother(IJSRuntime jSRuntime, string modalId, string anotherModalId)
+        {
+            await jSRuntime.InvokeVoidAsync("hideModalAndShowAnother", modalId, anotherModalId);
+        }
+
         public static async Task AddIndicator(IJSRuntime jSRuntime)
         {
             await jSRuntime.InvokeVoidAsync("addIndicator");

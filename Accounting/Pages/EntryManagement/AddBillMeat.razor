@@ -29,6 +29,7 @@
                         DisplayPaging="false">
                         <TBody>
                             <tr role="button" @onclick="() => OnSelectMeat(Context.Id)">
+                                <td>@(Meats.Items.IndexOf(Context) + 1)</td>
                                 <td>@Context.Name</td>
                                 <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
                                 <td>@(Context.Frozen.Value ? LRes["Frozen Meat"] : LRes["Normal Meat"])</td>
@@ -66,6 +67,7 @@
 
     protected override void OnInitialized()
     {
+        Headers.Add(new Header() { Name = "Number", DisplayName = LRes["Number"] });
         Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"] });
         Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"] });
         Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"]});

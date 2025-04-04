@@ -22,6 +22,7 @@
                 SortData="async (sortingString) => await SortData(sortingString)">
                     <TBody>
                         <tr>
+                            <td>@(Meats.Items.IndexOf(Context) + 1)</td>
                             <td>@Context.Name</td>
                             <td>@HelperFunctions.RenderMeatType(LRes, Context.Type.Value)</td>
                             <td>@(Context.Frozen.Value ? LRes["Frozen Meat"] : LRes["Normal Meat"])</td>
@@ -68,6 +69,7 @@
             var today = DateTime.Now;
             var yesterday = DateTime.Now.AddDays(-1);
 
+            Headers.Add(new Header() { Name = "Number", DisplayName = LRes["Number"] });
             Headers.Add(new Header() { Name = "Name", DisplayName = LRes["Name"], Ordering = true });
             Headers.Add(new Header() { Name = "Type", DisplayName = LRes["Meat Type"], Ordering = true });
             Headers.Add(new Header() { Name = "Frozen", DisplayName = LRes["Product Type"], Ordering = true });
